@@ -106,24 +106,13 @@ class TestValidateRows:
             volume=1_200_000.0,
             source="yfinance",
         )
-        cap = structlog.testing.CapturingLogger()
-        old_factory = structlog.get_config().get("logger_factory")
-
-        structlog.configure(logger_factory=lambda *a, **kw: cap)
-        try:
+        with structlog.testing.capture_logs() as captured:
             validate_rows(five_ohlcv_rows, asset_symbol="BBCA.JK")
-        finally:
-            if old_factory:
-                structlog.configure(logger_factory=old_factory)
-            else:
-                structlog.reset_defaults()
 
-        warning_calls = [c for c in cap.calls if c.method_name == "warning"]
-        assert len(warning_calls) >= 1
-        # Check the log event has the expected fields
-        event_kwargs = warning_calls[0].kwargs
-        assert event_kwargs.get("event") == "ohlcv_row_rejected"
-        assert event_kwargs.get("asset") == "BBCA.JK"
+        warning_logs = [e for e in captured if e.get("log_level") == "warning"]
+        assert len(warning_logs) >= 1
+        assert warning_logs[0]["event"] == "ohlcv_row_rejected"
+        assert warning_logs[0]["asset"] == "BBCA.JK"
 
     def test_empty_input_returns_empty(self) -> None:
         result = validate_rows([])
@@ -244,24 +233,15 @@ class TestValidateDateCoverage:
                 source="yfinance",
             ),
         ]
-        cap = structlog.testing.CapturingLogger()
-        old_factory = structlog.get_config().get("logger_factory")
-
-        structlog.configure(logger_factory=lambda *a, **kw: cap)
-        try:
+        with structlog.testing.capture_logs() as captured:
             missing = validate_date_coverage(
                 rows,
                 start=date(2026, 3, 16),
                 end=date(2026, 3, 20),
                 asset_symbol="BBCA.JK",
             )
-        finally:
-            if old_factory:
-                structlog.configure(logger_factory=old_factory)
-            else:
-                structlog.reset_defaults()
 
         assert len(missing) == 3  # Tue, Wed, Thu
-        warning_calls = [c for c in cap.calls if c.method_name == "warning"]
-        assert len(warning_calls) >= 1
-        assert warning_calls[0].kwargs.get("event") == "ohlcv_date_gaps"
+        warning_logs = [e for e in captured if e.get("log_level") == "warning"]
+        assert len(warning_logs) >= 1
+        assert warning_logs[0]["event"] == "ohlcv_date_gaps"
