@@ -12,11 +12,13 @@ from __future__ import annotations
 import argparse
 import asyncio
 from datetime import date, timedelta
+from typing import Any
 
 import asyncpg
 import structlog
 
 from src.config import settings
+from src.data.base import BaseFetcher
 from src.data.crypto import CryptoFetcher
 from src.data.idx_stocks import IDXStockFetcher
 from src.data.validation import validate_rows
@@ -72,7 +74,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 async def _fetch_and_upsert(
-    conn: asyncpg.Connection,  # type: ignore[type-arg]
+    conn: Any,
     sem: asyncio.Semaphore,
     asset_id: int,
     symbol: str,
@@ -85,10 +87,11 @@ async def _fetch_and_upsert(
         log = logger.bind(asset=symbol, type=asset_type)
         try:
             if asset_type == "stock":
-                fetcher = IDXStockFetcher()
+                fetcher: BaseFetcher = IDXStockFetcher()
                 rows = await fetcher.fetch(asset_id, symbol, start, end)
             else:
-                fetcher = CryptoFetcher()
+                crypto_fetcher = CryptoFetcher()
+                fetcher = crypto_fetcher
                 rows = await fetcher.fetch(asset_id, symbol, start, end)
 
             validation = validate_rows(rows, asset_symbol=symbol)
@@ -97,7 +100,7 @@ async def _fetch_and_upsert(
             # For crypto: also fetch hourly (last 7 days only)
             if asset_type == "crypto":
                 hourly_start = max(start, end - timedelta(days=7))
-                hourly_rows = await fetcher.fetch_hourly(asset_id, symbol, hourly_start, end)
+                hourly_rows = await crypto_fetcher.fetch_hourly(asset_id, symbol, hourly_start, end)
                 hourly_validation = validate_rows(hourly_rows, asset_symbol=symbol)
                 await upsert_prices(conn, hourly_validation.valid, table="price_history_hourly")
 

@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 import functools
 from datetime import UTC, date, timedelta
+from typing import Any
 
 import structlog
 import yfinance as yf
@@ -20,7 +21,7 @@ from src.data.validation import validate_rows
 logger = structlog.get_logger(__name__)
 
 
-def _download_with_retry(symbol: str, start_str: str, end_str: str) -> object:
+def _download_with_retry(symbol: str, start_str: str, end_str: str) -> Any:
     """Synchronous yfinance download wrapped with tenacity retry.
 
     Retries up to 3 times with exponential backoff on transient errors.
@@ -34,7 +35,7 @@ def _download_with_retry(symbol: str, start_str: str, end_str: str) -> object:
     retry=retry_if_exception_type((ConnectionError, TimeoutError, Exception)),
     reraise=True,
 )
-def _download_inner(symbol: str, start_str: str, end_str: str) -> object:
+def _download_inner(symbol: str, start_str: str, end_str: str) -> Any:
     """The actual yfinance download call, decorated with retry."""
     return yf.download(
         tickers=symbol,

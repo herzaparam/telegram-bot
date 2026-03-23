@@ -39,3 +39,7 @@ pythonpath = ["."]
 python_version = "3.13"
 strict = true
 plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["yfinance", "ccxt", "asyncpg"]
+ignore_missing_imports = true

@@ -7,6 +7,7 @@ Falls back to CoinGecko free API if ccxt fails.
 from __future__ import annotations
 
 from datetime import UTC, date, datetime, time
+from typing import Any
 
 import ccxt
 import httpx
@@ -65,7 +66,7 @@ class CryptoFetcher(BaseFetcher):
             )
             # Always close exchange before fallback
             await exchange.close()
-            exchange = None  # type: ignore[assignment]
+            exchange = None
             return await self._fetch_coingecko(asset_id, symbol, start, end)
         finally:
             if exchange is not None:
@@ -95,7 +96,7 @@ class CryptoFetcher(BaseFetcher):
 
     async def _fetch_ccxt(
         self,
-        exchange: object,
+        exchange: Any,
         asset_id: int,
         symbol: str,
         start: date,
@@ -157,10 +158,11 @@ class CryptoFetcher(BaseFetcher):
         reraise=True,
     )
     async def _fetch_ccxt_page(
-        self, exchange: object, symbol: str, timeframe: str, since: int
+        self, exchange: Any, symbol: str, timeframe: str, since: int
     ) -> list[list[float]]:
         """Fetch a single page of OHLCV candles with retry."""
-        return await exchange.fetch_ohlcv(symbol, timeframe, since=since, limit=1000)  # type: ignore[union-attr]
+        result: list[list[float]] = await exchange.fetch_ohlcv(symbol, timeframe, since=since, limit=1000)
+        return result
 
     async def _fetch_coingecko(
         self, asset_id: int, symbol: str, start: date, end: date

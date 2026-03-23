@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 from datetime import UTC, date, datetime, timedelta
+from typing import cast
 
 import asyncpg
 import structlog
@@ -17,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
 from src.data.alerts import AlertCollector
+from src.data.base import BaseFetcher
 from src.data.crypto import CryptoFetcher
 from src.data.idx_stocks import IDXStockFetcher
 from src.data.staleness import check_staleness
@@ -147,6 +149,7 @@ async def ingest_stage(session: AsyncSession, asset: Asset) -> None:
     log = logger.bind(asset=asset.symbol, asset_type=asset.asset_type)
 
     # Select fetcher based on asset type
+    fetcher: BaseFetcher
     if asset.asset_type == "stock":
         fetcher = IDXStockFetcher()
         symbol = asset.yfinance_symbol or asset.symbol
@@ -217,8 +220,9 @@ async def ingest_stage(session: AsyncSession, asset: Asset) -> None:
 
         # For crypto: also fetch and upsert hourly candles (last 7 days)
         if asset.asset_type == "crypto" and hasattr(fetcher, "fetch_hourly"):
+            crypto_fetcher = cast(CryptoFetcher, fetcher)
             hourly_start = today - timedelta(days=7)
-            hourly_rows = await fetcher.fetch_hourly(
+            hourly_rows = await crypto_fetcher.fetch_hourly(
                 asset_id=asset.id, symbol=symbol, start=hourly_start, end=end
             )
             hourly_validation = validate_rows(hourly_rows, asset_symbol=asset.symbol)

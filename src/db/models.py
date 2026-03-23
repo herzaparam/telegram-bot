@@ -65,7 +65,7 @@ class PipelineRun(Base):
     status: Mapped[str] = mapped_column(String(20), nullable=False)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    metadata_: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True)
+    metadata_: Mapped[dict[str, object] | None] = mapped_column("metadata", JSONB, nullable=True)
 
 
 class PipelineAssetRun(Base):
@@ -104,12 +104,12 @@ class DailyDecision(Base):
     evaluation_price_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Signal and reasoning data
-    all_signals: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    all_signals: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)
     reasoning: Mapped[str | None] = mapped_column(Text, nullable=True)
-    key_factors: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    key_factors: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)
     risk_warning: Mapped[str | None] = mapped_column(Text, nullable=True)
     wait_for: Mapped[str | None] = mapped_column(Text, nullable=True)
-    lessons_applied: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    lessons_applied: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)
     model_used: Mapped[str | None] = mapped_column(String(50), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
