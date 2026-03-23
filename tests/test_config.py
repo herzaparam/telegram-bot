@@ -14,7 +14,7 @@ class TestSettings:
             from src.config import Settings
 
             s = Settings()
-        assert s.database_url == "postgresql+asyncpg://trade:trade@localhost:5432/trade_agent"
+        assert s.database_url == "postgresql+asyncpg://trade:trade_dev@localhost:5432/trade_agent"
 
     def test_database_url_from_env(self):
         """Settings reads DATABASE_URL from environment."""
@@ -92,4 +92,4 @@ class TestSettings:
             from src.config import Settings
 
             s = Settings()
-        assert s.database_url_sync == "postgresql://trade:trade@localhost:5432/trade_agent"
+        assert s.database_url_sync == "postgresql://trade:trade_dev@localhost:5432/trade_agent"

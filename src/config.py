@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     )
 
     # Database
-    database_url: str = "postgresql+asyncpg://trade:trade@localhost:5432/trade_agent"
-    database_url_sync: str = "postgresql://trade:trade@localhost:5432/trade_agent"
+    database_url: str = "postgresql+asyncpg://trade:trade_dev@localhost:5432/trade_agent"
+    database_url_sync: str = "postgresql://trade:trade_dev@localhost:5432/trade_agent"
 
     # LLM
     openai_api_key: SecretStr = SecretStr("")
