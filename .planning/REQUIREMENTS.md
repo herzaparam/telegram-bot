@@ -11,7 +11,7 @@
 - [ ] **DATA-02**: System fetches IDX stock prices via yfinance (.JK suffix) with aggressive caching
 - [ ] **DATA-03**: System fetches crypto OHLCV via ccxt (Binance) with CoinGecko metadata backup
 - [ ] **DATA-04**: Pipeline stages are idempotent and restartable from point of failure
-- [ ] **DATA-05**: Pipeline tracks execution state in pipeline_runs table
+- [x] **DATA-05**: Pipeline tracks execution state in pipeline_runs table
 - [ ] **DATA-06**: System classifies data sources by tier (critical/important/supplementary) and degrades gracefully on failure
 
 ### Watchlist
@@ -159,7 +159,7 @@
 | DATA-02 | Phase 2 | Pending |
 | DATA-03 | Phase 2 | Pending |
 | DATA-04 | Phase 1 | Pending |
-| DATA-05 | Phase 1 | Pending |
+| DATA-05 | Phase 1 | Complete |
 | DATA-06 | Phase 1 | Pending |
 | WTCH-01 | Phase 5 | Pending |
 | WTCH-02 | Phase 5 | Pending |
