@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     )
 
     # Database
+    db_password: str = "trade_dev"
     database_url: str = "postgresql+asyncpg://trade:trade_dev@localhost:5432/trade_agent"
     database_url_sync: str = "postgresql://trade:trade_dev@localhost:5432/trade_agent"
 
