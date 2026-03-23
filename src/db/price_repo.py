@@ -6,16 +6,13 @@ Uses raw asyncpg for hot-path performance (10-50x faster than ORM for bulk inser
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import asyncpg
+from typing import Any
 
 from src.data.base import OHLCVRow
 
 
 async def upsert_prices(
-    conn: asyncpg.Connection,
+    conn: Any,
     rows: list[OHLCVRow],
     table: str = "price_history",
 ) -> int:
@@ -52,7 +49,7 @@ async def upsert_prices(
 
 
 async def get_latest_date(
-    conn: asyncpg.Connection,
+    conn: Any,
     asset_id: int,
     table: str = "price_history",
 ) -> datetime | None:
@@ -67,4 +64,5 @@ async def get_latest_date(
         The most recent datetime, or None if no data exists.
     """
     sql = f"SELECT MAX(time) FROM {table} WHERE asset_id = $1"
-    return await conn.fetchval(sql, asset_id)
+    result: datetime | None = await conn.fetchval(sql, asset_id)
+    return result
