@@ -41,7 +41,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md — Project setup, config, Docker, DB models, Alembic migrations
 - [ ] 01-02-PLAN.md — Pipeline runner with per-asset checkpointing and data tier classification
-- [ ] 01-03-PLAN.md — LLM wrapper with deterministic fallback, bot health stub, production Docker
+- [x] 01-03-PLAN.md — LLM wrapper with deterministic fallback, bot health stub, production Docker
 
 ### Phase 2: Data Layer
 **Goal**: IDX stock and crypto prices are fetched, validated, and stored in TimescaleDB hypertables with compression — the data foundation every engine depends on
