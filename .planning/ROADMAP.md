@@ -37,7 +37,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. LLM wrapper returns a deterministic fallback result (LLM_UNAVAILABLE flag) rather than crashing when the OpenAI API is unreachable
   4. Data source failures are classified by tier (critical/important/supplementary) and the pipeline continues with degraded output instead of halting
   5. decisions table stores decision_price and evaluation_price with explicit timestamps so no look-ahead bias is possible in accuracy calculations
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 01-01-PLAN.md — Project setup, config, Docker, DB models, Alembic migrations
+- [ ] 01-02-PLAN.md — Pipeline runner with per-asset checkpointing and data tier classification
+- [ ] 01-03-PLAN.md — LLM wrapper with deterministic fallback, bot health stub, production Docker
 
 ### Phase 2: Data Layer
 **Goal**: IDX stock and crypto prices are fetched, validated, and stored in TimescaleDB hypertables with compression — the data foundation every engine depends on
@@ -176,7 +180,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/3 | Planning complete | - |
 | 2. Data Layer | 0/TBD | Not started | - |
 | 3. Technical Engine + Pipeline Shell | 0/TBD | Not started | - |
 | 4. LLM Decision Maker | 0/TBD | Not started | - |
