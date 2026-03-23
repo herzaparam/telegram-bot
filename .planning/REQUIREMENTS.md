@@ -7,7 +7,7 @@
 
 ### Data Infrastructure
 
-- [ ] **DATA-01**: System stores daily OHLCV price history in TimescaleDB hypertables with auto-compression after 30 days
+- [x] **DATA-01**: System stores daily OHLCV price history in TimescaleDB hypertables with auto-compression after 30 days
 - [ ] **DATA-02**: System fetches IDX stock prices via yfinance (.JK suffix) with aggressive caching
 - [ ] **DATA-03**: System fetches crypto OHLCV via ccxt (Binance) with CoinGecko metadata backup
 - [x] **DATA-04**: Pipeline stages are idempotent and restartable from point of failure
@@ -155,7 +155,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | Phase 2 | Pending |
+| DATA-01 | Phase 2 | Complete |
 | DATA-02 | Phase 2 | Pending |
 | DATA-03 | Phase 2 | Pending |
 | DATA-04 | Phase 1 | Complete |

@@ -54,7 +54,7 @@ Plans:
   4. Re-running the ingest stage for an already-fetched date produces no duplicate rows (idempotent)
 **Plans**: 2 plans
 Plans:
-- [ ] 02-01-PLAN.md — Schema models, Alembic hypertable migration, price repository, base fetcher contract, validation
+- [x] 02-01-PLAN.md — Schema models, Alembic hypertable migration, price repository, base fetcher contract, validation
 - [ ] 02-02-PLAN.md — IDX stock and crypto fetchers, staleness detection, alerts, ingest stage, backfill CLI
 
 ### Phase 3: Technical Engine + Pipeline Shell
