@@ -55,7 +55,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 02-01-PLAN.md — Schema models, Alembic hypertable migration, price repository, base fetcher contract, validation
-- [ ] 02-02-PLAN.md — IDX stock and crypto fetchers, staleness detection, alerts, ingest stage, backfill CLI
+- [x] 02-02-PLAN.md — IDX stock and crypto fetchers, staleness detection, alerts, ingest stage, backfill CLI
 
 ### Phase 3: Technical Engine + Pipeline Shell
 **Goal**: The pipeline orchestrator sequences stages end-to-end and the technical analysis engine demonstrates the full BaseEngine interface contract — score, confidence, reasoning — on real price data

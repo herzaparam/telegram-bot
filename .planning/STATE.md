@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-03-23T12:56:59.457Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-03-23T13:17:18.883Z"
 progress:
   total_phases: 12
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -50,6 +50,7 @@ Plan: 2 of 2
 | Phase 01 P03 | 3min | 2 tasks | 9 files |
 | Phase 01-foundation P02 | 5min | 2 tasks | 6 files |
 | Phase 02 P01 | 6min | 2 tasks | 11 files |
+| Phase 02 P02 | 17min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,9 @@ Recent decisions affecting current work:
 - [Phase 02]: asyncpg conn typed as Any to avoid missing py.typed stubs
 - [Phase 02]: Migration smoke tests use inspect.getsource() for DDL verification without TimescaleDB
 - [Phase 02]: structlog.testing.capture_logs() for log assertions in tests
+- [Phase 02]: tenacity wait_none() in tests for fast retry testing
+- [Phase 02]: CoinGecko OHLC fallback sets volume=0, tagged source=coingecko
+- [Phase 02]: Monday detection for weekly re-fetch trigger
 
 ### Pending Todos
 
@@ -85,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23T12:56:59.453Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-03-23T13:17:18.880Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
