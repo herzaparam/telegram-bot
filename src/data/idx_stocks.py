@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import functools
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, timedelta
 
 import structlog
 import yfinance as yf
@@ -98,7 +98,7 @@ class IDXStockFetcher(BaseFetcher):
             try:
                 dt = idx.to_pydatetime()
                 if dt.tzinfo is None:
-                    dt = dt.replace(tzinfo=timezone.utc)
+                    dt = dt.replace(tzinfo=UTC)
             except Exception:
                 continue
 

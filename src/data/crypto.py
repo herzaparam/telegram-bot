@@ -6,7 +6,7 @@ Falls back to CoinGecko free API if ccxt fails.
 
 from __future__ import annotations
 
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time
 
 import ccxt
 import httpx
@@ -104,10 +104,10 @@ class CryptoFetcher(BaseFetcher):
     ) -> list[OHLCVRow]:
         """Fetch OHLCV from ccxt with pagination and retry."""
         start_ms = int(
-            datetime.combine(start, time.min, tzinfo=timezone.utc).timestamp() * 1000
+            datetime.combine(start, time.min, tzinfo=UTC).timestamp() * 1000
         )
         end_ms = int(
-            datetime.combine(end, time.max, tzinfo=timezone.utc).timestamp() * 1000
+            datetime.combine(end, time.max, tzinfo=UTC).timestamp() * 1000
         )
 
         all_candles: list[list[float]] = []
@@ -124,7 +124,7 @@ class CryptoFetcher(BaseFetcher):
         rows: list[OHLCVRow] = []
         for candle in all_candles:
             ts_ms, o, h, l, c, v = candle  # noqa: E741
-            dt = datetime.fromtimestamp(ts_ms / 1000, tz=timezone.utc)
+            dt = datetime.fromtimestamp(ts_ms / 1000, tz=UTC)
             if dt.timestamp() * 1000 > end_ms:
                 break
             rows.append(
@@ -195,7 +195,7 @@ class CryptoFetcher(BaseFetcher):
         rows: list[OHLCVRow] = []
         for candle in data:
             ts_ms, o, h, l, c = candle  # noqa: E741
-            dt = datetime.fromtimestamp(ts_ms / 1000, tz=timezone.utc)
+            dt = datetime.fromtimestamp(ts_ms / 1000, tz=UTC)
             rows.append(
                 OHLCVRow(
                     time=dt,
