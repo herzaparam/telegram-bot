@@ -3,7 +3,6 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from src.llm.client import LLM_UNAVAILABLE, LLMResult, llm_completion
 
 
