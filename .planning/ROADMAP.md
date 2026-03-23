@@ -40,7 +40,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 Plans:
 - [x] 01-01-PLAN.md — Project setup, config, Docker, DB models, Alembic migrations
-- [ ] 01-02-PLAN.md — Pipeline runner with per-asset checkpointing and data tier classification
+- [x] 01-02-PLAN.md — Pipeline runner with per-asset checkpointing and data tier classification
 - [x] 01-03-PLAN.md — LLM wrapper with deterministic fallback, bot health stub, production Docker
 
 ### Phase 2: Data Layer
