@@ -52,7 +52,10 @@ Plans:
   2. If yfinance returns stale or malformed data, the pipeline sends a DATA_STALE alert rather than storing bad rows or crashing
   3. Rows older than 30 days are automatically compressed by TimescaleDB with measurable storage reduction
   4. Re-running the ingest stage for an already-fetched date produces no duplicate rows (idempotent)
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 02-01-PLAN.md — Schema models, Alembic hypertable migration, price repository, base fetcher contract, validation
+- [ ] 02-02-PLAN.md — IDX stock and crypto fetchers, staleness detection, alerts, ingest stage, backfill CLI
 
 ### Phase 3: Technical Engine + Pipeline Shell
 **Goal**: The pipeline orchestrator sequences stages end-to-end and the technical analysis engine demonstrates the full BaseEngine interface contract — score, confidence, reasoning — on real price data
@@ -181,7 +184,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 0/3 | Planning complete | - |
-| 2. Data Layer | 0/TBD | Not started | - |
+| 2. Data Layer | 0/2 | Planning complete | - |
 | 3. Technical Engine + Pipeline Shell | 0/TBD | Not started | - |
 | 4. LLM Decision Maker | 0/TBD | Not started | - |
 | 5. Telegram Bot + Daily Delivery | 0/TBD | Not started | - |
