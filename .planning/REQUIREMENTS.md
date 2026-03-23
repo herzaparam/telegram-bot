@@ -155,13 +155,95 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled during roadmap creation) | | |
+| DATA-01 | Phase 2 | Pending |
+| DATA-02 | Phase 2 | Pending |
+| DATA-03 | Phase 2 | Pending |
+| DATA-04 | Phase 1 | Pending |
+| DATA-05 | Phase 1 | Pending |
+| DATA-06 | Phase 1 | Pending |
+| WTCH-01 | Phase 5 | Pending |
+| WTCH-02 | Phase 5 | Pending |
+| WTCH-03 | Phase 5 | Pending |
+| ENGN-01 | Phase 3 | Pending |
+| ENGN-02 | Phase 8 | Pending |
+| ENGN-03 | Phase 3 | Pending |
+| ENGN-04 | Phase 10 | Pending |
+| ENGN-05 | Phase 8 | Pending |
+| ENGN-06 | Phase 10 | Pending |
+| ENGN-07 | Phase 10 | Pending |
+| ENGN-08 | Phase 10 | Pending |
+| ENGN-09 | Phase 8 | Pending |
+| ENGN-10 | Phase 10 | Pending |
+| ENGN-11 | Phase 10 | Pending |
+| ENGN-12 | Phase 8 | Pending |
+| ENGN-13 | Phase 10 | Pending |
+| ENGN-14 | Phase 10 | Pending |
+| ENGN-15 | Phase 9 | Pending |
+| LLM-01 | Phase 4 | Pending |
+| LLM-02 | Phase 4 | Pending |
+| LLM-03 | Phase 4 | Pending |
+| LLM-04 | Phase 7 | Pending |
+| LLM-05 | Phase 4 | Pending |
+| LLM-06 | Phase 11 | Pending |
+| EVAL-01 | Phase 6 | Pending |
+| EVAL-02 | Phase 7 | Pending |
+| EVAL-03 | Phase 7 | Pending |
+| EVAL-04 | Phase 7 | Pending |
+| EVAL-05 | Phase 6 | Pending |
+| IDXD-01 | Phase 9 | Pending |
+| IDXD-02 | Phase 9 | Pending |
+| IDXD-03 | Phase 9 | Pending |
+| NEWS-01 | Phase 8 | Pending |
+| NEWS-02 | Phase 8 | Pending |
+| NEWS-03 | Phase 8 | Pending |
+| NEWS-04 | Phase 8 | Pending |
+| TBOT-01 | Phase 5 | Pending |
+| TBOT-02 | Phase 5 | Pending |
+| TBOT-03 | Phase 5 | Pending |
+| TBOT-04 | Phase 6 | Pending |
+| TBOT-05 | Phase 7 | Pending |
+| TBOT-06 | Phase 11 | Pending |
+| TBOT-07 | Phase 5 | Pending |
+| TBOT-08 | Phase 12 | Pending |
+| TBOT-09 | Phase 9 | Pending |
+| TBOT-10 | Phase 11 | Pending |
+| TBOT-11 | Phase 11 | Pending |
+| TBOT-12 | Phase 12 | Pending |
+| TBOT-13 | Phase 9 | Pending |
+| REPT-01 | Phase 6 | Pending |
+| REPT-02 | Phase 5 | Pending |
+| REPT-03 | Phase 9 | Pending |
+| REPT-04 | Phase 5 | Pending |
+| REPT-05 | Phase 7 | Pending |
+| REPT-06 | Phase 12 | Pending |
+| REPT-07 | Phase 11 | Pending |
+| VALN-01 | Phase 9 | Pending |
+| VALN-02 | Phase 9 | Pending |
+| VALN-03 | Phase 9 | Pending |
+| VALN-04 | Phase 9 | Pending |
+| VALN-05 | Phase 9 | Pending |
+| DUED-01 | Phase 11 | Pending |
+| DUED-02 | Phase 11 | Pending |
+| DUED-03 | Phase 11 | Pending |
+| DUED-04 | Phase 11 | Pending |
+| RISK-01 | Phase 12 | Pending |
+| RISK-02 | Phase 12 | Pending |
+| RISK-03 | Phase 12 | Pending |
+| RISK-04 | Phase 12 | Pending |
+| RISK-05 | Phase 12 | Pending |
+| DISC-01 | Phase 11 | Pending |
+| DISC-02 | Phase 11 | Pending |
+| DISC-03 | Phase 11 | Pending |
+| DISC-04 | Phase 11 | Pending |
+| FUND-01 | Phase 12 | Pending |
+| FUND-02 | Phase 12 | Pending |
+| FUND-03 | Phase 12 | Pending |
 
 **Coverage:**
-- v1 requirements: 80 total
-- Mapped to phases: 0
-- Unmapped: 80 ⚠️
+- v1 requirements: 83 total
+- Mapped to phases: 83
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 after initial definition*
+*Last updated: 2026-03-23 after roadmap creation*
