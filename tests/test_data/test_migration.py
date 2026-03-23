@@ -1,18 +1,24 @@
 """Smoke tests for migration 002 - verify DDL patterns without a real database."""
 
+import importlib
 import inspect
 
 
-def _get_upgrade_source() -> str:
-    from src.db.migrations.versions.002_price_history_hypertables import upgrade
+def _load_migration():
+    """Load migration module using importlib (module name starts with digit)."""
+    return importlib.import_module(
+        "src.db.migrations.versions.002_price_history_hypertables"
+    )
 
-    return inspect.getsource(upgrade)
+
+def _get_upgrade_source() -> str:
+    mod = _load_migration()
+    return inspect.getsource(mod.upgrade)
 
 
 def _get_downgrade_source() -> str:
-    from src.db.migrations.versions.002_price_history_hypertables import downgrade
-
-    return inspect.getsource(downgrade)
+    mod = _load_migration()
+    return inspect.getsource(mod.downgrade)
 
 
 class TestMigration002Upgrade:

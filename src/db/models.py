@@ -7,6 +7,7 @@ from sqlalchemy import (
     Boolean,
     Date,
     DateTime,
+    Float,
     ForeignKey,
     Integer,
     MetaData,
@@ -111,6 +112,67 @@ class DailyDecision(Base):
     lessons_applied: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     model_used: Mapped[str | None] = mapped_column(String(50), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class PriceHistory(Base):
+    """Daily OHLCV candle data stored in a TimescaleDB hypertable."""
+
+    __tablename__ = "price_history"
+    __table_args__ = (UniqueConstraint("asset_id", "time"),)
+
+    time: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), primary_key=True
+    )
+    asset_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("assets.id"), primary_key=True
+    )
+    open: Mapped[float] = mapped_column(Float, nullable=False)
+    high: Mapped[float] = mapped_column(Float, nullable=False)
+    low: Mapped[float] = mapped_column(Float, nullable=False)
+    close: Mapped[float] = mapped_column(Float, nullable=False)
+    volume: Mapped[float] = mapped_column(Float, nullable=False)
+    source: Mapped[str] = mapped_column(
+        String(20), nullable=False, server_default="unknown"
+    )
+
+
+class PriceHistoryHourly(Base):
+    """Hourly OHLCV candle data for crypto (7-day rolling retention)."""
+
+    __tablename__ = "price_history_hourly"
+    __table_args__ = (UniqueConstraint("asset_id", "time"),)
+
+    time: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), primary_key=True
+    )
+    asset_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("assets.id"), primary_key=True
+    )
+    open: Mapped[float] = mapped_column(Float, nullable=False)
+    high: Mapped[float] = mapped_column(Float, nullable=False)
+    low: Mapped[float] = mapped_column(Float, nullable=False)
+    close: Mapped[float] = mapped_column(Float, nullable=False)
+    volume: Mapped[float] = mapped_column(Float, nullable=False)
+    source: Mapped[str] = mapped_column(
+        String(20), nullable=False, server_default="unknown"
+    )
+
+
+class BackoffState(Base):
+    """Adaptive retry backoff state persisted across pipeline runs."""
+
+    __tablename__ = "backoff_state"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    source: Mapped[str] = mapped_column(String(30), unique=True, nullable=False)
+    consecutive_failures: Mapped[int] = mapped_column(Integer, default=0)
+    last_failure_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    last_success_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    current_delay_seconds: Mapped[float] = mapped_column(Float, default=1.0)
 
 
 # Seed data for the assets table
