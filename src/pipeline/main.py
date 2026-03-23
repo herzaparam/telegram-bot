@@ -1,0 +1,84 @@
+"""Pipeline CLI entry point.
+
+Usage:
+    python -m src.pipeline.main
+    python -m src.pipeline.main --stage fetch
+    python -m src.pipeline.main --date 2026-03-23 --rerun-failed
+"""
+
+import argparse
+import asyncio
+from datetime import date
+
+import structlog
+
+from src.config import settings
+from src.db.database import async_session_factory
+from src.logging import setup_logging
+from src.pipeline.runner import PipelineRunner
+
+logger = structlog.get_logger(__name__)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the CLI argument parser."""
+    parser = argparse.ArgumentParser(
+        description="Run the trade-agent data pipeline.",
+    )
+    parser.add_argument(
+        "--date",
+        type=str,
+        default=None,
+        help="Run date in YYYY-MM-DD format (default: today).",
+    )
+    parser.add_argument(
+        "--stage",
+        type=str,
+        default=None,
+        help="Run only the specified stage (fetch, analyze, decide, report).",
+    )
+    parser.add_argument(
+        "--rerun-failed",
+        action="store_true",
+        default=False,
+        help="Reprocess assets with status 'failed'.",
+    )
+    return parser
+
+
+async def async_main() -> None:
+    """Async entry point for the pipeline."""
+    setup_logging(settings.log_level, settings.log_format)
+
+    parser = build_parser()
+    args = parser.parse_args()
+
+    run_date = date.fromisoformat(args.date) if args.date else date.today()
+    stages = [args.stage] if args.stage else None
+
+    runner = PipelineRunner(async_session_factory)
+    results = await runner.run_pipeline(
+        run_date=run_date,
+        stages=stages,
+        rerun_failed=args.rerun_failed,
+    )
+
+    for result in results:
+        logger.info(
+            "stage_result",
+            stage=result.stage,
+            status=result.status,
+            completed=result.assets_completed,
+            failed=result.assets_failed,
+            skipped=result.assets_skipped,
+            duration=f"{result.duration_seconds:.2f}s",
+        )
+
+
+def main() -> None:
+    """Synchronous entry point."""
+    asyncio.run(async_main())
+
+
+if __name__ == "__main__":
+    main()

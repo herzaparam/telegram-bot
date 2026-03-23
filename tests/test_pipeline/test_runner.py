@@ -6,7 +6,7 @@ from datetime import date, datetime, timezone
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import JSON, MetaData, Table, event, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.db.models import Asset, Base, PipelineAssetRun, PipelineRun
@@ -14,12 +14,36 @@ from src.pipeline.runner import PipelineRunner, StageResult
 from src.pipeline.tiers import SourceCriticalError
 
 
+def _sqlite_friendly_create_all(connection) -> None:
+    """Create all tables, replacing PostgreSQL-specific types for SQLite.
+
+    JSONB columns are rendered as JSON (supported by SQLite).
+    UUID columns are rendered as CHAR(32) (SQLAlchemy handles this automatically).
+    """
+    from sqlalchemy.dialects.postgresql import JSONB
+
+    # Temporarily swap JSONB -> JSON in all columns that use it
+    swapped: list[tuple[Table, str, object]] = []
+    for table in Base.metadata.tables.values():
+        for col in table.columns:
+            if isinstance(col.type, JSONB):
+                swapped.append((table, col.name, col.type))
+                col.type = JSON()
+
+    try:
+        Base.metadata.create_all(connection)
+    finally:
+        # Restore original types
+        for table, col_name, original_type in swapped:
+            table.c[col_name].type = original_type
+
+
 @pytest.fixture()
 async def async_engine():
     """Create an async in-memory SQLite engine for tests."""
     engine = create_async_engine("sqlite+aiosqlite://", echo=False)
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(_sqlite_friendly_create_all)
     yield engine
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
