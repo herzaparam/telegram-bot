@@ -1,0 +1,61 @@
+services:
+  db:
+    image: timescale/timescaledb:2.18.0-pg16
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+        reservations:
+          memory: 128M
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: trade_agent
+      POSTGRES_USER: trade
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    shm_size: "64mb"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trade -d trade_agent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  bot:
+    build: .
+    command: uv run python -m src.bot.main
+    deploy:
+      resources:
+        limits:
+          memory: 192M
+          cpus: "0.25"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; r = httpx.get('http://localhost:8000/health'); assert r.status_code == 200"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "8000:8000"
+
+  pipeline:
+    build: .
+    command: uv run python -m src.pipeline.main
+    deploy:
+      resources:
+        limits:
+          memory: 1280M
+          cpus: "1.5"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    profiles: ["pipeline"]
+
+volumes:
+  pgdata:
