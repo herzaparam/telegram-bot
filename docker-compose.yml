@@ -1,0 +1,21 @@
+services:
+  db:
+    image: timescale/timescaledb:2.18.0-pg16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: trade_agent
+      POSTGRES_USER: trade
+      POSTGRES_PASSWORD: trade_dev
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    shm_size: "64mb"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trade -d trade_agent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  pgdata:
