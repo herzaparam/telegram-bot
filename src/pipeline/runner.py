@@ -67,7 +67,7 @@ class PipelineRunner:
             List of StageResult, one per stage executed.
         """
         if stages is None:
-            stages = ["fetch", "analyze", "decide", "report"]
+            stages = ["evaluate", "fetch", "analyze", "decide", "report"]
 
         if stage_funcs is None:
             stage_funcs = {}
@@ -297,6 +297,7 @@ class PipelineRunner:
             Timeout in seconds.
         """
         timeouts: dict[str, int] = {
+            "evaluate": settings.timeout_evaluate,
             "fetch": settings.timeout_fetch,
             "analyze": settings.timeout_analyze,
             "decide": settings.timeout_llm,

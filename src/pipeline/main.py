@@ -15,6 +15,7 @@ import structlog
 from src.config import settings
 from src.data.analyze import analyze_stage
 from src.data.decide import decide_stage
+from src.data.evaluate import evaluate_stage
 from src.data.ingest import ingest_stage
 from src.data.report import send_daily_report, send_pipeline_failure_alert
 from src.db.database import async_session_factory
@@ -39,7 +40,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--stage",
         type=str,
         default=None,
-        help="Run only the specified stage (fetch, analyze, decide, report).",
+        help="Run only the specified stage (evaluate, fetch, analyze, decide, report).",
     )
     parser.add_argument(
         "--rerun-failed",
@@ -62,6 +63,7 @@ async def async_main() -> None:
 
     runner = PipelineRunner(async_session_factory)
     stage_funcs = {
+        "evaluate": evaluate_stage,  # Runs first: evaluate prior decisions (D-11)
         "fetch": ingest_stage,
         "analyze": analyze_stage,
         "decide": decide_stage,
