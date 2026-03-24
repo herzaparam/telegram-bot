@@ -115,7 +115,7 @@ Plans:
   4. Per-engine accuracy is tracked independently so the LLM can be given engine quality metadata in future phases
 **Plans**: 2 plans
 Plans:
-- [ ] 06-01-PLAN.md — Evaluation models, migration, repository, evaluate stage with classification and pipeline wiring
+- [x] 06-01-PLAN.md — Evaluation models, migration, repository, evaluate stage with classification and pipeline wiring
 - [ ] 06-02-PLAN.md — Scorecard formatting, daily report integration, /scorecard bot command
 
 ### Phase 7: Self-Evaluation Feedback Loop

@@ -49,11 +49,11 @@
 
 ### Self-Evaluation
 
-- [ ] **EVAL-01**: System reviews yesterday's decisions against actual prices every morning
+- [x] **EVAL-01**: System reviews yesterday's decisions against actual prices every morning
 - [ ] **EVAL-02**: LLM analyzes what went right/wrong and why
 - [ ] **EVAL-03**: System extracts concrete lessons and stores in database
 - [ ] **EVAL-04**: Lessons feed into future LLM decisions automatically
-- [ ] **EVAL-05**: System tracks accuracy stats over time (win rate, best/worst engine)
+- [x] **EVAL-05**: System tracks accuracy stats over time (win rate, best/worst engine)
 
 ### IDX Documents
 
@@ -185,11 +185,11 @@
 | LLM-04 | Phase 7 | Pending |
 | LLM-05 | Phase 4 | Complete |
 | LLM-06 | Phase 11 | Pending |
-| EVAL-01 | Phase 6 | Pending |
+| EVAL-01 | Phase 6 | Complete |
 | EVAL-02 | Phase 7 | Pending |
 | EVAL-03 | Phase 7 | Pending |
 | EVAL-04 | Phase 7 | Pending |
-| EVAL-05 | Phase 6 | Pending |
+| EVAL-05 | Phase 6 | Complete |
 | IDXD-01 | Phase 9 | Pending |
 | IDXD-02 | Phase 9 | Pending |
 | IDXD-03 | Phase 9 | Pending |

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Phase 6 UI-SPEC approved
-last_updated: "2026-03-24T10:26:02.154Z"
+status: Ready to execute
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-03-24T10:45:52.935Z"
 progress:
   total_phases: 12
   completed_phases: 5
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 16
+  completed_plans: 15
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** The daily signal loop must work reliably: fetch data, run engines, produce LLM verdicts, and deliver a Telegram report every morning
-**Current focus:** Phase 05 — telegram-bot-daily-delivery
+**Current focus:** Phase 06 — accuracy-tracking-scorecard
 
 ## Current Position
 
-Phase: 6
-Plan: Not started
+Phase: 06 (accuracy-tracking-scorecard) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Plan: Not started
 | Phase 05 P01 | 4min | 2 tasks | 9 files |
 | Phase 05 P03 | 3min | 2 tasks | 4 files |
 | Phase 05 P02 | 3min | 2 tasks | 12 files |
+| Phase 06 P01 | 6min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,9 @@ Recent decisions affecting current work:
 - [Phase 05]: httpx for Telegram API in pipeline (not PTB) per D-16 two-process boundary
 - [Phase 05]: PTB Application with updater(None) and lifespan context manager for FastAPI integration
 - [Phase 05]: Lazy imports of yfinance/ccxt in validation functions with run_in_executor for async safety
+- [Phase 06]: Evaluation uses SQLAlchemy ORM (not raw asyncpg) matching decision_repo pattern
+- [Phase 06]: HOLD bands scale per window: stock 2%/3%/5%/8%, crypto 5%/8%/12%/20%
+- [Phase 06]: evaluate_stage as first pipeline stage before fetch; catches all exceptions (error isolation)
 
 ### Pending Todos
 
@@ -118,6 +122,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T10:26:02.147Z
-Stopped at: Phase 6 UI-SPEC approved
-Resume file: .planning/phases/06-accuracy-tracking-scorecard/06-UI-SPEC.md
+Last session: 2026-03-24T10:45:52.932Z
+Stopped at: Completed 06-01-PLAN.md
+Resume file: None
