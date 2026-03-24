@@ -97,10 +97,11 @@ Plans:
   3. Sending /report BTC delivers a single-asset detailed report for BTC
   4. The bot process never imports pipeline modules — querying pg_stat_activity confirms the bot process holds only bot-related queries
   5. Reports longer than Telegram's 4096-character limit are automatically split into multiple messages without truncation
-**Plans**: 2 plans
+**Plans**: 3 plans
 Plans:
-- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
-- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
+- [ ] 05-01-PLAN.md — Watchlist + BotSettings models, Alembic migration, shared report formatter, config
+- [ ] 05-02-PLAN.md — PTB webhook integration, auth, all bot command handlers (/start, /add, /remove, /watchlist, /report, /settings)
+- [ ] 05-03-PLAN.md — Pipeline report stage with Telegram delivery via httpx, wire into pipeline
 **UI hint**: yes
 
 ### Phase 6: Accuracy Tracking + Scorecard
@@ -208,6 +209,7 @@ Plans:
 - [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
 **UI hint**: yes
 
+
 ## Progress
 
 **Execution Order:**
@@ -219,7 +221,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Data Layer | 0/2 | Planning complete | - |
 | 3. Technical Engine + Pipeline Shell | 0/4 | Planning complete | - |
 | 4. LLM Decision Maker | 1/2 | In Progress|  |
-| 5. Telegram Bot + Daily Delivery | 0/TBD | Not started | - |
+| 5. Telegram Bot + Daily Delivery | 0/3 | Planning complete | - |
 | 6. Accuracy Tracking + Scorecard | 0/TBD | Not started | - |
 | 7. Self-Evaluation Feedback Loop | 0/TBD | Not started | - |
 | 8. Fundamental, Macro, Sentiment, and News Engines | 0/TBD | Not started | - |
