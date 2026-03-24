@@ -14,6 +14,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler
 
 from src.bot.handlers.report import report_handler
+from src.bot.handlers.scorecard import scorecard_handler
 from src.bot.handlers.settings import settings_handler
 from src.bot.handlers.start import start_handler
 from src.bot.handlers.watchlist import add_handler, remove_handler, watchlist_handler
@@ -42,6 +43,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         ptb_app.add_handler(CommandHandler("remove", remove_handler))
         ptb_app.add_handler(CommandHandler("watchlist", watchlist_handler))
         ptb_app.add_handler(CommandHandler("report", report_handler))
+        ptb_app.add_handler(CommandHandler("scorecard", scorecard_handler))
         ptb_app.add_handler(CommandHandler("settings", settings_handler))
 
         async with ptb_app:
