@@ -258,20 +258,20 @@ async def test_message_splitting_many_decisions(mock_settings):
     """Test message splitting with 20 mock decisions triggers multiple messages per chat."""
     session = AsyncMock()
 
-    # Watchlist returns 20 items
+    # Watchlist returns 50 items (enough to exceed 4096-char limit)
     watchlist_result = MagicMock()
     watchlist_scalars = MagicMock()
-    watchlist_scalars.all.return_value = [MagicMock(asset_id=i) for i in range(1, 21)]
+    watchlist_scalars.all.return_value = [MagicMock(asset_id=i) for i in range(1, 51)]
     watchlist_result.scalars.return_value = watchlist_scalars
 
-    # 20 decisions with long reasoning to force splitting
+    # 50 decisions to force message splitting (each card ~180 chars, 50*180=9000 > 4096)
     decisions = []
-    for i in range(20):
+    for i in range(50):
         dec = MagicMock()
         dec.verdict = "BUY"
         dec.score = 0.5
         dec.confidence = 0.8
-        dec.reasoning = "A" * 200  # Long reasoning to push size
+        dec.reasoning = f"Asset {i} has very strong technical and fundamental signals with multiple confluent bullish patterns visible across timeframes"
         dec.risk_warning = None
 
         asset = MagicMock()
