@@ -70,13 +70,13 @@
 
 ### Telegram Bot
 
-- [ ] **TBOT-01**: `/start` welcome + setup
+- [x] **TBOT-01**: `/start` welcome + setup
 - [x] **TBOT-02**: `/report` gets today's full report on demand
-- [ ] **TBOT-03**: `/report BTC` gets detailed single-asset report
+- [x] **TBOT-03**: `/report BTC` gets detailed single-asset report
 - [ ] **TBOT-04**: `/scorecard` shows accuracy stats + recent results
 - [ ] **TBOT-05**: `/lessons` shows learned lessons
 - [ ] **TBOT-06**: `/discover` shows today's opportunities
-- [ ] **TBOT-07**: `/settings` configures notification time, categories
+- [x] **TBOT-07**: `/settings` configures notification time, categories
 - [ ] **TBOT-08**: `/backtest BTC 30d` runs historical signal replay
 - [ ] **TBOT-09**: `/valuation BBCA` shows DCF, peer comparison, fair value
 - [ ] **TBOT-10**: `/compare BBCA BBRI BMRI` side-by-side sector comparison
@@ -197,13 +197,13 @@
 | NEWS-02 | Phase 8 | Pending |
 | NEWS-03 | Phase 8 | Pending |
 | NEWS-04 | Phase 8 | Pending |
-| TBOT-01 | Phase 5 | Pending |
+| TBOT-01 | Phase 5 | Complete |
 | TBOT-02 | Phase 5 | Complete |
-| TBOT-03 | Phase 5 | Pending |
+| TBOT-03 | Phase 5 | Complete |
 | TBOT-04 | Phase 6 | Pending |
 | TBOT-05 | Phase 7 | Pending |
 | TBOT-06 | Phase 11 | Pending |
-| TBOT-07 | Phase 5 | Pending |
+| TBOT-07 | Phase 5 | Complete |
 | TBOT-08 | Phase 12 | Pending |
 | TBOT-09 | Phase 9 | Pending |
 | TBOT-10 | Phase 11 | Pending |
