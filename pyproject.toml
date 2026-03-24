@@ -15,6 +15,7 @@ dependencies = [
     "pandas-ta-classic>=0.4.47",
     "pmdarima>=2.1.1",
     "pydantic-settings>=2.13.1",
+    "python-telegram-bot>=22.7",
     "sqlalchemy[asyncio]>=2.0.48",
     "structlog>=25.5.0",
     "tenacity>=9.1.4",
