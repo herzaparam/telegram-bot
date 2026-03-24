@@ -16,6 +16,7 @@ from src.config import settings
 from src.data.analyze import analyze_stage
 from src.data.decide import decide_stage
 from src.data.ingest import ingest_stage
+from src.data.report import send_daily_report, send_pipeline_failure_alert
 from src.db.database import async_session_factory
 from src.logging import setup_logging
 from src.pipeline.runner import PipelineRunner
@@ -82,6 +83,15 @@ async def async_main() -> None:
             skipped=result.assets_skipped,
             duration=f"{result.duration_seconds:.2f}s",
         )
+
+    # Post-pipeline: send daily Telegram report (D-15)
+    # Report runs after all stages, not as a per-asset StageFunc
+    all_failed = all(r.status == "failed" for r in results) if results else True
+    if all_failed and results:
+        await send_pipeline_failure_alert(run_date)
+    else:
+        async with async_session_factory() as session:
+            await send_daily_report(session, run_date, stage_results=results)
 
 
 def main() -> None:
