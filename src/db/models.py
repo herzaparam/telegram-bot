@@ -286,6 +286,29 @@ class IDXHoliday(Base):
     year: Mapped[int] = mapped_column(Integer, nullable=False)
 
 
+class Lesson(Base):
+    """Learned lesson from self-evaluation feedback loop."""
+
+    __tablename__ = "lessons"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    date: Mapped[date] = mapped_column(Date, nullable=False)
+    asset_type: Mapped[str | None] = mapped_column(String(10), nullable=True)  # "stock","crypto","all"
+    engine_tags: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)  # e.g. ["technical","quantitative"]
+    topic: Mapped[str | None] = mapped_column(String(30), nullable=True)  # "momentum","volatility", etc.
+    lesson: Mapped[str] = mapped_column(Text, nullable=False)
+    source_decision_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("daily_decisions.id"), nullable=True
+    )
+    times_observed: Mapped[int] = mapped_column(Integer, default=1)
+    times_applied: Mapped[int] = mapped_column(Integer, default=0)
+    times_correct: Mapped[int] = mapped_column(Integer, default=0)
+    confidence_tier: Mapped[str] = mapped_column(String(15), nullable=False, default="hypothesis")
+    still_valid: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
 # Seed data for the assets table
 SEED_ASSETS: list[dict[str, str | None]] = [
     # IDX stocks
