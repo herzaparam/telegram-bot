@@ -22,9 +22,9 @@
 
 ### Signal Engines
 
-- [ ] **ENGN-01**: Technical analysis engine (RSI, MACD, Bollinger, MA, volume) outputs score/confidence/reasoning
+- [x] **ENGN-01**: Technical analysis engine (RSI, MACD, Bollinger, MA, volume) outputs score/confidence/reasoning
 - [ ] **ENGN-02**: Fundamental analysis engine (P/E, P/B, revenue growth, ROE) for IDX stocks
-- [ ] **ENGN-03**: Quantitative/statistical engine (momentum, mean reversion, ARIMA)
+- [x] **ENGN-03**: Quantitative/statistical engine (momentum, mean reversion, ARIMA)
 - [ ] **ENGN-04**: ML/AI engine (XGBoost, LSTM via ONNX, ensemble)
 - [ ] **ENGN-05**: Sentiment engine (Reddit, Stockbit, Fear & Greed)
 - [ ] **ENGN-06**: On-chain engine for crypto (TVL, whale tracking, exchange flows, NVT)
@@ -164,9 +164,9 @@
 | WTCH-01 | Phase 5 | Pending |
 | WTCH-02 | Phase 5 | Pending |
 | WTCH-03 | Phase 5 | Pending |
-| ENGN-01 | Phase 3 | Pending |
+| ENGN-01 | Phase 3 | Complete |
 | ENGN-02 | Phase 8 | Pending |
-| ENGN-03 | Phase 3 | Pending |
+| ENGN-03 | Phase 3 | Complete |
 | ENGN-04 | Phase 10 | Pending |
 | ENGN-05 | Phase 8 | Pending |
 | ENGN-06 | Phase 10 | Pending |

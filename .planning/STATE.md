@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-stopped_at: Phase 3 context gathered
-last_updated: "2026-03-23T13:44:13.583Z"
+status: Ready to execute
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-03-24T07:57:05.104Z"
 progress:
   total_phases: 12
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 9
+  completed_plans: 6
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** The daily signal loop must work reliably: fetch data, run engines, produce LLM verdicts, and deliver a Telegram report every morning
-**Current focus:** Phase 02 — data-layer
+**Current focus:** Phase 03 — technical-engine-pipeline-shell
 
 ## Current Position
 
-Phase: 02 (data-layer) — EXECUTING
-Plan: 2 of 2
+Phase: 03 (technical-engine-pipeline-shell) — EXECUTING
+Plan: 2 of 4
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Plan: 2 of 2
 | Phase 01-foundation P02 | 5min | 2 tasks | 6 files |
 | Phase 02 P01 | 6min | 2 tasks | 11 files |
 | Phase 02 P02 | 17min | 2 tasks | 14 files |
+| Phase 03 P01 | 4min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,9 @@ Recent decisions affecting current work:
 - [Phase 02]: tenacity wait_none() in tests for fast retry testing
 - [Phase 02]: CoinGecko OHLC fallback sets volume=0, tagged source=coingecko
 - [Phase 02]: Monday detection for weekly re-fetch trigger
+- [Phase 03]: SignalRepository uses SQLAlchemy ORM with pg_insert for UPSERT (not raw asyncpg)
+- [Phase 03]: Signal dataclass is frozen for immutability after engine computation
+- [Phase 03]: signals table is regular PostgreSQL (not hypertable) — low-volume relational data
 
 ### Pending Todos
 
@@ -89,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23T13:44:13.580Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-technical-engine-pipeline-shell/03-CONTEXT.md
+Last session: 2026-03-24T07:57:05.100Z
+Stopped at: Completed 03-01-PLAN.md
+Resume file: None
