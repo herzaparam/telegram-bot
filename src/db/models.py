@@ -226,6 +226,66 @@ class BotSettings(Base):
     )
 
 
+class Evaluation(Base):
+    """Evaluation of a prior decision against actual prices at a specific window."""
+
+    __tablename__ = "evaluations"
+    __table_args__ = (
+        UniqueConstraint("decision_id", "window", name="uq_evaluations_decision_window"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    decision_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("daily_decisions.id"), nullable=False
+    )
+    window: Mapped[str] = mapped_column(String(5), nullable=False)  # '24h','3d','7d','30d'
+    eval_price: Mapped[float] = mapped_column(Numeric(20, 8), nullable=False)
+    eval_price_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    change_pct: Mapped[float] = mapped_column(Numeric(8, 4), nullable=False)
+    was_correct: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    engine_results: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class AccuracyStats(Base):
+    """Pre-computed accuracy statistics for scorecard display."""
+
+    __tablename__ = "accuracy_stats"
+    __table_args__ = (
+        UniqueConstraint(
+            "asset_id", "engine_name", "window", "period",
+            name="uq_accuracy_stats_lookup",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("assets.id"), nullable=True
+    )
+    engine_name: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    window: Mapped[str] = mapped_column(String(5), nullable=False)
+    period: Mapped[str] = mapped_column(String(10), nullable=False)  # '7d','30d','90d','all'
+    total: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    correct: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    win_rate: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
+    computed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class IDXHoliday(Base):
+    """Indonesian stock exchange (IDX) holiday calendar."""
+
+    __tablename__ = "idx_holidays"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    holiday_date: Mapped[date] = mapped_column(Date, unique=True, nullable=False)
+    name: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    year: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
 # Seed data for the assets table
 SEED_ASSETS: list[dict[str, str | None]] = [
     # IDX stocks

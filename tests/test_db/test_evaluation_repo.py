@@ -178,13 +178,35 @@ class TestRecomputeAccuracyStats:
     ) -> None:
         """recompute_accuracy_stats executes queries against the session."""
         session = AsyncMock()
-        # Mock the various queries that recompute makes
-        mock_result = MagicMock()
-        mock_result.all.return_value = []
-        mock_result.scalars.return_value = mock_result
-        session.execute.return_value = mock_result
+
+        # Mock execute to return proper scalar results
+        # First calls are count queries (return 0), then engine_results queries (return empty)
+        mock_count_result = MagicMock()
+        mock_count_result.scalar.return_value = 0
+
+        mock_scalars_result = MagicMock()
+        mock_scalars_result.scalars.return_value = mock_scalars_result
+        mock_scalars_result.all.return_value = []
+
+        # Alternate between count results and scalars results
+        call_count = 0
+
+        def execute_side_effect(*args, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            # Every 3rd call per window/period cycle is engine_results
+            # Pattern: total_count, correct_count, upsert, engine_results
+            # But simpler: just return count=0 for scalar calls and empty for scalars
+            result = MagicMock()
+            result.scalar.return_value = 0
+            result.scalars.return_value = result
+            result.all.return_value = []
+            return result
+
+        session.execute = AsyncMock(side_effect=execute_side_effect)
 
         await repo.recompute_accuracy_stats(session=session, asset_id=1)
+        # 4 windows x 4 periods x (2 counts + 1 upsert + 1 engine query) = 64 minimum
         assert session.execute.await_count >= 1
 
 

@@ -42,6 +42,7 @@ class Settings(BaseSettings):
     timeout_analyze: int = 120
     timeout_llm: int = 30
     timeout_decide_per_call: int = 12
+    timeout_evaluate: int = 60
     timeout_report: int = 30
 
     # Technical engine indicator weights (sum to 1.0)
