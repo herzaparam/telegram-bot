@@ -143,10 +143,12 @@ Plans:
   3. The sentiment engine ingests Reddit, Stockbit sentiment, and Fear & Greed index and produces a score with stated data sources
   4. The event engine signals upcoming earnings, BI rate meetings, and crypto halvings in the LLM's event-awareness context
   5. Indonesian news (Kontan, CNBC Indonesia, Bisnis) and global crypto news (Finnhub) are fetched, LLM-scored for impact per asset, and summarized in the daily report
-**Plans**: 2 plans
+**Plans**: 4 plans
 Plans:
-- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
-- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
+- [ ] 08-01-PLAN.md — Dependencies, config extensions, DB models (NewsEvent, MacroData, StockFundamental), Alembic migration 007
+- [ ] 08-02-PLAN.md — Data fetchers: fundamental (yfinance), macro (FRED), news (RSS+Finnhub), sentiment (Fear&Greed+Reddit)
+- [ ] 08-03-PLAN.md — Four engines (Fundamental, Macro, Sentiment, Event) and LLM news impact scorer
+- [ ] 08-04-PLAN.md — Wiring: analyze_stage with 6 engines, global data fetch in pipeline, news digest in daily report
 
 ### Phase 9: IDX Documents + Valuation Engine
 **Goal**: The system parses Indonesian financial PDFs directly from IDX and produces DCF, peer comparison, and scenario valuation — users can query fair value for any IDX stock
@@ -224,7 +226,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. Telegram Bot + Daily Delivery | 2/3 | In Progress|  |
 | 6. Accuracy Tracking + Scorecard | 0/2 | Planning complete | - |
 | 7. Self-Evaluation Feedback Loop | 0/2 | Planning complete | - |
-| 8. Fundamental, Macro, Sentiment, and News Engines | 0/TBD | Not started | - |
+| 8. Fundamental, Macro, Sentiment, and News Engines | 0/4 | Planning complete | - |
 | 9. IDX Documents + Valuation Engine | 0/TBD | Not started | - |
 | 10. Remaining Specialized Engines | 0/TBD | Not started | - |
 | 11. Asset Discovery + Due Diligence | 0/TBD | Not started | - |
