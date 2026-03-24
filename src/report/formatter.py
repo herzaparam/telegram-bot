@@ -10,6 +10,7 @@ MarkdownV2 escape issues with financial data.
 from __future__ import annotations
 
 import html
+from dataclasses import dataclass
 
 MAX_MESSAGE_LENGTH = 4096
 
@@ -194,6 +195,187 @@ def split_report(header: str, asset_cards: list[str]) -> list[str]:
         page += 1
 
     return messages
+
+
+@dataclass(frozen=True)
+class EvalDisplayItem:
+    """A single evaluation result for display."""
+
+    symbol: str
+    verdict: str
+    change_pct: float
+    was_correct: bool
+
+
+# Ordered windows for scorecard display
+_WINDOW_ORDER = ["24h", "3d", "7d", "30d"]
+
+# Period label mapping for /scorecard command
+_PERIOD_LABELS: dict[str, str] = {
+    "7d": "7 Days",
+    "30d": "30 Days",
+    "90d": "90 Days",
+    "all": "All Time",
+}
+
+
+def format_scorecard_section(
+    results_by_window: dict[str, list[EvalDisplayItem]],
+    weekly_trend: str | None,
+) -> str:
+    """Format the scorecard section for the daily report.
+
+    Per D-18: return "" if no results in any window.
+    Per D-16: iterate windows in order ["24h", "3d", "7d", "30d"].
+    Per D-15: each line uses checkmark/cross emoji.
+    Per D-17: trend line at bottom in italics if not None.
+    """
+    # D-18: skip entirely when no evaluations
+    has_any = any(items for items in results_by_window.values())
+    if not has_any:
+        return ""
+
+    lines: list[str] = ["<b>Yesterday's Scorecard</b>", ""]
+
+    first_window = True
+    for window in _WINDOW_ORDER:
+        items = results_by_window.get(window, [])
+        if not items:
+            continue
+
+        if not first_window:
+            lines.append("")  # blank line between window sections
+
+        correct = sum(1 for item in items if item.was_correct)
+        total = len(items)
+        lines.append(f"<b>{window} Results ({correct}/{total})</b>")
+
+        for item in items:
+            emoji = "\u2705" if item.was_correct else "\u274c"
+            sign = "+" if item.change_pct >= 0 else ""
+            lines.append(
+                f"{emoji} {item.symbol} -- {item.verdict} -> {sign}{item.change_pct:.1f}%"
+            )
+
+        first_window = False
+
+    if weekly_trend is not None:
+        lines.append("")
+        lines.append(f"<i>{weekly_trend}</i>")
+
+    return "\n".join(lines)
+
+
+def format_scorecard_message(
+    period: str,
+    asset_filter: str | None,
+    win_rates_by_window: dict[str, tuple[int, int]],
+    total_decisions: int,
+    best_engine: tuple[str, float] | None,
+    worst_engine: tuple[str, float] | None,
+    per_asset_buyhold: list[dict[str, object]],
+    recent_calls: list[dict[str, object]] | None = None,
+    period_empty: bool = False,
+) -> str:
+    """Format the /scorecard command response.
+
+    Per UI-SPEC: title, win rates by window, best/worst engine,
+    buy-and-hold comparison, optional recent calls for asset filter.
+    """
+    # Empty state
+    if total_decisions == 0 and not win_rates_by_window:
+        if period_empty:
+            period_label = _PERIOD_LABELS.get(period, period)
+            return (
+                f"\u2139\ufe0f No evaluations in the last {period_label.lower()}.\n\n"
+                "Try a longer period: /scorecard 30d"
+            )
+        return (
+            "\u2139\ufe0f No scorecard data available yet.\n\n"
+            "Signals need at least one day to be evaluated. "
+            "Check back after the pipeline has run for two consecutive days."
+        )
+
+    period_label = _PERIOD_LABELS.get(period, period)
+
+    # Title
+    if asset_filter:
+        title = f"<b>Scorecard - {asset_filter} - Last {period_label}</b>"
+    else:
+        title = f"<b>Scorecard - Last {period_label}</b>"
+
+    lines: list[str] = [title, ""]
+
+    # Win Rate by Window
+    if win_rates_by_window:
+        lines.append("<b>Win Rate by Window</b>")
+        for window in _WINDOW_ORDER:
+            if window not in win_rates_by_window:
+                continue
+            correct, total = win_rates_by_window[window]
+            pct = round((correct / total) * 100) if total > 0 else 0
+            # Pad shorter window names for alignment
+            padded = f"{window}:".rjust(4)
+            lines.append(f"{padded} {pct}% ({correct}/{total})")
+        lines.append("")
+
+    # Total Decisions
+    lines.append(f"<b>Total Decisions:</b> {total_decisions}")
+    lines.append("")
+
+    # Best/Worst Engine
+    if best_engine:
+        name, rate = best_engine
+        lines.append(
+            f"<b>Best Engine:</b> \U0001f3c6 {name} ({rate:.0f}% at 24h)"
+        )
+    if worst_engine:
+        name, rate = worst_engine
+        lines.append(
+            f"<b>Worst Engine:</b> \u26a0\ufe0f {name} ({rate:.0f}% at 24h)"
+        )
+
+    # Buy & Hold comparison
+    if per_asset_buyhold:
+        lines.append("")
+        lines.append("<b>vs Buy & Hold</b>")
+        for entry in per_asset_buyhold:
+            symbol = entry["symbol"]
+            sig_ret = float(entry["signal_return"])  # type: ignore[arg-type]
+            bh_ret = float(entry["buyhold_return"])  # type: ignore[arg-type]
+            alpha = sig_ret - bh_ret
+
+            sig_sign = "+" if sig_ret >= 0 else ""
+            bh_sign = "+" if bh_ret >= 0 else ""
+
+            if alpha >= 0:
+                alpha_str = f"<b>+{alpha:.1f}% alpha</b>"
+            else:
+                alpha_str = f"<i>{alpha:.1f}% underperform</i>"
+
+            lines.append(
+                f"{symbol}: Signals {sig_sign}{sig_ret:.1f}% | "
+                f"B&H {bh_sign}{bh_ret:.1f}% | {alpha_str}"
+            )
+
+    # Recent Calls (asset-filtered mode)
+    if asset_filter and recent_calls:
+        lines.append("")
+        lines.append("<b>Recent Calls</b>")
+        for call in recent_calls[:5]:
+            emoji = "\u2705" if call["was_correct"] else "\u274c"
+            sign = "+" if float(call["change_pct"]) >= 0 else ""  # type: ignore[arg-type]
+            lines.append(
+                f"{emoji} {call['date']} {call['verdict']} -> "
+                f"{sign}{float(call['change_pct']):.1f}% ({call['window']})"  # type: ignore[arg-type]
+            )
+
+    return "\n".join(lines)
+
+
+def format_scorecard_error() -> str:
+    """Format scorecard error message per UI-SPEC copywriting."""
+    return "\u26a0\ufe0f Failed to load scorecard data. Try again in a few minutes."
 
 
 def format_watchlist_message(assets: list[tuple[str, str, str]]) -> str:

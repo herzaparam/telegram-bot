@@ -17,8 +17,15 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
-from src.db.models import Asset, DailyDecision, Watchlist
-from src.report.formatter import format_asset_card, format_report_header, split_report
+from src.db.evaluation_repo import evaluation_repo
+from src.db.models import Asset, DailyDecision, Evaluation, Watchlist
+from src.report.formatter import (
+    EvalDisplayItem,
+    format_asset_card,
+    format_report_header,
+    format_scorecard_section,
+    split_report,
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -69,6 +76,89 @@ async def send_telegram_message(chat_id: str, text: str, token: str) -> bool:
             response_text=response.text,
         )
         return False
+
+
+async def _build_scorecard_section(
+    session: AsyncSession,
+    run_date: date,
+) -> str:
+    """Build scorecard section text from matured evaluations.
+
+    Queries recent evaluations for each window, computes weekly trend,
+    and formats via format_scorecard_section().
+    Returns empty string if no evaluations found (D-18).
+    """
+    from datetime import timedelta
+
+    window_days_back = {"24h": 2, "3d": 4, "7d": 8, "30d": 31}
+    results_by_window: dict[str, list[EvalDisplayItem]] = {}
+
+    for window, days in window_days_back.items():
+        evals = await evaluation_repo.get_recent_evaluations(
+            session, window, days_back=days
+        )
+        if not evals:
+            continue
+
+        # Join with decisions to get verdict and symbol
+        items: list[EvalDisplayItem] = []
+        for ev in evals:
+            decision_stmt = select(DailyDecision, Asset).join(
+                Asset, DailyDecision.asset_id == Asset.id
+            ).where(DailyDecision.id == ev.decision_id)
+            result = await session.execute(decision_stmt)
+            row = result.first()
+            if row:
+                decision, asset = row
+                items.append(
+                    EvalDisplayItem(
+                        symbol=asset.symbol,
+                        verdict=decision.verdict,
+                        change_pct=float(ev.change_pct),
+                        was_correct=ev.was_correct,
+                    )
+                )
+        if items:
+            results_by_window[window] = items
+
+    # Compute weekly trend for 24h accuracy
+    weekly_trend: str | None = None
+    try:
+        this_week_evals = await evaluation_repo.get_recent_evaluations(
+            session, "24h", days_back=7
+        )
+        last_week_evals = await evaluation_repo.get_recent_evaluations(
+            session, "24h", days_back=14
+        )
+        # Subtract this week from last week to get only last week
+        this_week_ids = {e.id for e in this_week_evals}
+        last_week_only = [e for e in last_week_evals if e.id not in this_week_ids]
+
+        if this_week_evals and last_week_only:
+            this_correct = sum(1 for e in this_week_evals if e.was_correct)
+            this_total = len(this_week_evals)
+            this_rate = round((this_correct / this_total) * 100)
+
+            last_correct = sum(1 for e in last_week_only if e.was_correct)
+            last_total = len(last_week_only)
+            last_rate = round((last_correct / last_total) * 100)
+
+            diff = this_rate - last_rate
+            if diff > 2:
+                direction = "^"
+            elif diff < -2:
+                direction = "v"
+            else:
+                direction = "~"
+
+            weekly_trend = (
+                f"Trending: {this_rate}% win rate this week "
+                f"({direction} from {last_rate}% last week)"
+            )
+    except Exception:
+        logger.debug("weekly_trend_computation_failed", exc_info=True)
+
+    return format_scorecard_section(results_by_window, weekly_trend)
 
 
 async def send_daily_report(
@@ -148,6 +238,9 @@ async def send_daily_report(
                 )
                 break
 
+    # Build scorecard section from matured evaluations
+    scorecard_text = await _build_scorecard_section(session, run_date)
+
     # Format header
     header = format_report_header(
         str(run_date), len(results), distribution, risk_warnings
@@ -155,6 +248,10 @@ async def send_daily_report(
 
     if failure_notice:
         header = header + "\n\n" + failure_notice
+
+    # Prepend scorecard section if evaluations exist
+    if scorecard_text:
+        header = scorecard_text + "\n\n---\n\n" + header
 
     # Format asset cards
     cards = [
