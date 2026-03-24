@@ -16,9 +16,9 @@
 
 ### Watchlist
 
-- [ ] **WTCH-01**: User can add IDX stocks and crypto assets to personal watchlist via Telegram
-- [ ] **WTCH-02**: User can remove assets from watchlist via Telegram
-- [ ] **WTCH-03**: User can view current watchlist via `/watchlist` command
+- [x] **WTCH-01**: User can add IDX stocks and crypto assets to personal watchlist via Telegram
+- [x] **WTCH-02**: User can remove assets from watchlist via Telegram
+- [x] **WTCH-03**: User can view current watchlist via `/watchlist` command
 
 ### Signal Engines
 
@@ -40,11 +40,11 @@
 
 ### LLM Decision Maker
 
-- [ ] **LLM-01**: LLM reads all 15 engine scores + valuation data + context to produce final verdict
-- [ ] **LLM-02**: LLM detects contradictions between signals (e.g., bullish technicals but overvalued)
-- [ ] **LLM-03**: LLM considers upcoming events that could invalidate signals
+- [x] **LLM-01**: LLM reads all 15 engine scores + valuation data + context to produce final verdict
+- [x] **LLM-02**: LLM detects contradictions between signals (e.g., bullish technicals but overvalued)
+- [x] **LLM-03**: LLM considers upcoming events that could invalidate signals
 - [ ] **LLM-04**: LLM applies lessons learned from past mistakes
-- [ ] **LLM-05**: LLM outputs STRONG BUY / BUY / HOLD / SELL / STRONG SELL + reasoning + fair value context
+- [x] **LLM-05**: LLM outputs STRONG BUY / BUY / HOLD / SELL / STRONG SELL + reasoning + fair value context
 - [ ] **LLM-06**: LLM considers due diligence flags (insider selling, management changes, earnings quality)
 
 ### Self-Evaluation
@@ -71,7 +71,7 @@
 ### Telegram Bot
 
 - [ ] **TBOT-01**: `/start` welcome + setup
-- [ ] **TBOT-02**: `/report` gets today's full report on demand
+- [x] **TBOT-02**: `/report` gets today's full report on demand
 - [ ] **TBOT-03**: `/report BTC` gets detailed single-asset report
 - [ ] **TBOT-04**: `/scorecard` shows accuracy stats + recent results
 - [ ] **TBOT-05**: `/lessons` shows learned lessons
@@ -87,9 +87,9 @@
 ### Daily Report
 
 - [ ] **REPT-01**: Yesterday's scorecard (was I right/wrong, accuracy stats)
-- [ ] **REPT-02**: Today's signal for each watchlist asset (all 15 categories + LLM verdict)
+- [x] **REPT-02**: Today's signal for each watchlist asset (all 15 categories + LLM verdict)
 - [ ] **REPT-03**: Valuation summary (fair value vs market price, margin of safety)
-- [ ] **REPT-04**: LLM reasoning for each decision
+- [x] **REPT-04**: LLM reasoning for each decision
 - [ ] **REPT-05**: Lessons applied today
 - [ ] **REPT-06**: Portfolio risk snapshot (concentration, correlation alerts)
 - [ ] **REPT-07**: New opportunities discovered
@@ -161,9 +161,9 @@
 | DATA-04 | Phase 1 | Complete |
 | DATA-05 | Phase 1 | Complete |
 | DATA-06 | Phase 1 | Complete |
-| WTCH-01 | Phase 5 | Pending |
-| WTCH-02 | Phase 5 | Pending |
-| WTCH-03 | Phase 5 | Pending |
+| WTCH-01 | Phase 5 | Complete |
+| WTCH-02 | Phase 5 | Complete |
+| WTCH-03 | Phase 5 | Complete |
 | ENGN-01 | Phase 3 | Complete |
 | ENGN-02 | Phase 8 | Pending |
 | ENGN-03 | Phase 3 | Complete |
@@ -179,11 +179,11 @@
 | ENGN-13 | Phase 10 | Pending |
 | ENGN-14 | Phase 10 | Pending |
 | ENGN-15 | Phase 9 | Pending |
-| LLM-01 | Phase 4 | Pending |
-| LLM-02 | Phase 4 | Pending |
-| LLM-03 | Phase 4 | Pending |
+| LLM-01 | Phase 4 | Complete |
+| LLM-02 | Phase 4 | Complete |
+| LLM-03 | Phase 4 | Complete |
 | LLM-04 | Phase 7 | Pending |
-| LLM-05 | Phase 4 | Pending |
+| LLM-05 | Phase 4 | Complete |
 | LLM-06 | Phase 11 | Pending |
 | EVAL-01 | Phase 6 | Pending |
 | EVAL-02 | Phase 7 | Pending |
@@ -198,7 +198,7 @@
 | NEWS-03 | Phase 8 | Pending |
 | NEWS-04 | Phase 8 | Pending |
 | TBOT-01 | Phase 5 | Pending |
-| TBOT-02 | Phase 5 | Pending |
+| TBOT-02 | Phase 5 | Complete |
 | TBOT-03 | Phase 5 | Pending |
 | TBOT-04 | Phase 6 | Pending |
 | TBOT-05 | Phase 7 | Pending |
@@ -211,9 +211,9 @@
 | TBOT-12 | Phase 12 | Pending |
 | TBOT-13 | Phase 9 | Pending |
 | REPT-01 | Phase 6 | Pending |
-| REPT-02 | Phase 5 | Pending |
+| REPT-02 | Phase 5 | Complete |
 | REPT-03 | Phase 9 | Pending |
-| REPT-04 | Phase 5 | Pending |
+| REPT-04 | Phase 5 | Complete |
 | REPT-05 | Phase 7 | Pending |
 | REPT-06 | Phase 12 | Pending |
 | REPT-07 | Phase 11 | Pending |

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Phase 5 UI-SPEC approved
-last_updated: "2026-03-24T09:27:37.978Z"
+status: Ready to execute
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-03-24T09:51:50.367Z"
 progress:
   total_phases: 12
   completed_phases: 4
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 14
+  completed_plans: 13
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** The daily signal loop must work reliably: fetch data, run engines, produce LLM verdicts, and deliver a Telegram report every morning
-**Current focus:** Phase 04 — llm-decision-maker
+**Current focus:** Phase 05 — telegram-bot-daily-delivery
 
 ## Current Position
 
-Phase: 5
-Plan: Not started
+Phase: 05 (telegram-bot-daily-delivery) — EXECUTING
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -57,6 +57,8 @@ Plan: Not started
 | Phase 03 P04 | 3min | 2 tasks | 3 files |
 | Phase 04 P01 | 5min | 2 tasks | 8 files |
 | Phase 04 P02 | 2min | 1 tasks | 2 files |
+| Phase 05 P01 | 4min | 2 tasks | 9 files |
+| Phase 05 P03 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -95,6 +97,11 @@ Recent decisions affecting current work:
 - [Phase 04]: timeout_decide_per_call=12s per LLM call so initial + retry fits within 30s stage timeout
 - [Phase 04]: Contradiction detection uses D-08 thresholds: score >+0.3/<-0.3 and confidence >0.5
 - [Phase 04]: Fallback confidence capped at 0.5 with spread-based calculation
+- [Phase 05]: HTML parse_mode for Telegram messages (avoids MarkdownV2 escape issues with financial data)
+- [Phase 05]: Formatter in src/report/ shared by both bot and pipeline processes (not duplicated)
+- [Phase 05]: Reasoning truncation at word boundary with 100-char limit for compact cards
+- [Phase 05]: Report stage runs as post-pipeline hook (not StageFunc) since it aggregates across all assets
+- [Phase 05]: httpx for Telegram API in pipeline (not PTB) per D-16 two-process boundary
 
 ### Pending Todos
 
@@ -108,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T09:27:37.970Z
-Stopped at: Phase 5 UI-SPEC approved
-Resume file: .planning/phases/05-telegram-bot-daily-delivery/05-UI-SPEC.md
+Last session: 2026-03-24T09:51:50.364Z
+Stopped at: Completed 05-03-PLAN.md
+Resume file: None

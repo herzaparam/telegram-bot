@@ -99,9 +99,9 @@ Plans:
   5. Reports longer than Telegram's 4096-character limit are automatically split into multiple messages without truncation
 **Plans**: 3 plans
 Plans:
-- [ ] 05-01-PLAN.md — Watchlist + BotSettings models, Alembic migration, shared report formatter, config
+- [x] 05-01-PLAN.md — Watchlist + BotSettings models, Alembic migration, shared report formatter, config
 - [ ] 05-02-PLAN.md — PTB webhook integration, auth, all bot command handlers (/start, /add, /remove, /watchlist, /report, /settings)
-- [ ] 05-03-PLAN.md — Pipeline report stage with Telegram delivery via httpx, wire into pipeline
+- [x] 05-03-PLAN.md — Pipeline report stage with Telegram delivery via httpx, wire into pipeline
 **UI hint**: yes
 
 ### Phase 6: Accuracy Tracking + Scorecard
@@ -221,7 +221,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Data Layer | 0/2 | Planning complete | - |
 | 3. Technical Engine + Pipeline Shell | 0/4 | Planning complete | - |
 | 4. LLM Decision Maker | 1/2 | In Progress|  |
-| 5. Telegram Bot + Daily Delivery | 0/3 | Planning complete | - |
+| 5. Telegram Bot + Daily Delivery | 2/3 | In Progress|  |
 | 6. Accuracy Tracking + Scorecard | 0/TBD | Not started | - |
 | 7. Self-Evaluation Feedback Loop | 0/TBD | Not started | - |
 | 8. Fundamental, Macro, Sentiment, and News Engines | 0/TBD | Not started | - |
