@@ -15,6 +15,7 @@ import structlog
 
 from src.config import settings
 from src.db.decision_repo import decision_repo
+from src.db.lesson_repo import lesson_repo
 from src.db.models import Asset, SignalRecord
 from src.db.signal_repo import signal_repo
 from src.llm.client import llm_completion
@@ -249,8 +250,28 @@ async def decide_stage(session: "AsyncSession", asset: Asset) -> None:  # noqa: 
     if contradictions:
         log.info("contradictions_detected", count=len(contradictions))
 
+    # 2.5 Load relevant lessons for injection (D-12)
+    engine_categories = list({s.category for s in signals})
+    relevant_lessons = await lesson_repo.get_relevant_lessons(
+        session, asset.asset_type, engine_categories, max_lessons=20
+    )
+    lessons_for_prompt: list[dict[str, object]] | None = None
+    if relevant_lessons:
+        lessons_for_prompt = [
+            {
+                "id": l.id,
+                "lesson": l.lesson,
+                "asset_type": l.asset_type,
+                "engine_tags": l.engine_tags or [],
+                "accuracy": (l.times_correct / l.times_applied) if l.times_applied > 0 else None,
+                "times_applied": l.times_applied,
+            }
+            for l in relevant_lessons
+        ]
+        log.info("lessons_injected", count=len(relevant_lessons))
+
     # 3. Build prompt and call LLM
-    messages = build_decision_prompt(asset, signals, contradictions)
+    messages = build_decision_prompt(asset, signals, contradictions, lessons=lessons_for_prompt)
     result = await llm_completion(
         messages=messages,
         response_format={"type": "json_object"},
@@ -299,6 +320,18 @@ async def decide_stage(session: "AsyncSession", asset: Asset) -> None:  # noqa: 
         all_signals=decision.all_signals,
         model_used=model_used,
     )
+
+    # 5. Record lessons applied and update lesson counters
+    if relevant_lessons:
+        lessons_applied_data = {
+            str(l.id): l.lesson for l in relevant_lessons
+        }
+        await decision_repo.update_lessons_applied(
+            session, asset.id, today, lessons_applied_data
+        )
+        await lesson_repo.increment_times_applied(
+            session, [l.id for l in relevant_lessons]
+        )
 
     log.info(
         "decision_stored",
