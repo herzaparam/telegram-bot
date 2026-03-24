@@ -15,10 +15,13 @@ The daily signal loop must work reliably: fetch data, run engines, produce LLM v
 <!-- Shipped and confirmed valuable. -->
 
 - [x] LLM final decision maker synthesizing all engine scores into a verdict — Validated in Phase 4: LLM Decision Maker
+- [x] Watchlist management via Telegram commands (add/remove IDX stocks and crypto) — Validated in Phase 5: Telegram Bot & Daily Delivery
+- [x] Daily Telegram report with signals and reasoning — Validated in Phase 5: Telegram Bot & Daily Delivery
+- [x] Telegram bot commands (/start, /add, /remove, /watchlist, /report, /settings) — Validated in Phase 5: Telegram Bot & Daily Delivery
 
 ### Active
 
-- [ ] Watchlist management via Telegram commands (add/remove IDX stocks and crypto)
+- [ ] 15-category signal analysis engines (technical, fundamental, sentiment, on-chain, macro, etc.)
 - [ ] 15-category signal analysis engines (technical, fundamental, sentiment, on-chain, macro, etc.)
 - [ ] Each engine outputs score (-1 to +1), confidence (0-1), and reasoning
 - [x] LLM final decision maker synthesizing all engine scores into a verdict (Phase 4)
@@ -26,9 +29,7 @@ The daily signal loop must work reliably: fetch data, run engines, produce LLM v
 - [ ] Self-evaluation feedback loop — review yesterday's decisions, extract lessons, improve over time
 - [ ] Indonesian financial document (laporan keuangan) PDF parsing with GPT
 - [ ] News-driven signals from Indonesian and global sources
-- [ ] Daily Telegram report with scorecard, signals, reasoning, lessons, and opportunities
 - [ ] Asset discovery — scan IHSG and crypto for unusual volume, breakouts, anomalies
-- [ ] Telegram bot commands (/report, /scorecard, /valuation, /portfolio, etc.)
 - [ ] Due diligence module (ownership, insider tracking, management quality, sector benchmarking)
 - [ ] Portfolio risk monitor (correlation matrix, concentration risk, VaR, stress testing)
 - [ ] Enhanced fundamental deep dive with ratio dashboards and earnings quality analysis
@@ -68,4 +69,4 @@ The daily signal loop must work reliably: fetch data, run engines, produce LLM v
 | asyncpg for hot paths, SQLAlchemy for relational | Raw asyncpg ~0.1ms/query for price reads, SQLAlchemy for type safety elsewhere | — Pending |
 
 ---
-*Last updated: 2026-03-24 after Phase 4 (LLM Decision Maker) completion*
+*Last updated: 2026-03-24 after Phase 5 (Telegram Bot & Daily Delivery) completion*
