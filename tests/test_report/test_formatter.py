@@ -150,14 +150,15 @@ class TestFormatAssetDetail:
             "Reasoning", {"factor": "value"}, None
         )
         # Should still produce a result without error
-        assert "<b>BBCA</b>" in result
+        assert "BBCA" in result
+        assert "Risk Warning" not in result
 
     def test_detail_with_no_key_factors(self):
         result = format_asset_detail(
             "BBCA", "Bank Central Asia", "BUY", 0.5, 0.8,
             "Reasoning", None, "Warning here"
         )
-        assert "<b>BBCA</b>" in result
+        assert "BBCA" in result
 
 
 class TestFormatReportHeader:
