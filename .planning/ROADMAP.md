@@ -82,7 +82,10 @@ Plans:
   2. When technical engine signals are bullish but a contradicting valuation score exists, the LLM flags the contradiction explicitly in its reasoning
   3. When the LLM API fails three times, the pipeline produces a verdict using a deterministic weighted-average fallback marked LLM_UNAVAILABLE rather than crashing
   4. LLM calls complete within 30 seconds per asset or abort with the fallback result
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
+- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
 
 ### Phase 5: Telegram Bot + Daily Delivery
 **Goal**: Users receive the daily signal report automatically every morning via Telegram and can query it on demand — the core daily signal loop is complete end-to-end
@@ -94,7 +97,10 @@ Plans:
   3. Sending /report BTC delivers a single-asset detailed report for BTC
   4. The bot process never imports pipeline modules — querying pg_stat_activity confirms the bot process holds only bot-related queries
   5. Reports longer than Telegram's 4096-character limit are automatically split into multiple messages without truncation
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
+- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
 **UI hint**: yes
 
 ### Phase 6: Accuracy Tracking + Scorecard
@@ -106,7 +112,10 @@ Plans:
   2. /scorecard shows win rate, total decisions, best and worst performing engine, and comparison against a buy-and-hold baseline
   3. The daily report begins with an honest yesterday's scorecard section showing which calls were right and which were wrong
   4. Per-engine accuracy is tracked independently so the LLM can be given engine quality metadata in future phases
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
+- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
 
 ### Phase 7: Self-Evaluation Feedback Loop
 **Goal**: The LLM reviews its past mistakes, extracts concrete lessons, stores them in tiers, and injects them into future decisions — the system improves over time without human intervention
@@ -118,7 +127,10 @@ Plans:
   3. Active lessons (up to 20 maximum) are injected into the LLM decision prompt for the current day's analysis
   4. /lessons shows the current active lesson set with their confidence tier (hypothesis / pattern / rule) and sample count
   5. The daily report includes a "lessons applied today" section listing which lessons were active
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
+- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
 
 ### Phase 8: Fundamental, Macro, Sentiment, and News Engines
 **Goal**: Four additional engines deepen signal quality — fundamentals for IDX stocks, macro context for both asset classes, sentiment from social sources, and news-driven event signals
@@ -130,7 +142,10 @@ Plans:
   3. The sentiment engine ingests Reddit, Stockbit sentiment, and Fear & Greed index and produces a score with stated data sources
   4. The event engine signals upcoming earnings, BI rate meetings, and crypto halvings in the LLM's event-awareness context
   5. Indonesian news (Kontan, CNBC Indonesia, Bisnis) and global crypto news (Finnhub) are fetched, LLM-scored for impact per asset, and summarized in the daily report
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
+- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
 
 ### Phase 9: IDX Documents + Valuation Engine
 **Goal**: The system parses Indonesian financial PDFs directly from IDX and produces DCF, peer comparison, and scenario valuation — users can query fair value for any IDX stock
@@ -142,7 +157,10 @@ Plans:
   3. /valuation BBCA returns a DCF estimate, comparable company analysis, bull/base/bear scenario returns, and margin of safety versus current price
   4. The daily report includes a valuation summary showing fair value vs market price and margin of safety for each IDX stock
   5. Quarter-over-quarter ratio changes trigger alerts when they exceed defined thresholds
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
+- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
 
 ### Phase 10: Remaining Specialized Engines
 **Goal**: The full 15-engine suite is operational — ML/AI prediction, on-chain crypto analysis, options flow, behavioral anomalies, network correlation, game theory order book, and emerging quantitative methods
@@ -154,7 +172,10 @@ Plans:
   3. All 15 engines produce a valid score/confidence/reasoning for each applicable asset in a single pipeline run
   4. Any engine that fails its data source returns score=0/confidence=0 — the pipeline completes the full run without that engine's contribution
   5. Per-engine accuracy is tracked for all 15 engines and visible in /scorecard
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
+- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
 
 ### Phase 11: Asset Discovery + Due Diligence
 **Goal**: The system scans beyond the watchlist to surface new opportunities and provides full due diligence reports on IDX stocks including ownership, management, and competitive positioning
@@ -166,7 +187,10 @@ Plans:
   3. /duediligence BBCA returns a report including sector benchmarking, insider ownership changes, management quality score, and competitive positioning
   4. The LLM incorporates due diligence flags (insider selling, management changes, earnings quality warnings) when they exist for an asset
   5. /compare BBCA BBRI BMRI returns a side-by-side sector comparison across key metrics
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
+- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
 
 ### Phase 12: Portfolio Risk + Advanced Commands
 **Goal**: Users can monitor their portfolio's risk exposure with correlation alerts, VaR estimates, and stress tests — and access historical backtesting and deep ratio analysis
@@ -178,7 +202,10 @@ Plans:
   3. /backtest BTC 30d replays historical signals over the specified period and reports win rate, return, and comparison against buy-and-hold
   4. /fundamentals BBCA shows a 5-year trend dashboard of profitability, leverage, efficiency, and growth ratios alongside earnings quality and dividend analysis
   5. Stress testing runs historical scenario shocks (e.g., 2020 COVID crash, 2022 crypto winter) against the current portfolio and reports projected drawdown
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
+- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
 **UI hint**: yes
 
 ## Progress
@@ -191,7 +218,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Foundation | 0/3 | Planning complete | - |
 | 2. Data Layer | 0/2 | Planning complete | - |
 | 3. Technical Engine + Pipeline Shell | 0/4 | Planning complete | - |
-| 4. LLM Decision Maker | 0/TBD | Not started | - |
+| 4. LLM Decision Maker | 0/2 | Planning complete | - |
 | 5. Telegram Bot + Daily Delivery | 0/TBD | Not started | - |
 | 6. Accuracy Tracking + Scorecard | 0/TBD | Not started | - |
 | 7. Self-Evaluation Feedback Loop | 0/TBD | Not started | - |
