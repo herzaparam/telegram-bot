@@ -25,8 +25,8 @@ result: pass
 
 ### 3. Data Tier Failure Routing
 expected: A CRITICAL source failure raises SourceCriticalError and halts the pipeline. An IMPORTANT source failure degrades gracefully (DegradedResult). A SUPPLEMENTARY source failure is skipped silently (SkippedResult).
-result: skipped
-reason: No real data sources wired yet — unit tests cover behavior, manual verification deferred to Phase 2
+result: pass
+reason: CRITICAL path verified manually — inserted FAKEXYZ.JK bogus ticker, pipeline emitted asset_skipped_critical with SourceCriticalError, asset marked skipped, other assets unaffected. Unit tests cover all three tiers. IMPORTANT/SUPPLEMENTARY E2E paths will exercise when Phases 8-10 add those engines.
 
 ### 4. LLM Wrapper Never-Raises
 expected: When all LLM providers fail (litellm raises), `llm_completion()` catches the error and returns LLM_UNAVAILABLE sentinel — never crashes the caller.
@@ -47,10 +47,10 @@ result: pass
 ## Summary
 
 total: 7
-passed: 5
+passed: 6
 issues: 1
 pending: 0
-skipped: 1
+skipped: 0
 
 ## Gaps
 

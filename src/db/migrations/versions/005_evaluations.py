@@ -118,9 +118,10 @@ def upgrade() -> None:
     # Seed IDX 2026 holidays
     for dt_str, name in IDX_HOLIDAYS_2026:
         year = int(dt_str[:4])
+        escaped_name = name.replace("'", "''")
         op.execute(
             f"INSERT INTO idx_holidays (holiday_date, name, year) "
-            f"VALUES ('{dt_str}', '{name}', {year})"
+            f"VALUES ('{dt_str}', '{escaped_name}', {year})"
         )
 
 
