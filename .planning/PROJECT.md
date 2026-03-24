@@ -26,7 +26,7 @@ The daily signal loop must work reliably: fetch data, run engines, produce LLM v
 - [ ] Each engine outputs score (-1 to +1), confidence (0-1), and reasoning
 - [x] LLM final decision maker synthesizing all engine scores into a verdict (Phase 4)
 - [ ] Valuation engine with DCF, peer comparison, and fair value estimates
-- [ ] Self-evaluation feedback loop — review yesterday's decisions, extract lessons, improve over time
+- [x] Self-evaluation feedback loop — review yesterday's decisions, extract lessons, improve over time — Validated in Phase 7: Self-Evaluation Feedback Loop
 - [ ] Indonesian financial document (laporan keuangan) PDF parsing with GPT
 - [ ] News-driven signals from Indonesian and global sources
 - [ ] Asset discovery — scan IHSG and crypto for unusual volume, breakouts, anomalies
