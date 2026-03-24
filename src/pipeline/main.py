@@ -17,6 +17,7 @@ from src.data.analyze import analyze_stage
 from src.data.decide import decide_stage
 from src.data.evaluate import evaluate_stage
 from src.data.ingest import ingest_stage
+from src.data.reflect import reflect_stage, run_batch_cross_cutting
 from src.data.report import send_daily_report, send_pipeline_failure_alert
 from src.db.database import async_session_factory
 from src.logging import setup_logging
@@ -40,7 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--stage",
         type=str,
         default=None,
-        help="Run only the specified stage (evaluate, fetch, analyze, decide, report).",
+        help="Run only the specified stage (evaluate, reflect, fetch, analyze, decide, report).",
     )
     parser.add_argument(
         "--rerun-failed",
@@ -64,6 +65,7 @@ async def async_main() -> None:
     runner = PipelineRunner(async_session_factory)
     stage_funcs = {
         "evaluate": evaluate_stage,  # Runs first: evaluate prior decisions (D-11)
+        "reflect": reflect_stage,    # After evaluate: extract lessons from past decisions
         "fetch": ingest_stage,
         "analyze": analyze_stage,
         "decide": decide_stage,
@@ -85,6 +87,13 @@ async def async_main() -> None:
             skipped=result.assets_skipped,
             duration=f"{result.duration_seconds:.2f}s",
         )
+
+    # Post-reflect: run batch cross-cutting analysis (D-06)
+    try:
+        async with async_session_factory() as session:
+            await run_batch_cross_cutting(session)
+    except Exception:
+        logger.exception("batch_cross_cutting_error")
 
     # Post-pipeline: send daily Telegram report (D-15)
     # Report runs after all stages, not as a per-asset StageFunc
