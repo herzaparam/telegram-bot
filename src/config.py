@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     telegram_bot_token: SecretStr = SecretStr("")
     telegram_chat_id: str = ""
 
+    # Telegram webhook
+    webhook_base_url: str = ""
+    telegram_webhook_secret: str = ""
+
     # Logging
     log_level: str = "INFO"
     log_format: str = "json"

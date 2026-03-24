@@ -198,6 +198,34 @@ class SignalRecord(Base):
     )
 
 
+class Watchlist(Base):
+    """Shared watchlist linking assets to the Telegram report filter (D-09)."""
+
+    __tablename__ = "watchlist"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("assets.id"), unique=True, nullable=False
+    )
+    added_by_chat_id: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    added_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class BotSettings(Base):
+    """Bot configuration stored in DB for runtime updates via /settings (D-17)."""
+
+    __tablename__ = "bot_settings"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    key: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    value: Mapped[str] = mapped_column(String(200), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
 # Seed data for the assets table
 SEED_ASSETS: list[dict[str, str | None]] = [
     # IDX stocks
