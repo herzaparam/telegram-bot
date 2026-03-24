@@ -14,14 +14,14 @@ The daily signal loop must work reliably: fetch data, run engines, produce LLM v
 
 <!-- Shipped and confirmed valuable. -->
 
-(None yet — ship to validate)
+- [x] LLM final decision maker synthesizing all engine scores into a verdict — Validated in Phase 4: LLM Decision Maker
 
 ### Active
 
 - [ ] Watchlist management via Telegram commands (add/remove IDX stocks and crypto)
 - [ ] 15-category signal analysis engines (technical, fundamental, sentiment, on-chain, macro, etc.)
 - [ ] Each engine outputs score (-1 to +1), confidence (0-1), and reasoning
-- [ ] LLM final decision maker synthesizing all engine scores into a verdict
+- [x] LLM final decision maker synthesizing all engine scores into a verdict (Phase 4)
 - [ ] Valuation engine with DCF, peer comparison, and fair value estimates
 - [ ] Self-evaluation feedback loop — review yesterday's decisions, extract lessons, improve over time
 - [ ] Indonesian financial document (laporan keuangan) PDF parsing with GPT
@@ -68,4 +68,4 @@ The daily signal loop must work reliably: fetch data, run engines, produce LLM v
 | asyncpg for hot paths, SQLAlchemy for relational | Raw asyncpg ~0.1ms/query for price reads, SQLAlchemy for type safety elsewhere | — Pending |
 
 ---
-*Last updated: 2026-03-23 after initialization*
+*Last updated: 2026-03-24 after Phase 4 (LLM Decision Maker) completion*
