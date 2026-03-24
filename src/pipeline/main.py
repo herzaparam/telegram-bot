@@ -14,6 +14,7 @@ import structlog
 
 from src.config import settings
 from src.data.analyze import analyze_stage
+from src.data.decide import decide_stage
 from src.data.ingest import ingest_stage
 from src.db.database import async_session_factory
 from src.logging import setup_logging
@@ -62,6 +63,7 @@ async def async_main() -> None:
     stage_funcs = {
         "fetch": ingest_stage,
         "analyze": analyze_stage,
+        "decide": decide_stage,
     }
     results = await runner.run_pipeline(
         run_date=run_date,

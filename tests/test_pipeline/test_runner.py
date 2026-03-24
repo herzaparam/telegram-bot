@@ -318,6 +318,53 @@ class TestRerunFailed:
         assert result.assets_completed == 3
 
 
+class TestDecideStageRegistration:
+    """Verify decide_stage is wired into the pipeline."""
+
+    def test_decide_stage_in_stage_funcs(self):
+        """decide_stage is importable and matches StageFunc signature."""
+        from src.data.decide import decide_stage
+
+        import inspect
+
+        sig = inspect.signature(decide_stage)
+        params = list(sig.parameters.keys())
+        assert params == ["session", "asset"]
+
+    def test_decide_stage_is_coroutine(self):
+        """decide_stage is an async function."""
+        from src.data.decide import decide_stage
+
+        import asyncio
+
+        assert asyncio.iscoroutinefunction(decide_stage)
+
+    def test_pipeline_main_imports_decide_stage(self):
+        """main.py successfully imports decide_stage."""
+        import importlib
+
+        mod = importlib.import_module("src.pipeline.main")
+        # The module should have the stage_funcs built inside async_main,
+        # but at minimum the import should work
+        assert hasattr(mod, "async_main")
+
+    async def test_pipeline_runner_accepts_decide_stage(
+        self, runner, run_date, seeded_session_factory
+    ):
+        """PipelineRunner can run with decide stage func."""
+        from src.data.decide import decide_stage
+
+        # Use a mock that matches signature instead of real decide_stage
+        # (which needs DB signals), just to verify runner accepts it
+        async def mock_decide(session, asset):
+            pass
+
+        result = await runner.run_stage(run_date, "decide", mock_decide)
+        assert result.stage == "decide"
+        assert result.status == "completed"
+        assert result.assets_completed == 3
+
+
 class TestCLIArgParsing:
     """CLI argument parsing tests."""
 
