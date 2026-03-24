@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-03-24T07:57:05.104Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-03-24T08:04:00.141Z"
 progress:
   total_phases: 12
   completed_phases: 2
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 03 (technical-engine-pipeline-shell) — EXECUTING
-Plan: 2 of 4
+Plan: 4 of 4
 
 ## Performance Metrics
 
@@ -52,6 +52,8 @@ Plan: 2 of 4
 | Phase 02 P01 | 6min | 2 tasks | 11 files |
 | Phase 02 P02 | 17min | 2 tasks | 14 files |
 | Phase 03 P01 | 4min | 2 tasks | 11 files |
+| Phase 03 P03 | 3min | 2 tasks | 2 files |
+| Phase 03 P02 | 4min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -80,6 +82,10 @@ Recent decisions affecting current work:
 - [Phase 03]: SignalRepository uses SQLAlchemy ORM with pg_insert for UPSERT (not raw asyncpg)
 - [Phase 03]: Signal dataclass is frozen for immutability after engine computation
 - [Phase 03]: signals table is regular PostgreSQL (not hypertable) — low-volume relational data
+- [Phase 03]: Lazy import of pmdarima inside _arima_forecast to avoid loading heavy ML stack until needed
+- [Phase 03]: Regime detection thresholds at H>0.55 trending, H<0.45 mean-reverting (0.05 buffer around 0.5)
+- [Phase 03]: Zone thresholds: RSI <20/30/45/55/70/80 mapped to scores, EMA shorter periods weighted more
+- [Phase 03]: pandas_ta_classic must be imported at module level to register .ta DataFrame accessor
 
 ### Pending Todos
 
@@ -93,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T07:57:05.100Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-03-24T08:04:00.137Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None

@@ -69,7 +69,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 03-01-PLAN.md — Dependencies, BaseEngine ABC, Signal dataclass, signals table migration, SignalRepository, config weights
-- [ ] 03-02-PLAN.md — TechnicalEngine with RSI, MACD, Bollinger, EMA, volume zone mapping and weighted scoring
+- [x] 03-02-PLAN.md — TechnicalEngine with RSI, MACD, Bollinger, EMA, volume zone mapping and weighted scoring
 - [ ] 03-03-PLAN.md — QuantitativeEngine with momentum, mean reversion, ARIMA, and Hurst regime detection
 - [ ] 03-04-PLAN.md — Analyze stage wiring into PipelineRunner with integration tests
 
