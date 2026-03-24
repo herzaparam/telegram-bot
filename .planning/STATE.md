@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Phase complete — ready for verification
-stopped_at: Phase 7 context gathered
-last_updated: "2026-03-24T15:50:12.391Z"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-03-24T16:26:00.915Z"
 progress:
   total_phases: 12
   completed_phases: 6
-  total_plans: 16
-  completed_plans: 16
+  total_plans: 18
+  completed_plans: 17
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** The daily signal loop must work reliably: fetch data, run engines, produce LLM verdicts, and deliver a Telegram report every morning
-**Current focus:** Phase 06 — accuracy-tracking-scorecard
+**Current focus:** Phase 07 — self-evaluation-feedback-loop
 
 ## Current Position
 
-Phase: 06 (accuracy-tracking-scorecard) — EXECUTING
+Phase: 07 (self-evaluation-feedback-loop) — EXECUTING
 Plan: 2 of 2
 
 ## Performance Metrics
@@ -62,6 +62,8 @@ Plan: 2 of 2
 | Phase 05 P02 | 3min | 2 tasks | 12 files |
 | Phase 06 P01 | 6min | 2 tasks | 9 files |
 | Phase 06 P02 | 5min | 2 tasks | 6 files |
+| Phase 07 P01 | 6min | 2 tasks | 8 files |
+| Phase 07 P02 | 6min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -113,6 +115,12 @@ Recent decisions affecting current work:
 - [Phase 06]: EvalDisplayItem frozen dataclass for type-safe evaluation display items
 - [Phase 06]: Scorecard section prepended to daily report header with --- separator
 - [Phase 06]: Asset filter resolved via Watchlist join (only watchlisted assets valid for /scorecard)
+- [Phase 07]: Lesson scoring weights: recency 0.25, accuracy 0.30, asset-type 0.25, engine relevance 0.20
+- [Phase 07]: Tier promotion thresholds: hypothesis <10, pattern 10-29, rule >=30 observations
+- [Phase 07]: Reflect stage placed after evaluate, before fetch in pipeline ordering
+- [Phase 07]: Batch cross-cutting runs post-pipeline as separate function, not StageFunc
+- [Phase 07]: Lessons split into ASSET-SPECIFIC and GENERAL sections in LLM prompt
+- [Phase 07]: /lessons command uses same positional arg filter pattern as /scorecard
 
 ### Pending Todos
 
@@ -126,6 +134,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T15:50:12.387Z
-Stopped at: Phase 7 context gathered
-Resume file: .planning/phases/07-self-evaluation-feedback-loop/07-CONTEXT.md
+Last session: 2026-03-24T16:26:00.912Z
+Stopped at: Completed 07-02-PLAN.md
+Resume file: None

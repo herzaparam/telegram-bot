@@ -43,16 +43,16 @@
 - [x] **LLM-01**: LLM reads all 15 engine scores + valuation data + context to produce final verdict
 - [x] **LLM-02**: LLM detects contradictions between signals (e.g., bullish technicals but overvalued)
 - [x] **LLM-03**: LLM considers upcoming events that could invalidate signals
-- [ ] **LLM-04**: LLM applies lessons learned from past mistakes
+- [x] **LLM-04**: LLM applies lessons learned from past mistakes
 - [x] **LLM-05**: LLM outputs STRONG BUY / BUY / HOLD / SELL / STRONG SELL + reasoning + fair value context
 - [ ] **LLM-06**: LLM considers due diligence flags (insider selling, management changes, earnings quality)
 
 ### Self-Evaluation
 
 - [x] **EVAL-01**: System reviews yesterday's decisions against actual prices every morning
-- [ ] **EVAL-02**: LLM analyzes what went right/wrong and why
-- [ ] **EVAL-03**: System extracts concrete lessons and stores in database
-- [ ] **EVAL-04**: Lessons feed into future LLM decisions automatically
+- [x] **EVAL-02**: LLM analyzes what went right/wrong and why
+- [x] **EVAL-03**: System extracts concrete lessons and stores in database
+- [x] **EVAL-04**: Lessons feed into future LLM decisions automatically
 - [x] **EVAL-05**: System tracks accuracy stats over time (win rate, best/worst engine)
 
 ### IDX Documents
@@ -74,7 +74,7 @@
 - [x] **TBOT-02**: `/report` gets today's full report on demand
 - [x] **TBOT-03**: `/report BTC` gets detailed single-asset report
 - [x] **TBOT-04**: `/scorecard` shows accuracy stats + recent results
-- [ ] **TBOT-05**: `/lessons` shows learned lessons
+- [x] **TBOT-05**: `/lessons` shows learned lessons
 - [ ] **TBOT-06**: `/discover` shows today's opportunities
 - [x] **TBOT-07**: `/settings` configures notification time, categories
 - [ ] **TBOT-08**: `/backtest BTC 30d` runs historical signal replay
@@ -90,7 +90,7 @@
 - [x] **REPT-02**: Today's signal for each watchlist asset (all 15 categories + LLM verdict)
 - [ ] **REPT-03**: Valuation summary (fair value vs market price, margin of safety)
 - [x] **REPT-04**: LLM reasoning for each decision
-- [ ] **REPT-05**: Lessons applied today
+- [x] **REPT-05**: Lessons applied today
 - [ ] **REPT-06**: Portfolio risk snapshot (concentration, correlation alerts)
 - [ ] **REPT-07**: New opportunities discovered
 
@@ -182,13 +182,13 @@
 | LLM-01 | Phase 4 | Complete |
 | LLM-02 | Phase 4 | Complete |
 | LLM-03 | Phase 4 | Complete |
-| LLM-04 | Phase 7 | Pending |
+| LLM-04 | Phase 7 | Complete |
 | LLM-05 | Phase 4 | Complete |
 | LLM-06 | Phase 11 | Pending |
 | EVAL-01 | Phase 6 | Complete |
-| EVAL-02 | Phase 7 | Pending |
-| EVAL-03 | Phase 7 | Pending |
-| EVAL-04 | Phase 7 | Pending |
+| EVAL-02 | Phase 7 | Complete |
+| EVAL-03 | Phase 7 | Complete |
+| EVAL-04 | Phase 7 | Complete |
 | EVAL-05 | Phase 6 | Complete |
 | IDXD-01 | Phase 9 | Pending |
 | IDXD-02 | Phase 9 | Pending |
@@ -201,7 +201,7 @@
 | TBOT-02 | Phase 5 | Complete |
 | TBOT-03 | Phase 5 | Complete |
 | TBOT-04 | Phase 6 | Complete |
-| TBOT-05 | Phase 7 | Pending |
+| TBOT-05 | Phase 7 | Complete |
 | TBOT-06 | Phase 11 | Pending |
 | TBOT-07 | Phase 5 | Complete |
 | TBOT-08 | Phase 12 | Pending |
@@ -214,7 +214,7 @@
 | REPT-02 | Phase 5 | Complete |
 | REPT-03 | Phase 9 | Pending |
 | REPT-04 | Phase 5 | Complete |
-| REPT-05 | Phase 7 | Pending |
+| REPT-05 | Phase 7 | Complete |
 | REPT-06 | Phase 12 | Pending |
 | REPT-07 | Phase 11 | Pending |
 | VALN-01 | Phase 9 | Pending |

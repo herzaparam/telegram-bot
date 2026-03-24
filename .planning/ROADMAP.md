@@ -130,7 +130,7 @@ Plans:
   5. The daily report includes a "lessons applied today" section listing which lessons were active
 **Plans**: 2 plans
 Plans:
-- [ ] 07-01-PLAN.md — Lesson model, migration, repository, reflect stage with two-pass LLM analysis and pipeline wiring
+- [x] 07-01-PLAN.md — Lesson model, migration, repository, reflect stage with two-pass LLM analysis and pipeline wiring
 - [ ] 07-02-PLAN.md — Lesson injection into decide prompt, /lessons command, daily report lessons section
 
 ### Phase 8: Fundamental, Macro, Sentiment, and News Engines
