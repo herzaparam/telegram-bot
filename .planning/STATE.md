@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-24T10:45:52.935Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-03-24T10:53:28.363Z"
 progress:
   total_phases: 12
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 16
-  completed_plans: 15
+  completed_plans: 16
 ---
 
 # Project State
@@ -61,6 +61,7 @@ Plan: 2 of 2
 | Phase 05 P03 | 3min | 2 tasks | 4 files |
 | Phase 05 P02 | 3min | 2 tasks | 12 files |
 | Phase 06 P01 | 6min | 2 tasks | 9 files |
+| Phase 06 P02 | 5min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,9 @@ Recent decisions affecting current work:
 - [Phase 06]: Evaluation uses SQLAlchemy ORM (not raw asyncpg) matching decision_repo pattern
 - [Phase 06]: HOLD bands scale per window: stock 2%/3%/5%/8%, crypto 5%/8%/12%/20%
 - [Phase 06]: evaluate_stage as first pipeline stage before fetch; catches all exceptions (error isolation)
+- [Phase 06]: EvalDisplayItem frozen dataclass for type-safe evaluation display items
+- [Phase 06]: Scorecard section prepended to daily report header with --- separator
+- [Phase 06]: Asset filter resolved via Watchlist join (only watchlisted assets valid for /scorecard)
 
 ### Pending Todos
 
@@ -122,6 +126,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T10:45:52.932Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-03-24T10:53:28.360Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None

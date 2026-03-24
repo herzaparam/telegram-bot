@@ -116,7 +116,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 06-01-PLAN.md — Evaluation models, migration, repository, evaluate stage with classification and pipeline wiring
-- [ ] 06-02-PLAN.md — Scorecard formatting, daily report integration, /scorecard bot command
+- [x] 06-02-PLAN.md — Scorecard formatting, daily report integration, /scorecard bot command
 
 ### Phase 7: Self-Evaluation Feedback Loop
 **Goal**: The LLM reviews its past mistakes, extracts concrete lessons, stores them in tiers, and injects them into future decisions — the system improves over time without human intervention

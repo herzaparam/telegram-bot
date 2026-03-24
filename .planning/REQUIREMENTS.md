@@ -73,7 +73,7 @@
 - [x] **TBOT-01**: `/start` welcome + setup
 - [x] **TBOT-02**: `/report` gets today's full report on demand
 - [x] **TBOT-03**: `/report BTC` gets detailed single-asset report
-- [ ] **TBOT-04**: `/scorecard` shows accuracy stats + recent results
+- [x] **TBOT-04**: `/scorecard` shows accuracy stats + recent results
 - [ ] **TBOT-05**: `/lessons` shows learned lessons
 - [ ] **TBOT-06**: `/discover` shows today's opportunities
 - [x] **TBOT-07**: `/settings` configures notification time, categories
@@ -86,7 +86,7 @@
 
 ### Daily Report
 
-- [ ] **REPT-01**: Yesterday's scorecard (was I right/wrong, accuracy stats)
+- [x] **REPT-01**: Yesterday's scorecard (was I right/wrong, accuracy stats)
 - [x] **REPT-02**: Today's signal for each watchlist asset (all 15 categories + LLM verdict)
 - [ ] **REPT-03**: Valuation summary (fair value vs market price, margin of safety)
 - [x] **REPT-04**: LLM reasoning for each decision
@@ -200,7 +200,7 @@
 | TBOT-01 | Phase 5 | Complete |
 | TBOT-02 | Phase 5 | Complete |
 | TBOT-03 | Phase 5 | Complete |
-| TBOT-04 | Phase 6 | Pending |
+| TBOT-04 | Phase 6 | Complete |
 | TBOT-05 | Phase 7 | Pending |
 | TBOT-06 | Phase 11 | Pending |
 | TBOT-07 | Phase 5 | Complete |
@@ -210,7 +210,7 @@
 | TBOT-11 | Phase 11 | Pending |
 | TBOT-12 | Phase 12 | Pending |
 | TBOT-13 | Phase 9 | Pending |
-| REPT-01 | Phase 6 | Pending |
+| REPT-01 | Phase 6 | Complete |
 | REPT-02 | Phase 5 | Complete |
 | REPT-03 | Phase 9 | Pending |
 | REPT-04 | Phase 5 | Complete |
