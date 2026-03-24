@@ -6,47 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Trade-agent is an async Python trading agent pipeline that fetches market data (IDX stocks via yfinance, crypto via ccxt/Binance + CoinGecko fallback), validates and ingests it into TimescaleDB, and runs analysis/decision stages via LLM integration (litellm with gpt-4o-mini primary, Gemini fallback).
 
-## Commands
+## Codebase Reference
 
-```bash
-# Install dependencies
-uv sync                    # all deps including dev
-uv sync --no-dev           # production only
+Detailed codebase documentation lives in `.planning/codebase/`:
 
-# Run tests
-pytest                     # all tests
-pytest tests/test_data/    # specific module
-pytest -x -vv              # stop on first failure, verbose
-
-# Linting & formatting
-ruff check src/ tests/     # lint check
-ruff check src/ --fix      # auto-fix
-ruff format src/ tests/    # format
-mypy src/                  # type checking (strict mode)
-
-# Pre-commit hooks
-pre-commit run --all-files
-
-# Full pre-commit check
-pytest && ruff check --fix && ruff format && mypy src/
-
-# Run pipeline
-python -m src.pipeline.main                          # all stages, today
-python -m src.pipeline.main --stage fetch            # single stage
-python -m src.pipeline.main --date 2026-03-23        # specific date
-python -m src.pipeline.main --rerun-failed           # retry failed assets
-
-# Backfill historical data
-python -m src.data.backfill --from 2024-01-01 --to 2026-03-23
-python -m src.data.backfill --type crypto --assets BTC,ETH
-
-# Database migrations
-alembic upgrade head
-alembic revision --autogenerate -m "description"
-
-# Bot service
-python -m src.bot.main     # FastAPI on :8000
-
-# Docker (TimescaleDB)
-docker-compose up -d db
-```
+- [STACK.md](.planning/codebase/STACK.md) - Languages, runtime, frameworks, dependencies, configuration
+- [ARCHITECTURE.md](.planning/codebase/ARCHITECTURE.md) - System design, layers, data flow, abstractions, entry points
+- [STRUCTURE.md](.planning/codebase/STRUCTURE.md) - Directory layout, key locations, naming conventions
+- [CONVENTIONS.md](.planning/codebase/CONVENTIONS.md) - Code style, naming patterns, error handling
+- [TESTING.md](.planning/codebase/TESTING.md) - Test framework, structure, mocking, coverage
+- [INTEGRATIONS.md](.planning/codebase/INTEGRATIONS.md) - External APIs, databases, auth providers
+- [CONCERNS.md](.planning/codebase/CONCERNS.md) - Technical debt, known issues, performance, security
