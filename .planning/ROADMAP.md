@@ -66,7 +66,12 @@ Plans:
   2. The quantitative engine (momentum, mean reversion, ARIMA) produces a valid score/confidence/reasoning for each asset alongside the technical engine
   3. Per-engine directional accuracy tracking is active from first run — each engine's outputs are stored with enough data to calculate accuracy once outcomes are known
   4. An engine that fails to fetch its data returns score=0/confidence=0 rather than raising an exception that halts the pipeline
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 03-01-PLAN.md — Dependencies, BaseEngine ABC, Signal dataclass, signals table migration, SignalRepository, config weights
+- [ ] 03-02-PLAN.md — TechnicalEngine with RSI, MACD, Bollinger, EMA, volume zone mapping and weighted scoring
+- [ ] 03-03-PLAN.md — QuantitativeEngine with momentum, mean reversion, ARIMA, and Hurst regime detection
+- [ ] 03-04-PLAN.md — Analyze stage wiring into PipelineRunner with integration tests
 
 ### Phase 4: LLM Decision Maker
 **Goal**: The LLM synthesizes all available engine scores into a final verdict with structured output, contradiction detection, event awareness, and a deterministic fallback — verdicts are stored and ready for delivery
@@ -185,7 +190,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|----------------|--------|-----------|
 | 1. Foundation | 0/3 | Planning complete | - |
 | 2. Data Layer | 0/2 | Planning complete | - |
-| 3. Technical Engine + Pipeline Shell | 0/TBD | Not started | - |
+| 3. Technical Engine + Pipeline Shell | 0/4 | Planning complete | - |
 | 4. LLM Decision Maker | 0/TBD | Not started | - |
 | 5. Telegram Bot + Daily Delivery | 0/TBD | Not started | - |
 | 6. Accuracy Tracking + Scorecard | 0/TBD | Not started | - |
