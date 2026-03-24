@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     timeout_fetch: int = 60
     timeout_analyze: int = 120
     timeout_llm: int = 30
+    timeout_decide_per_call: int = 12
 
     # Technical engine indicator weights (sum to 1.0)
     weight_rsi: float = 0.20

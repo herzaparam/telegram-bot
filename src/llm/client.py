@@ -36,6 +36,7 @@ async def llm_completion(
     fallback_models: list[str] | None = None,
     num_retries: int | None = None,
     timeout: int | None = None,
+    response_format: dict[str, str] | None = None,
 ) -> LLMResult:
     """Call LLM with retry + model fallback.
 
@@ -46,14 +47,18 @@ async def llm_completion(
     retries = num_retries if num_retries is not None else settings.llm_max_retries
     tout = timeout or settings.llm_timeout
 
+    kwargs: dict[str, object] = {
+        "model": model,
+        "messages": messages,
+        "num_retries": retries,
+        "timeout": tout,
+        "fallbacks": fallbacks,
+    }
+    if response_format is not None:
+        kwargs["response_format"] = response_format
+
     try:
-        response = await litellm.acompletion(
-            model=model,
-            messages=messages,
-            num_retries=retries,
-            timeout=tout,
-            fallbacks=fallbacks,
-        )
+        response = await litellm.acompletion(**kwargs)
         return LLMResult(
             content=response.choices[0].message.content or "",
             model_used=response.model or model,
