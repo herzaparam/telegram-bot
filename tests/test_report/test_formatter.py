@@ -12,6 +12,8 @@ from src.report.formatter import (
     EvalDisplayItem,
     format_asset_card,
     format_asset_detail,
+    format_lessons_applied,
+    format_lessons_message,
     format_report_header,
     format_scorecard_error,
     format_scorecard_message,
@@ -546,6 +548,73 @@ class TestBuyAndHold:
             ],
         )
         assert "+0.0% alpha" in result
+
+
+class TestLessonsSection:
+    """Tests for lesson formatting functions."""
+
+    def test_format_lessons_message_with_data(self):
+        """Both recently_learned and top_lessons sections appear when data provided."""
+        recently = [
+            {
+                "id": 1,
+                "lesson": "RSI reversals precede bounces",
+                "tier": "pattern",
+                "times_observed": 12,
+                "times_applied": 8,
+                "accuracy": 0.75,
+            },
+        ]
+        top = [
+            {
+                "id": 2,
+                "lesson": "Sentiment overreaction fades within 3 days",
+                "tier": "rule",
+                "times_observed": 35,
+                "times_applied": 20,
+                "accuracy": 0.80,
+            },
+        ]
+        result = format_lessons_message(recently, top)
+        assert "Recently Learned (7d)" in result
+        assert "Top Lessons (by accuracy)" in result
+        assert "RSI reversals" in result
+        assert "Sentiment overreaction" in result
+
+    def test_format_lessons_message_empty(self):
+        """Empty lists show 'No lessons learned yet' message."""
+        result = format_lessons_message([], [])
+        assert "No lessons learned yet" in result
+
+    def test_format_lessons_message_with_filters(self):
+        """Filter labels appear in the title."""
+        result = format_lessons_message([], [], asset_filter="crypto", engine_filter="technical")
+        assert "(crypto, technical)" in result
+
+    def test_format_lessons_applied_with_lessons(self):
+        """Lessons applied dict formats as bullet list."""
+        lessons = {"1": "Watch RSI divergence", "2": "Momentum fades"}
+        result = format_lessons_applied(lessons)
+        assert "Lessons applied:" in result
+        assert "Watch RSI divergence" in result
+        assert "Momentum fades" in result
+
+    def test_format_lessons_applied_none(self):
+        """None returns empty string."""
+        result = format_lessons_applied(None)
+        assert result == ""
+
+    def test_format_lessons_applied_empty_dict(self):
+        """Empty dict returns empty string."""
+        result = format_lessons_applied({})
+        assert result == ""
+
+    def test_format_lessons_applied_truncates_long_text(self):
+        """Lesson text longer than 80 chars is truncated."""
+        long_text = "A" * 200
+        result = format_lessons_applied({"1": long_text})
+        # Should not contain the full 200-char text
+        assert "A" * 81 not in result
 
 
 class TestScorecardError:
