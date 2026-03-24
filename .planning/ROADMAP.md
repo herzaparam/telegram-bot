@@ -130,8 +130,8 @@ Plans:
   5. The daily report includes a "lessons applied today" section listing which lessons were active
 **Plans**: 2 plans
 Plans:
-- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
-- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
+- [ ] 07-01-PLAN.md — Lesson model, migration, repository, reflect stage with two-pass LLM analysis and pipeline wiring
+- [ ] 07-02-PLAN.md — Lesson injection into decide prompt, /lessons command, daily report lessons section
 
 ### Phase 8: Fundamental, Macro, Sentiment, and News Engines
 **Goal**: Four additional engines deepen signal quality — fundamentals for IDX stocks, macro context for both asset classes, sentiment from social sources, and news-driven event signals
@@ -223,7 +223,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 4. LLM Decision Maker | 1/2 | In Progress|  |
 | 5. Telegram Bot + Daily Delivery | 2/3 | In Progress|  |
 | 6. Accuracy Tracking + Scorecard | 0/2 | Planning complete | - |
-| 7. Self-Evaluation Feedback Loop | 0/TBD | Not started | - |
+| 7. Self-Evaluation Feedback Loop | 0/2 | Planning complete | - |
 | 8. Fundamental, Macro, Sentiment, and News Engines | 0/TBD | Not started | - |
 | 9. IDX Documents + Valuation Engine | 0/TBD | Not started | - |
 | 10. Remaining Specialized Engines | 0/TBD | Not started | - |
