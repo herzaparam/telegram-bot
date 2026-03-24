@@ -84,7 +84,7 @@ Plans:
   4. LLM calls complete within 30 seconds per asset or abort with the fallback result
 **Plans**: 2 plans
 Plans:
-- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
+- [x] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
 - [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
 
 ### Phase 5: Telegram Bot + Daily Delivery
@@ -218,7 +218,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Foundation | 0/3 | Planning complete | - |
 | 2. Data Layer | 0/2 | Planning complete | - |
 | 3. Technical Engine + Pipeline Shell | 0/4 | Planning complete | - |
-| 4. LLM Decision Maker | 0/2 | Planning complete | - |
+| 4. LLM Decision Maker | 1/2 | In Progress|  |
 | 5. Telegram Bot + Daily Delivery | 0/TBD | Not started | - |
 | 6. Accuracy Tracking + Scorecard | 0/TBD | Not started | - |
 | 7. Self-Evaluation Feedback Loop | 0/TBD | Not started | - |
