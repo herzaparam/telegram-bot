@@ -115,8 +115,8 @@ Plans:
   4. Per-engine accuracy is tracked independently so the LLM can be given engine quality metadata in future phases
 **Plans**: 2 plans
 Plans:
-- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
-- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
+- [ ] 06-01-PLAN.md — Evaluation models, migration, repository, evaluate stage with classification and pipeline wiring
+- [ ] 06-02-PLAN.md — Scorecard formatting, daily report integration, /scorecard bot command
 
 ### Phase 7: Self-Evaluation Feedback Loop
 **Goal**: The LLM reviews its past mistakes, extracts concrete lessons, stores them in tiers, and injects them into future decisions — the system improves over time without human intervention
@@ -222,7 +222,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Technical Engine + Pipeline Shell | 0/4 | Planning complete | - |
 | 4. LLM Decision Maker | 1/2 | In Progress|  |
 | 5. Telegram Bot + Daily Delivery | 2/3 | In Progress|  |
-| 6. Accuracy Tracking + Scorecard | 0/TBD | Not started | - |
+| 6. Accuracy Tracking + Scorecard | 0/2 | Planning complete | - |
 | 7. Self-Evaluation Feedback Loop | 0/TBD | Not started | - |
 | 8. Fundamental, Macro, Sentiment, and News Engines | 0/TBD | Not started | - |
 | 9. IDX Documents + Valuation Engine | 0/TBD | Not started | - |
