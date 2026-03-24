@@ -18,6 +18,7 @@ from src.data.decide import (
     decide_stage,
 )
 from src.llm.client import LLM_UNAVAILABLE, LLMResult
+from src.llm.prompts import build_decision_prompt
 
 
 def _make_signal(
@@ -218,6 +219,7 @@ class TestDecideStage:
     """Test the decide_stage async function."""
 
     @pytest.mark.asyncio
+    @patch("src.data.decide.lesson_repo")
     @patch("src.data.decide.decision_repo")
     @patch("src.data.decide.llm_completion")
     @patch("src.data.decide.signal_repo")
@@ -226,6 +228,7 @@ class TestDecideStage:
         mock_signal_repo: MagicMock,
         mock_llm: MagicMock,
         mock_decision_repo: MagicMock,
+        mock_lesson_repo: MagicMock,
     ) -> None:
         """No signals: no LLM call, no decision stored."""
         mock_signal_repo.get_signals_for_asset = AsyncMock(return_value=[])
@@ -238,6 +241,7 @@ class TestDecideStage:
         mock_decision_repo.upsert_decision.assert_not_called()
 
     @pytest.mark.asyncio
+    @patch("src.data.decide.lesson_repo")
     @patch("src.data.decide.decision_repo")
     @patch("src.data.decide.llm_completion")
     @patch("src.data.decide.signal_repo")
@@ -246,10 +250,12 @@ class TestDecideStage:
         mock_signal_repo: MagicMock,
         mock_llm: MagicMock,
         mock_decision_repo: MagicMock,
+        mock_lesson_repo: MagicMock,
     ) -> None:
         """LLM returns valid JSON: decision is parsed and stored."""
         signals = [_make_signal(score=0.5, confidence=0.8)]
         mock_signal_repo.get_signals_for_asset = AsyncMock(return_value=signals)
+        mock_lesson_repo.get_relevant_lessons = AsyncMock(return_value=[])
 
         valid_response = json.dumps({
             "verdict": "BUY",
@@ -272,6 +278,7 @@ class TestDecideStage:
         assert call_kwargs[1]["verdict"] == "BUY" or call_kwargs[0][3] == "BUY"
 
     @pytest.mark.asyncio
+    @patch("src.data.decide.lesson_repo")
     @patch("src.data.decide.decision_repo")
     @patch("src.data.decide.llm_completion")
     @patch("src.data.decide.signal_repo")
@@ -280,10 +287,12 @@ class TestDecideStage:
         mock_signal_repo: MagicMock,
         mock_llm: MagicMock,
         mock_decision_repo: MagicMock,
+        mock_lesson_repo: MagicMock,
     ) -> None:
         """LLM returns LLM_UNAVAILABLE: deterministic fallback is used."""
         signals = [_make_signal(score=0.5, confidence=0.8)]
         mock_signal_repo.get_signals_for_asset = AsyncMock(return_value=signals)
+        mock_lesson_repo.get_relevant_lessons = AsyncMock(return_value=[])
         mock_llm.return_value = LLM_UNAVAILABLE
         mock_decision_repo.upsert_decision = AsyncMock()
 
@@ -298,6 +307,7 @@ class TestDecideStage:
         assert "none" in str(call_kwargs)
 
     @pytest.mark.asyncio
+    @patch("src.data.decide.lesson_repo")
     @patch("src.data.decide.decision_repo")
     @patch("src.data.decide.llm_completion")
     @patch("src.data.decide.signal_repo")
@@ -306,10 +316,12 @@ class TestDecideStage:
         mock_signal_repo: MagicMock,
         mock_llm: MagicMock,
         mock_decision_repo: MagicMock,
+        mock_lesson_repo: MagicMock,
     ) -> None:
         """Malformed JSON twice: retries once, then falls back with LLM_PARSE_ERROR."""
         signals = [_make_signal(score=0.3, confidence=0.8)]
         mock_signal_repo.get_signals_for_asset = AsyncMock(return_value=signals)
+        mock_lesson_repo.get_relevant_lessons = AsyncMock(return_value=[])
         # Both calls return malformed JSON
         mock_llm.side_effect = [
             LLMResult(content="not json", model_used="gpt-4o-mini"),
@@ -328,3 +340,164 @@ class TestDecideStage:
         # Fallback verdict stored
         call_str = str(mock_decision_repo.upsert_decision.call_args)
         assert "LLM_PARSE_ERROR" in call_str or "fallback" in call_str.lower()
+
+
+class TestLessonInjection:
+    """Tests for lesson injection into the decide stage."""
+
+    @pytest.mark.asyncio
+    @patch("src.data.decide.lesson_repo")
+    @patch("src.data.decide.decision_repo")
+    @patch("src.data.decide.llm_completion")
+    @patch("src.data.decide.signal_repo")
+    async def test_lessons_queried_and_injected(
+        self,
+        mock_signal_repo: MagicMock,
+        mock_llm: MagicMock,
+        mock_decision_repo: MagicMock,
+        mock_lesson_repo: MagicMock,
+    ) -> None:
+        """Relevant lessons are queried and passed to build_decision_prompt."""
+        signals = [_make_signal(score=0.5, confidence=0.8)]
+        mock_signal_repo.get_signals_for_asset = AsyncMock(return_value=signals)
+
+        # Create mock Lesson objects
+        lesson1 = MagicMock()
+        lesson1.id = 1
+        lesson1.lesson = "RSI reversal pattern"
+        lesson1.asset_type = "stock"
+        lesson1.engine_tags = ["technical"]
+        lesson1.times_applied = 10
+        lesson1.times_correct = 7
+
+        lesson2 = MagicMock()
+        lesson2.id = 2
+        lesson2.lesson = "Momentum divergence warning"
+        lesson2.asset_type = "all"
+        lesson2.engine_tags = ["quantitative"]
+        lesson2.times_applied = 5
+        lesson2.times_correct = 3
+
+        mock_lesson_repo.get_relevant_lessons = AsyncMock(return_value=[lesson1, lesson2])
+        mock_lesson_repo.increment_times_applied = AsyncMock()
+
+        valid_response = json.dumps({
+            "verdict": "BUY",
+            "score": 0.5,
+            "confidence": 0.8,
+            "reasoning": "Strong technicals",
+            "key_factors": ["RSI oversold"],
+            "risk_warning": None,
+        })
+        mock_llm.return_value = LLMResult(content=valid_response, model_used="gpt-4o-mini")
+        mock_decision_repo.upsert_decision = AsyncMock()
+        mock_decision_repo.update_lessons_applied = AsyncMock()
+
+        session = AsyncMock()
+        asset = _make_asset()
+
+        with patch("src.data.decide.build_decision_prompt", wraps=build_decision_prompt) as mock_build:
+            await decide_stage(session, asset)
+            # Verify lessons were passed to the prompt builder
+            call_kwargs = mock_build.call_args
+            lessons_arg = call_kwargs[1].get("lessons") or call_kwargs[0][3] if len(call_kwargs[0]) > 3 else call_kwargs[1].get("lessons")
+            assert lessons_arg is not None
+            assert len(lessons_arg) == 2
+
+    @pytest.mark.asyncio
+    @patch("src.data.decide.lesson_repo")
+    @patch("src.data.decide.decision_repo")
+    @patch("src.data.decide.llm_completion")
+    @patch("src.data.decide.signal_repo")
+    async def test_lessons_applied_recorded(
+        self,
+        mock_signal_repo: MagicMock,
+        mock_llm: MagicMock,
+        mock_decision_repo: MagicMock,
+        mock_lesson_repo: MagicMock,
+    ) -> None:
+        """After decide_stage completes, lessons_applied is recorded and counters incremented."""
+        signals = [_make_signal(score=0.5, confidence=0.8)]
+        mock_signal_repo.get_signals_for_asset = AsyncMock(return_value=signals)
+
+        lesson1 = MagicMock()
+        lesson1.id = 1
+        lesson1.lesson = "RSI reversal"
+        lesson1.asset_type = "stock"
+        lesson1.engine_tags = ["technical"]
+        lesson1.times_applied = 10
+        lesson1.times_correct = 7
+
+        mock_lesson_repo.get_relevant_lessons = AsyncMock(return_value=[lesson1])
+        mock_lesson_repo.increment_times_applied = AsyncMock()
+
+        valid_response = json.dumps({
+            "verdict": "BUY",
+            "score": 0.5,
+            "confidence": 0.8,
+            "reasoning": "Strong technicals",
+            "key_factors": ["RSI oversold"],
+            "risk_warning": None,
+        })
+        mock_llm.return_value = LLMResult(content=valid_response, model_used="gpt-4o-mini")
+        mock_decision_repo.upsert_decision = AsyncMock()
+        mock_decision_repo.update_lessons_applied = AsyncMock()
+
+        session = AsyncMock()
+        asset = _make_asset()
+
+        await decide_stage(session, asset)
+
+        mock_decision_repo.update_lessons_applied.assert_awaited_once()
+        call_args = mock_decision_repo.update_lessons_applied.call_args
+        lessons_applied_data = call_args[1].get("lessons_applied") or call_args[0][3]
+        assert "1" in lessons_applied_data
+        assert lessons_applied_data["1"] == "RSI reversal"
+
+        mock_lesson_repo.increment_times_applied.assert_awaited_once()
+        increment_args = mock_lesson_repo.increment_times_applied.call_args
+        lesson_ids = increment_args[1].get("lesson_ids") or increment_args[0][1]
+        assert lesson_ids == [1]
+
+    @pytest.mark.asyncio
+    @patch("src.data.decide.lesson_repo")
+    @patch("src.data.decide.decision_repo")
+    @patch("src.data.decide.llm_completion")
+    @patch("src.data.decide.signal_repo")
+    async def test_no_lessons_available(
+        self,
+        mock_signal_repo: MagicMock,
+        mock_llm: MagicMock,
+        mock_decision_repo: MagicMock,
+        mock_lesson_repo: MagicMock,
+    ) -> None:
+        """No relevant lessons: build_decision_prompt called with lessons=None."""
+        signals = [_make_signal(score=0.5, confidence=0.8)]
+        mock_signal_repo.get_signals_for_asset = AsyncMock(return_value=signals)
+        mock_lesson_repo.get_relevant_lessons = AsyncMock(return_value=[])
+
+        valid_response = json.dumps({
+            "verdict": "BUY",
+            "score": 0.5,
+            "confidence": 0.8,
+            "reasoning": "Strong technicals",
+            "key_factors": ["RSI oversold"],
+            "risk_warning": None,
+        })
+        mock_llm.return_value = LLMResult(content=valid_response, model_used="gpt-4o-mini")
+        mock_decision_repo.upsert_decision = AsyncMock()
+
+        session = AsyncMock()
+        asset = _make_asset()
+
+        with patch("src.data.decide.build_decision_prompt", wraps=build_decision_prompt) as mock_build:
+            await decide_stage(session, asset)
+            call_kwargs = mock_build.call_args
+            lessons_arg = call_kwargs[1].get("lessons")
+            assert lessons_arg is None
+
+        # No lessons_applied update should happen
+        mock_decision_repo.update_lessons_applied = AsyncMock()
+        # Already ran; check it was not called during the stage
+        # (it wasn't mocked before the call, so check lesson_repo.increment was not called)
+        mock_lesson_repo.increment_times_applied.assert_not_called()

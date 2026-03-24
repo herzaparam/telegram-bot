@@ -22,6 +22,7 @@ from src.db.models import Asset, DailyDecision, Evaluation, Watchlist
 from src.report.formatter import (
     EvalDisplayItem,
     format_asset_card,
+    format_lessons_applied,
     format_report_header,
     format_scorecard_section,
     split_report,
@@ -253,18 +254,17 @@ async def send_daily_report(
     if scorecard_text:
         header = scorecard_text + "\n\n---\n\n" + header
 
-    # Format asset cards
-    cards = [
-        format_asset_card(
-            a.symbol,
-            a.name or a.symbol,
-            d.verdict,
-            float(d.score or 0),
-            float(d.confidence or 0),
-            d.reasoning or "",
+    # Format asset cards with lessons applied
+    cards = []
+    for d, a in results:
+        card = format_asset_card(
+            a.symbol, a.name or a.symbol, d.verdict,
+            float(d.score or 0), float(d.confidence or 0), d.reasoning or "",
         )
-        for d, a in results
-    ]
+        lessons_text = format_lessons_applied(d.lessons_applied)
+        if lessons_text:
+            card = card + "\n" + lessons_text
+        cards.append(card)
 
     # Split into messages respecting 4096-char limit
     messages = split_report(header, cards)

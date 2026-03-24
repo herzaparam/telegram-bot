@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -73,6 +73,28 @@ class DecisionRepository:
                 "all_signals": stmt.excluded.all_signals,
                 "model_used": stmt.excluded.model_used,
             },
+        )
+        await session.execute(stmt)
+
+    async def update_lessons_applied(
+        self,
+        session: AsyncSession,
+        asset_id: int,
+        decision_date: date,
+        lessons_applied: dict[str, str],
+    ) -> None:
+        """Update the lessons_applied JSONB on an existing decision.
+
+        Args:
+            session: Async SQLAlchemy session.
+            asset_id: Asset database ID.
+            decision_date: Decision date.
+            lessons_applied: Dict mapping lesson ID (str) to lesson text.
+        """
+        stmt = (
+            update(DailyDecision)
+            .where(DailyDecision.asset_id == asset_id, DailyDecision.date == decision_date)
+            .values(lessons_applied=lessons_applied)
         )
         await session.execute(stmt)
 

@@ -373,6 +373,81 @@ def format_scorecard_message(
     return "\n".join(lines)
 
 
+def format_lessons_message(
+    recently_learned: list[dict[str, object]],
+    top_lessons: list[dict[str, object]],
+    asset_filter: str | None = None,
+    engine_filter: str | None = None,
+) -> str:
+    """Format /lessons response with two sections (D-16)."""
+    lines: list[str] = []
+
+    # Title with filters
+    filters = []
+    if asset_filter:
+        filters.append(asset_filter)
+    if engine_filter:
+        filters.append(engine_filter)
+    filter_str = f" ({', '.join(filters)})" if filters else ""
+    lines.append(f"<b>Lessons{filter_str}</b>")
+    lines.append("")
+
+    # Recently Learned section
+    if recently_learned:
+        lines.append("<b>Recently Learned (7d)</b>")
+        for item in recently_learned:
+            tier = item.get("tier", "hypothesis")
+            tier_icon = {"hypothesis": "?", "pattern": "~", "rule": "!"}.get(str(tier), "?")
+            lesson_text = html.escape(str(item.get("lesson", ""))[:120])
+            times_obs = item.get("times_observed", 0)
+            lines.append(
+                f"[{tier_icon}] {lesson_text}"
+                f"\n    {tier} | seen {times_obs}x"
+            )
+        lines.append("")
+
+    # Top Lessons section
+    if top_lessons:
+        lines.append("<b>Top Lessons (by accuracy)</b>")
+        for item in top_lessons:
+            accuracy_val = item.get("accuracy")
+            accuracy_pct = round(float(accuracy_val) * 100) if accuracy_val else 0
+            times_app = item.get("times_applied", 0)
+            tier = item.get("tier", "hypothesis")
+            lesson_text = html.escape(str(item.get("lesson", ""))[:120])
+            lines.append(
+                f"[!] {lesson_text}"
+                f"\n    {tier} | {accuracy_pct}% accuracy over {times_app} uses"
+            )
+
+    if not recently_learned and not top_lessons:
+        lines.append("No lessons learned yet. Check back after the pipeline runs for a few days.")
+
+    return "\n".join(lines)
+
+
+def format_lessons_applied(
+    lessons_applied: dict[str, str] | None,
+) -> str:
+    """Format lessons applied for a single asset card in the daily report.
+
+    Per D-19: list which lessons influenced this decision.
+    Returns empty string if no lessons applied.
+
+    Args:
+        lessons_applied: Dict mapping lesson ID to lesson text from DailyDecision.lessons_applied JSONB.
+    """
+    if not lessons_applied:
+        return ""
+
+    lines = ["   <b>Lessons applied:</b>"]
+    for lesson_id, lesson_text in list(lessons_applied.items())[:5]:
+        truncated = html.escape(str(lesson_text)[:80])
+        lines.append(f"   - {truncated}")
+
+    return "\n".join(lines)
+
+
 def format_scorecard_error() -> str:
     """Format scorecard error message per UI-SPEC copywriting."""
     return "\u26a0\ufe0f Failed to load scorecard data. Try again in a few minutes."

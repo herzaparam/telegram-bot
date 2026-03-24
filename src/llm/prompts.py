@@ -20,7 +20,9 @@ Output valid JSON with exactly these keys:
 - key_factors: list of 3-5 short strings identifying the main drivers
 - risk_warning: string describing key risks, or null if none
 
-Identify any contradictions between engine signals. When engines disagree, explain why and lower your confidence."""
+Identify any contradictions between engine signals. When engines disagree, explain why and lower your confidence.
+
+If lessons from past mistakes are provided, incorporate them into your analysis. Weight lessons with higher accuracy more heavily."""
 
 _STRICT_RETRY_PREFIX = """\
 IMPORTANT: Your previous response was not valid JSON or was missing required fields. \
@@ -42,6 +44,7 @@ def _format_engine_data(
     asset: Asset,
     signals: list[SignalRecord],
     contradictions: list[str],
+    lessons: list[dict[str, object]] | None = None,
 ) -> str:
     """Build the user message content with engine data.
 
@@ -49,6 +52,7 @@ def _format_engine_data(
         asset: The asset being analyzed.
         signals: List of signal records from engines.
         contradictions: List of contradiction description strings.
+        lessons: Optional list of lesson dicts for injection.
 
     Returns:
         Formatted user message string.
@@ -71,6 +75,30 @@ def _format_engine_data(
     lines.append("")
     lines.append("Upcoming Events: No event data available yet.")
 
+    if lessons:
+        asset_lessons = [l for l in lessons if l.get("asset_type") != "all"]
+        general_lessons = [l for l in lessons if l.get("asset_type") == "all"]
+
+        if asset_lessons:
+            lines.append("")
+            lines.append("ASSET-SPECIFIC LESSONS:")
+            for i, l in enumerate(asset_lessons, 1):
+                accuracy = f"{l['accuracy']:.0%}" if l.get("accuracy") else "N/A"
+                engines = ", ".join(l.get("engine_tags") or []) or "general"
+                lines.append(
+                    f"{i}. {l['lesson']} (engine: {engines}, accuracy: {accuracy} over {l.get('times_applied', 0)} uses)"
+                )
+
+        if general_lessons:
+            lines.append("")
+            lines.append("GENERAL LESSONS:")
+            for i, l in enumerate(general_lessons, 1):
+                accuracy = f"{l['accuracy']:.0%}" if l.get("accuracy") else "N/A"
+                engines = ", ".join(l.get("engine_tags") or []) or "general"
+                lines.append(
+                    f"{i}. {l['lesson']} (engine: {engines}, accuracy: {accuracy} over {l.get('times_applied', 0)} uses)"
+                )
+
     return "\n".join(lines)
 
 
@@ -78,6 +106,7 @@ def build_decision_prompt(
     asset: Asset,
     signals: list[SignalRecord],
     contradictions: list[str],
+    lessons: list[dict[str, object]] | None = None,
 ) -> list[dict[str, str]]:
     """Build the system + user messages for the LLM decision call.
 
@@ -85,13 +114,14 @@ def build_decision_prompt(
         asset: The asset being analyzed.
         signals: List of signal records from engines.
         contradictions: List of contradiction description strings.
+        lessons: Optional list of lesson dicts for injection.
 
     Returns:
         List of two message dicts (system, user).
     """
     return [
         {"role": "system", "content": _SYSTEM_PROMPT},
-        {"role": "user", "content": _format_engine_data(asset, signals, contradictions)},
+        {"role": "user", "content": _format_engine_data(asset, signals, contradictions, lessons)},
     ]
 
 
