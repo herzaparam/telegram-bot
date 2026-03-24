@@ -1,0 +1,132 @@
+"""Analyze stage: run signal engines on price data and store results."""
+
+from __future__ import annotations
+
+import gc
+from datetime import date
+
+import pandas as pd
+import structlog
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.db.models import Asset, PriceHistory
+from src.db.signal_repo import signal_repo
+from src.engines.base import BaseEngine, Signal
+from src.engines.quantitative import QuantitativeEngine
+from src.engines.technical import TechnicalEngine
+
+logger = structlog.get_logger(__name__)
+
+
+def _get_engines_for_asset(asset: Asset) -> list[BaseEngine]:
+    """Return engines applicable to this asset type."""
+    all_engines: list[BaseEngine] = [TechnicalEngine(), QuantitativeEngine()]
+    return [
+        e for e in all_engines
+        if (asset.asset_type == "stock" and e.supports_stocks)
+        or (asset.asset_type == "crypto" and e.supports_crypto)
+    ]
+
+
+def _failed_signal(category: str, error: str) -> Signal:
+    """Return a zero-score signal for a failed engine."""
+    return Signal(
+        category=category,
+        score=0.0,
+        confidence=0.0,
+        reasoning=f"Engine failed: {error}",
+        indicators={},
+        data_quality={"error": error},
+    )
+
+
+async def _load_price_dataframe(
+    session: AsyncSession, asset: Asset, limit: int = 300,
+) -> pd.DataFrame:
+    """Load price history into a pandas DataFrame.
+
+    Loads the most recent `limit` rows ordered by time descending,
+    then reverses to chronological order.
+
+    Args:
+        session: Async SQLAlchemy session.
+        asset: Asset to load prices for.
+        limit: Maximum number of rows to load (default 300, covers 200 trading days + buffer).
+
+    Returns:
+        DataFrame with columns: open, high, low, close, volume, indexed by time.
+    """
+    result = await session.execute(
+        select(PriceHistory)
+        .where(PriceHistory.asset_id == asset.id)
+        .order_by(PriceHistory.time.desc())
+        .limit(limit)
+    )
+    rows = result.scalars().all()
+
+    if not rows:
+        return pd.DataFrame(columns=["open", "high", "low", "close", "volume"])
+
+    data = [
+        {
+            "time": r.time,
+            "open": r.open,
+            "high": r.high,
+            "low": r.low,
+            "close": r.close,
+            "volume": r.volume,
+        }
+        for r in reversed(rows)  # Chronological order
+    ]
+    df = pd.DataFrame(data)
+    df.set_index("time", inplace=True)
+    return df
+
+
+async def analyze_stage(session: AsyncSession, asset: Asset) -> None:
+    """Analyze stage matching StageFunc signature.
+
+    Loads price data, runs all applicable engines, stores signals.
+
+    Args:
+        session: Async SQLAlchemy session.
+        asset: Asset to analyze.
+    """
+    log = logger.bind(asset=asset.symbol, asset_type=asset.asset_type)
+
+    # 1. Load price data
+    df = await _load_price_dataframe(session, asset)
+    if df.empty:
+        log.warning("no_price_data_for_analysis")
+        return
+
+    # 2. Run engines sequentially (CPU-bound)
+    engines = _get_engines_for_asset(asset)
+    signals: list[Signal] = []
+
+    for engine in engines:
+        try:
+            signal = engine.analyze(asset.id, asset.symbol, df)
+            signals.append(signal)
+            log.info(
+                "engine_completed",
+                engine=engine.category,
+                score=signal.score,
+                confidence=signal.confidence,
+            )
+        except Exception as exc:
+            log.warning("engine_failed", engine=engine.category, error=str(exc))
+            signals.append(_failed_signal(engine.category, str(exc)))
+
+    # 3. Store signals in one transaction
+    if signals:
+        price_at_signal = float(df["close"].iloc[-1])
+        await signal_repo.upsert_signals(
+            session, asset.id, date.today(), signals, price_at_signal,
+        )
+        log.info("signals_stored", count=len(signals))
+
+    # 4. Release DataFrame memory
+    del df
+    gc.collect()

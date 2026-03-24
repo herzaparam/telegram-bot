@@ -13,6 +13,8 @@ from datetime import date
 import structlog
 
 from src.config import settings
+from src.data.analyze import analyze_stage
+from src.data.ingest import ingest_stage
 from src.db.database import async_session_factory
 from src.logging import setup_logging
 from src.pipeline.runner import PipelineRunner
@@ -57,9 +59,14 @@ async def async_main() -> None:
     stages = [args.stage] if args.stage else None
 
     runner = PipelineRunner(async_session_factory)
+    stage_funcs = {
+        "fetch": ingest_stage,
+        "analyze": analyze_stage,
+    }
     results = await runner.run_pipeline(
         run_date=run_date,
         stages=stages,
+        stage_funcs=stage_funcs,
         rerun_failed=args.rerun_failed,
     )
 
