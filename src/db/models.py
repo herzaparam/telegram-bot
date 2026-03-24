@@ -175,6 +175,29 @@ class BackoffState(Base):
     current_delay_seconds: Mapped[float] = mapped_column(Float, default=1.0)
 
 
+class SignalRecord(Base):
+    """Engine-generated trading signal stored per asset per date per category."""
+
+    __tablename__ = "signals"
+    __table_args__ = (
+        UniqueConstraint("asset_id", "date", "category", name="uq_signals_asset_date_category"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(Integer, ForeignKey("assets.id"), nullable=False)
+    date: Mapped[date] = mapped_column(Date, nullable=False)
+    category: Mapped[str] = mapped_column(String(30), nullable=False)
+    score: Mapped[float] = mapped_column(Float, nullable=False)
+    confidence: Mapped[float] = mapped_column(Float, nullable=False)
+    reasoning: Mapped[str] = mapped_column(Text, nullable=False)
+    indicators: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)
+    data_quality: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)
+    price_at_signal: Mapped[float | None] = mapped_column(Float, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
 # Seed data for the assets table
 SEED_ASSETS: list[dict[str, str | None]] = [
     # IDX stocks

@@ -38,5 +38,18 @@ class Settings(BaseSettings):
     timeout_analyze: int = 120
     timeout_llm: int = 30
 
+    # Technical engine indicator weights (sum to 1.0)
+    weight_rsi: float = 0.20
+    weight_macd: float = 0.20
+    weight_bollinger: float = 0.15
+    weight_ema: float = 0.20
+    weight_volume: float = 0.10
+    weight_overall_trend: float = 0.15
+
+    # Quantitative engine component weights
+    weight_momentum: float = 0.35
+    weight_mean_reversion: float = 0.35
+    weight_arima: float = 0.30
+
 
 settings = Settings()
