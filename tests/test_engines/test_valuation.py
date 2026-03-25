@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 from src.engines.valuation import (
+    QoQAlert,
     ValuationEngine,
     _compute_dcf,
     _compute_nvt_proxy,
@@ -14,6 +15,7 @@ from src.engines.valuation import (
     _compute_tvl_proxy,
     _compute_wacc,
     _margin_of_safety_to_score,
+    detect_qoq_changes,
 )
 
 
@@ -345,3 +347,79 @@ def test_wacc_clamped() -> None:
 
     wacc_high = _compute_wacc(risk_free_rate=0.15, beta=2.0)
     assert wacc_high <= 0.25
+
+
+# ---------------------------------------------------------------------------
+# QoQ ratio change detection tests
+# ---------------------------------------------------------------------------
+
+
+def test_qoq_detects_margin_drop() -> None:
+    """detect_qoq_changes with 5pp net_margin drop returns alert (>3pp threshold)."""
+    data = [
+        {"period": "Q3-2025", "net_margin": 0.25, "revenue": 1e12},
+        {"period": "Q2-2025", "net_margin": 0.30, "revenue": 1e12},
+    ]
+    alerts = detect_qoq_changes(data)
+    assert len(alerts) >= 1
+    margin_alerts = [a for a in alerts if a.metric_name == "net_margin"]
+    assert len(margin_alerts) == 1
+    assert margin_alerts[0].is_percentage_point is True
+
+
+def test_qoq_no_alert_small_margin_change() -> None:
+    """detect_qoq_changes with 1pp net_margin change returns no alert (<3pp threshold)."""
+    data = [
+        {"period": "Q3-2025", "net_margin": 0.25, "revenue": 1e12},
+        {"period": "Q2-2025", "net_margin": 0.24, "revenue": 1e12},
+    ]
+    alerts = detect_qoq_changes(data)
+    margin_alerts = [a for a in alerts if a.metric_name == "net_margin"]
+    assert len(margin_alerts) == 0
+
+
+def test_qoq_detects_revenue_surge() -> None:
+    """detect_qoq_changes with 25% revenue change returns alert (>10% threshold)."""
+    data = [
+        {"period": "Q3-2025", "net_margin": 0.25, "revenue": 100e9},
+        {"period": "Q2-2025", "net_margin": 0.25, "revenue": 80e9},
+    ]
+    alerts = detect_qoq_changes(data)
+    rev_alerts = [a for a in alerts if a.metric_name == "revenue"]
+    assert len(rev_alerts) == 1
+    assert rev_alerts[0].is_percentage_point is False
+
+
+def test_qoq_max_two_alerts() -> None:
+    """detect_qoq_changes returns max 2 alerts even with many changes."""
+    data = [
+        {
+            "period": "Q3-2025",
+            "net_margin": 0.10,
+            "gross_margin": 0.20,
+            "operating_margin": 0.05,
+            "revenue": 200e9,
+            "net_profit": 30e9,
+            "total_debt": 500e9,
+        },
+        {
+            "period": "Q2-2025",
+            "net_margin": 0.30,
+            "gross_margin": 0.50,
+            "operating_margin": 0.25,
+            "revenue": 100e9,
+            "net_profit": 10e9,
+            "total_debt": 200e9,
+        },
+    ]
+    alerts = detect_qoq_changes(data)
+    assert len(alerts) <= 2
+
+
+def test_qoq_single_period_returns_empty() -> None:
+    """detect_qoq_changes with only one period returns empty list."""
+    data = [
+        {"period": "Q3-2025", "net_margin": 0.25, "revenue": 1e12},
+    ]
+    alerts = detect_qoq_changes(data)
+    assert alerts == []
