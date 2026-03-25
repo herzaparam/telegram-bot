@@ -1,4 +1,4 @@
-"""SQLAlchemy ORM models for Phase 1 tables."""
+"""SQLAlchemy ORM models."""
 
 import uuid
 from datetime import date, datetime
@@ -356,6 +356,44 @@ class StockFundamental(Base):
     dividend_yield: Mapped[float | None] = mapped_column(Float, nullable=True)
     debt_to_equity: Mapped[float | None] = mapped_column(Float, nullable=True)
     fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class FinancialDoc(Base):
+    """Downloaded IDX financial document (laporan keuangan) PDF metadata."""
+
+    __tablename__ = "financial_docs"
+    __table_args__ = (
+        UniqueConstraint("asset_id", "doc_type", "period", name="uq_financial_docs_asset_period"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(Integer, ForeignKey("assets.id"), nullable=False)
+    doc_type: Mapped[str] = mapped_column(String(20), nullable=False)  # "quarterly" or "annual"
+    period: Mapped[str] = mapped_column(String(10), nullable=False)  # "Q1-2025", "FY-2025"
+    file_path: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    parse_status: Mapped[str] = mapped_column(String(20), default="pending")  # pending, parsed, failed
+    downloaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    parsed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class FinancialData(Base):
+    """Parsed financial metric from a FinancialDoc (one row per metric per period)."""
+
+    __tablename__ = "financial_data"
+    __table_args__ = (
+        UniqueConstraint("doc_id", "metric_name", name="uq_financial_data_doc_metric"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    doc_id: Mapped[int] = mapped_column(Integer, ForeignKey("financial_docs.id"), nullable=False)
+    asset_id: Mapped[int] = mapped_column(Integer, ForeignKey("assets.id"), nullable=False)
+    metric_name: Mapped[str] = mapped_column(String(50), nullable=False)  # "revenue", "net_profit", "gross_margin", etc.
+    metric_value: Mapped[float | None] = mapped_column(Float, nullable=True)
+    metric_text: Mapped[str | None] = mapped_column(Text, nullable=True)  # For text fields like management_outlook
+    period: Mapped[str] = mapped_column(String(10), nullable=False)  # "Q3-2025"
+    period_date: Mapped[date] = mapped_column(Date, nullable=False)  # Period end date for ordering
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 # Seed data for the assets table
