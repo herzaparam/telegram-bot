@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-03-25T09:38:52.733Z"
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-03-25T09:47:12.426Z"
 progress:
   total_phases: 12
   completed_phases: 7
   total_plans: 22
-  completed_plans: 19
+  completed_plans: 20
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 08 (fundamental-macro-sentiment-and-news-engines) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Plan: 2 of 4
 | Phase 07 P01 | 6min | 2 tasks | 8 files |
 | Phase 07 P02 | 6min | 2 tasks | 11 files |
 | Phase 08 P01 | 2min | 2 tasks | 5 files |
+| Phase 08 P02 | 5min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,8 @@ Recent decisions affecting current work:
 - [Phase 07]: /lessons command uses same positional arg filter pattern as /scorecard
 - [Phase 08]: Phase 08-01: API keys default to empty string (not None) so Settings always instantiates; fetcher engines degrade gracefully when missing
 - [Phase 08]: Phase 08-01: StockFundamental unique on asset_id (one cached record per asset, weekly upsert); MacroData unique on (series_id, observation_date) for safe backfill
+- [Phase 08]: Phase 08-02: SentimentSnapshot not stored in DB -- passed directly to SentimentEngine as constructor arg
+- [Phase 08]: Phase 08-02: session.add() for NewsEvent INSERT (URL dedup happens before); pg_insert used for StockFundamental and MacroData UPSERT
 
 ### Pending Todos
 
@@ -137,6 +140,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T09:38:52.730Z
-Stopped at: Completed 08-01-PLAN.md
+Last session: 2026-03-25T09:47:12.423Z
+Stopped at: Completed 08-02-PLAN.md
 Resume file: None
