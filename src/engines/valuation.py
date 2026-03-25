@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import numpy as np
 import pandas as pd
 import structlog
@@ -311,6 +313,89 @@ def _compute_tvl_proxy(
 
 
 # ---------------------------------------------------------------------------
+# QoQ ratio change detection (per D-21 and UI-SPEC)
+# ---------------------------------------------------------------------------
+
+QOQ_THRESHOLDS: dict[str, float] = {
+    "gross_margin": 0.03,       # 3 percentage points
+    "operating_margin": 0.03,
+    "net_margin": 0.03,
+    "revenue": 0.10,            # 10% change
+    "net_profit": 0.10,
+    "total_debt": 0.15,         # 15% change
+    "operating_cash_flow": 0.15,
+    "capex": 0.15,
+}
+
+_MARGIN_METRICS: set[str] = {"gross_margin", "operating_margin", "net_margin"}
+
+
+@dataclass(frozen=True)
+class QoQAlert:
+    """Significant QoQ ratio change alert."""
+
+    metric_name: str
+    current_value: float
+    previous_value: float
+    change: float  # absolute change for margins (pp), percentage for others
+    is_percentage_point: bool  # True for margins, False for absolute metrics
+
+
+def detect_qoq_changes(financial_data: list[dict]) -> list[QoQAlert]:  # type: ignore[type-arg]
+    """Detect significant QoQ ratio changes.
+
+    Args:
+        financial_data: List of period dicts ordered by period_date DESC.
+            At least 2 periods needed for comparison.
+
+    Returns:
+        List of up to 2 most significant QoQAlert objects.
+    """
+    if len(financial_data) < 2:
+        return []
+
+    current = financial_data[0]
+    previous = financial_data[1]
+
+    alerts: list[QoQAlert] = []
+
+    for metric, threshold in QOQ_THRESHOLDS.items():
+        cur_val = current.get(metric)
+        prev_val = previous.get(metric)
+
+        if cur_val is None or prev_val is None:
+            continue
+        if not isinstance(cur_val, (int, float)) or not isinstance(prev_val, (int, float)):
+            continue
+
+        is_pp = metric in _MARGIN_METRICS
+
+        if is_pp:
+            # Absolute difference in percentage points
+            change = abs(cur_val - prev_val)
+        else:
+            # Percentage change
+            if prev_val == 0:
+                continue
+            change = abs(cur_val - prev_val) / abs(prev_val)
+
+        if change > threshold:
+            alerts.append(
+                QoQAlert(
+                    metric_name=metric,
+                    current_value=float(cur_val),
+                    previous_value=float(prev_val),
+                    change=round(change, 4),
+                    is_percentage_point=is_pp,
+                )
+            )
+
+    # Sort by magnitude of change descending and return top 2
+    alerts.sort(key=lambda a: a.change, reverse=True)
+    return alerts[:2]
+
+
+# ---------------------------------------------------------------------------
 # ValuationEngine (per D-15)
 # ---------------------------------------------------------------------------
 
@@ -479,6 +564,29 @@ class ValuationEngine(BaseEngine):
             std_dev=std_dev,
         )
         indicators["scenarios"] = scenarios
+
+        # Store enriched data for bot display (two-process boundary)
+        indicators["fair_value"] = round(fair_value, 2)
+        sector = IDX_SECTOR_MAP.get(asset_symbol)
+        indicators["sector"] = sector
+        indicators["has_pdf_data"] = True
+        # Build peer comparison dict for bot display
+        if self._peer_data:
+            peer_display: dict[str, dict[str, object]] = {}
+            _sa = self._peer_data[0]
+            _sm: dict[str, float] = {}
+            for _fd in self._financial_data:
+                for _k in ("pe", "pb", "ev_ebitda"):
+                    if _k in _fd and _fd[_k] is not None:
+                        _sm[_k] = _fd[_k]
+            for _k in ("pe", "pb", "ev_ebitda"):
+                if _k in _sm and _k in _sa:
+                    _v, _a = _sm[_k], _sa[_k]
+                    _r = "cheap" if _a > 0 and _v / _a < 0.85 else ("expensive" if _a > 0 and _v / _a > 1.15 else "fair")
+                    peer_display[_k] = {"value": _v, "sector_avg": _a, "rank": _r}
+            indicators["peer_comparison"] = peer_display
+        # Store period from financial data
+        indicators["period"] = latest.get("period", "N/A")
 
         # 9. Score from margin of safety
         mos_score = _margin_of_safety_to_score(margin)
