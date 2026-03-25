@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
 from src.db.evaluation_repo import evaluation_repo
-from src.db.models import Asset, DailyDecision, Evaluation, NewsEvent, Watchlist
+from src.db.models import Asset, DailyDecision, Evaluation, NewsEvent, SignalRecord, Watchlist
 from src.report.formatter import (
     EvalDisplayItem,
     format_asset_card,
@@ -26,6 +26,7 @@ from src.report.formatter import (
     format_news_digest,
     format_report_header,
     format_scorecard_section,
+    format_valuation_summary,
     split_report,
 )
 
@@ -266,6 +267,41 @@ async def send_daily_report(
         if lessons_text:
             card = card + "\n" + lessons_text
         cards.append(card)
+
+    # Build valuation summary for IDX stocks (REPT-03)
+    try:
+        idx_stocks = [a for d, a in results if a.asset_type == "stock"]
+        if idx_stocks:
+            val_stocks: list[dict] = []
+            for a in idx_stocks:
+                sig_stmt = (
+                    select(SignalRecord)
+                    .where(
+                        SignalRecord.asset_id == a.id,
+                        SignalRecord.category == "valuation",
+                    )
+                    .order_by(SignalRecord.date.desc())
+                    .limit(1)
+                )
+                sig_result = await session.execute(sig_stmt)
+                sig = sig_result.scalar_one_or_none()
+                if sig and sig.indicators:
+                    ind = sig.indicators
+                    fv = ind.get("fair_value") or ind.get("dcf_fair_value", 0)
+                    val_stocks.append({
+                        "symbol": a.symbol,
+                        "price": ind.get("current_price", 0),
+                        "fair_value": fv,
+                        "margin": ind.get("margin_of_safety", 0),
+                        "has_pdf": ind.get("has_pdf_data", False),
+                        "qoq_alerts": ind.get("qoq_alerts", []),
+                    })
+            if val_stocks:
+                val_section = format_valuation_summary(val_stocks)
+                if val_section:
+                    cards.append(val_section)
+    except Exception:
+        logger.debug("valuation_summary_failed", exc_info=True)
 
     # Query today's scored news events and append news digest (D-19)
     try:

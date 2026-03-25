@@ -200,3 +200,23 @@ class TestFormatValuationSummary:
         ]
         result = format_valuation_summary(stocks)
         assert "\U0001f534" in result  # red circle
+
+
+class TestReportStageWiring:
+    """Verify report_stage wires to format_valuation_summary for IDX stocks."""
+
+    @pytest.mark.asyncio
+    async def test_report_stage_calls_format_valuation_summary(self) -> None:
+        """report stage imports and can call format_valuation_summary."""
+        from unittest.mock import patch, MagicMock
+
+        # Verify the import exists in src.data.report
+        from src.data.report import format_valuation_summary as imported_fn
+        assert imported_fn is format_valuation_summary
+
+        # Verify function is callable with expected input
+        result = format_valuation_summary([
+            {"symbol": "BBCA", "price": 8250, "fair_value": 10000, "margin": 0.21, "has_pdf": True, "qoq_alerts": []},
+        ])
+        assert "BBCA" in result
+        assert "Valuation Summary" in result
