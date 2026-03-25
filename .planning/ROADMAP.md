@@ -162,10 +162,10 @@ Plans:
   5. Quarter-over-quarter ratio changes trigger alerts when they exceed defined thresholds
 **Plans**: 5 plans
 Plans:
-- [ ] 09-01-PLAN.md — DB models (FinancialDoc, FinancialData), Alembic migration 008, IDX document fetcher
-- [ ] 09-02-PLAN.md — pymupdf4llm dependency, LLM financial document parser with extraction prompt
-- [ ] 09-03-PLAN.md — ValuationEngine (DCF, peer comparison, scenario analysis, crypto proxy)
-- [ ] 09-04-PLAN.md — Pipeline wiring (fetch + analyze stages), QoQ ratio change detection
+- [x] 09-01-PLAN.md — DB models (FinancialDoc, FinancialData), Alembic migration 008, IDX document fetcher
+- [x] 09-02-PLAN.md — pymupdf4llm dependency, LLM financial document parser with extraction prompt
+- [x] 09-03-PLAN.md — ValuationEngine (DCF, peer comparison, scenario analysis, crypto proxy)
+- [x] 09-04-PLAN.md — Pipeline wiring (fetch + analyze stages), QoQ ratio change detection
 - [ ] 09-05-PLAN.md — Bot commands (/valuation, /fundamentals), report formatter, daily report integration
 
 ### Phase 10: Remaining Specialized Engines
@@ -230,7 +230,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 6. Accuracy Tracking + Scorecard | 0/2 | Planning complete | - |
 | 7. Self-Evaluation Feedback Loop | 0/2 | Planning complete | - |
 | 8. Fundamental, Macro, Sentiment, and News Engines | 4/4 | Complete   | 2026-03-25 |
-| 9. IDX Documents + Valuation Engine | 0/5 | Planning complete | - |
+| 9. IDX Documents + Valuation Engine | 0/5 | Planned    |  |
 | 10. Remaining Specialized Engines | 0/TBD | Not started | - |
 | 11. Asset Discovery + Due Diligence | 0/TBD | Not started | - |
 | 12. Portfolio Risk + Advanced Commands | 0/TBD | Not started | - |

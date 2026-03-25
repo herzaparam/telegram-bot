@@ -36,7 +36,7 @@
 - [x] **ENGN-12**: Macro/economic engine (BI rate, Fed rate, CPI, DXY, rupiah)
 - [ ] **ENGN-13**: Game theory engine (order book imbalance, whale patterns)
 - [ ] **ENGN-14**: Emerging methods engine (fractal dimension, wavelet analysis)
-- [ ] **ENGN-15**: Valuation engine (DCF, peer multiples, margin of safety) with fair value estimates
+- [x] **ENGN-15**: Valuation engine (DCF, peer multiples, margin of safety) with fair value estimates
 
 ### LLM Decision Maker
 
@@ -57,9 +57,9 @@
 
 ### IDX Documents
 
-- [ ] **IDXD-01**: System downloads laporan keuangan (quarterly/annual) from idx.co.id
-- [ ] **IDXD-02**: GPT parses PDF reports in Bahasa Indonesia
-- [ ] **IDXD-03**: System extracts revenue, net profit, debt, cash flow, management outlook
+- [x] **IDXD-01**: System downloads laporan keuangan (quarterly/annual) from idx.co.id
+- [x] **IDXD-02**: GPT parses PDF reports in Bahasa Indonesia
+- [x] **IDXD-03**: System extracts revenue, net profit, debt, cash flow, management outlook
 
 ### News
 
@@ -96,11 +96,11 @@
 
 ### Valuation Engine
 
-- [ ] **VALN-01**: DCF model for IDX stocks using parsed financial data
-- [ ] **VALN-02**: Comparable company analysis with sector peer grouping
-- [ ] **VALN-03**: Crypto valuation proxies (NVT ratio, stock-to-flow for BTC, revenue multiples for DeFi)
-- [ ] **VALN-04**: Scenario analysis (bull/base/bear) with probability-weighted returns
-- [ ] **VALN-05**: Quarter-over-quarter ratio tracking with change alerts
+- [x] **VALN-01**: DCF model for IDX stocks using parsed financial data
+- [x] **VALN-02**: Comparable company analysis with sector peer grouping
+- [x] **VALN-03**: Crypto valuation proxies (NVT ratio, stock-to-flow for BTC, revenue multiples for DeFi)
+- [x] **VALN-04**: Scenario analysis (bull/base/bear) with probability-weighted returns
+- [x] **VALN-05**: Quarter-over-quarter ratio tracking with change alerts
 
 ### Due Diligence
 
@@ -178,7 +178,7 @@
 | ENGN-12 | Phase 8 | Complete |
 | ENGN-13 | Phase 10 | Pending |
 | ENGN-14 | Phase 10 | Pending |
-| ENGN-15 | Phase 9 | Pending |
+| ENGN-15 | Phase 9 | Complete |
 | LLM-01 | Phase 4 | Complete |
 | LLM-02 | Phase 4 | Complete |
 | LLM-03 | Phase 4 | Complete |
@@ -190,9 +190,9 @@
 | EVAL-03 | Phase 7 | Complete |
 | EVAL-04 | Phase 7 | Complete |
 | EVAL-05 | Phase 6 | Complete |
-| IDXD-01 | Phase 9 | Pending |
-| IDXD-02 | Phase 9 | Pending |
-| IDXD-03 | Phase 9 | Pending |
+| IDXD-01 | Phase 9 | Complete |
+| IDXD-02 | Phase 9 | Complete |
+| IDXD-03 | Phase 9 | Complete |
 | NEWS-01 | Phase 8 | Complete |
 | NEWS-02 | Phase 8 | Complete |
 | NEWS-03 | Phase 8 | Complete |
@@ -217,11 +217,11 @@
 | REPT-05 | Phase 7 | Complete |
 | REPT-06 | Phase 12 | Pending |
 | REPT-07 | Phase 11 | Pending |
-| VALN-01 | Phase 9 | Pending |
-| VALN-02 | Phase 9 | Pending |
-| VALN-03 | Phase 9 | Pending |
-| VALN-04 | Phase 9 | Pending |
-| VALN-05 | Phase 9 | Pending |
+| VALN-01 | Phase 9 | Complete |
+| VALN-02 | Phase 9 | Complete |
+| VALN-03 | Phase 9 | Complete |
+| VALN-04 | Phase 9 | Complete |
+| VALN-05 | Phase 9 | Complete |
 | DUED-01 | Phase 11 | Pending |
 | DUED-02 | Phase 11 | Pending |
 | DUED-03 | Phase 11 | Pending |
