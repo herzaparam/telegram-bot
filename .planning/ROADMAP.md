@@ -145,7 +145,7 @@ Plans:
   5. Indonesian news (Kontan, CNBC Indonesia, Bisnis) and global crypto news (Finnhub) are fetched, LLM-scored for impact per asset, and summarized in the daily report
 **Plans**: 4 plans
 Plans:
-- [ ] 08-01-PLAN.md — Dependencies, config extensions, DB models (NewsEvent, MacroData, StockFundamental), Alembic migration 007
+- [x] 08-01-PLAN.md — Dependencies, config extensions, DB models (NewsEvent, MacroData, StockFundamental), Alembic migration 007
 - [ ] 08-02-PLAN.md — Data fetchers: fundamental (yfinance), macro (FRED), news (RSS+Finnhub), sentiment (Fear&Greed+Reddit)
 - [ ] 08-03-PLAN.md — Four engines (Fundamental, Macro, Sentiment, Event) and LLM news impact scorer
 - [ ] 08-04-PLAN.md — Wiring: analyze_stage with 6 engines, global data fetch in pipeline, news digest in daily report
@@ -226,7 +226,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. Telegram Bot + Daily Delivery | 2/3 | In Progress|  |
 | 6. Accuracy Tracking + Scorecard | 0/2 | Planning complete | - |
 | 7. Self-Evaluation Feedback Loop | 0/2 | Planning complete | - |
-| 8. Fundamental, Macro, Sentiment, and News Engines | 0/4 | Planning complete | - |
+| 8. Fundamental, Macro, Sentiment, and News Engines | 1/4 | In Progress|  |
 | 9. IDX Documents + Valuation Engine | 0/TBD | Not started | - |
 | 10. Remaining Specialized Engines | 0/TBD | Not started | - |
 | 11. Asset Discovery + Due Diligence | 0/TBD | Not started | - |

@@ -23,17 +23,17 @@
 ### Signal Engines
 
 - [x] **ENGN-01**: Technical analysis engine (RSI, MACD, Bollinger, MA, volume) outputs score/confidence/reasoning
-- [ ] **ENGN-02**: Fundamental analysis engine (P/E, P/B, revenue growth, ROE) for IDX stocks
+- [x] **ENGN-02**: Fundamental analysis engine (P/E, P/B, revenue growth, ROE) for IDX stocks
 - [x] **ENGN-03**: Quantitative/statistical engine (momentum, mean reversion, ARIMA)
 - [ ] **ENGN-04**: ML/AI engine (XGBoost, LSTM via ONNX, ensemble)
-- [ ] **ENGN-05**: Sentiment engine (Reddit, Stockbit, Fear & Greed)
+- [x] **ENGN-05**: Sentiment engine (Reddit, Stockbit, Fear & Greed)
 - [ ] **ENGN-06**: On-chain engine for crypto (TVL, whale tracking, exchange flows, NVT)
 - [ ] **ENGN-07**: Options engine (put/call ratio, max pain) — limited scope
 - [ ] **ENGN-08**: Behavioral engine (volume anomaly, herding detection)
-- [ ] **ENGN-09**: Event-driven engine (earnings calendar, BI meetings, halving)
+- [x] **ENGN-09**: Event-driven engine (earnings calendar, BI meetings, halving)
 - [ ] **ENGN-10**: Alternative data engine (GitHub activity) for crypto
 - [ ] **ENGN-11**: Network/graph engine (correlation analysis between assets)
-- [ ] **ENGN-12**: Macro/economic engine (BI rate, Fed rate, CPI, DXY, rupiah)
+- [x] **ENGN-12**: Macro/economic engine (BI rate, Fed rate, CPI, DXY, rupiah)
 - [ ] **ENGN-13**: Game theory engine (order book imbalance, whale patterns)
 - [ ] **ENGN-14**: Emerging methods engine (fractal dimension, wavelet analysis)
 - [ ] **ENGN-15**: Valuation engine (DCF, peer multiples, margin of safety) with fair value estimates
@@ -63,8 +63,8 @@
 
 ### News
 
-- [ ] **NEWS-01**: System ingests Indonesian financial news (Kontan, CNBC Indonesia, Bisnis) via RSS
-- [ ] **NEWS-02**: System ingests global crypto/financial news (Finnhub)
+- [x] **NEWS-01**: System ingests Indonesian financial news (Kontan, CNBC Indonesia, Bisnis) via RSS
+- [x] **NEWS-02**: System ingests global crypto/financial news (Finnhub)
 - [ ] **NEWS-03**: LLM scores news impact per asset
 - [ ] **NEWS-04**: Daily digest of relevant news included in report
 
@@ -165,17 +165,17 @@
 | WTCH-02 | Phase 5 | Complete |
 | WTCH-03 | Phase 5 | Complete |
 | ENGN-01 | Phase 3 | Complete |
-| ENGN-02 | Phase 8 | Pending |
+| ENGN-02 | Phase 8 | Complete |
 | ENGN-03 | Phase 3 | Complete |
 | ENGN-04 | Phase 10 | Pending |
-| ENGN-05 | Phase 8 | Pending |
+| ENGN-05 | Phase 8 | Complete |
 | ENGN-06 | Phase 10 | Pending |
 | ENGN-07 | Phase 10 | Pending |
 | ENGN-08 | Phase 10 | Pending |
-| ENGN-09 | Phase 8 | Pending |
+| ENGN-09 | Phase 8 | Complete |
 | ENGN-10 | Phase 10 | Pending |
 | ENGN-11 | Phase 10 | Pending |
-| ENGN-12 | Phase 8 | Pending |
+| ENGN-12 | Phase 8 | Complete |
 | ENGN-13 | Phase 10 | Pending |
 | ENGN-14 | Phase 10 | Pending |
 | ENGN-15 | Phase 9 | Pending |
@@ -193,8 +193,8 @@
 | IDXD-01 | Phase 9 | Pending |
 | IDXD-02 | Phase 9 | Pending |
 | IDXD-03 | Phase 9 | Pending |
-| NEWS-01 | Phase 8 | Pending |
-| NEWS-02 | Phase 8 | Pending |
+| NEWS-01 | Phase 8 | Complete |
+| NEWS-02 | Phase 8 | Complete |
 | NEWS-03 | Phase 8 | Pending |
 | NEWS-04 | Phase 8 | Pending |
 | TBOT-01 | Phase 5 | Complete |
