@@ -86,21 +86,21 @@ class TestFormatNewsDigest:
         """format_news_digest() caps at 10 headlines per D-19."""
         from src.report.formatter import format_news_digest
 
-        # Create 15 items
+        # Create 20 items with unique non-overlapping identifiers
         items = [
             {
-                "headline": f"Headline {i}",
+                "headline": f"Item-{i:03d}-news",
                 "source": "kontan",
                 "category": "macro",
                 "impact_score": float(i) / 10,
                 "affected_assets": {},
             }
-            for i in range(1, 16)
+            for i in range(1, 21)
         ]
         result = format_news_digest(items)
 
-        # Count how many headlines appear -- should be at most 10
-        headline_count = sum(1 for i in range(1, 16) if f"Headline {i}" in result)
+        # Count how many unique items appear -- should be at most 10
+        headline_count = sum(1 for i in range(1, 21) if f"Item-{i:03d}-news" in result)
         assert headline_count <= 10
 
     def test_escapes_html_in_headline(self):
