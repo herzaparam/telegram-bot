@@ -89,18 +89,14 @@ class TestFetchIdxDocs:
 
         captured_params: list[dict] = []
 
-        mock_response = AsyncMock()
+        mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = _make_empty_api_response()
         mock_response.raise_for_status = MagicMock()
 
         mock_client = AsyncMock()
-        mock_client.get = AsyncMock(return_value=mock_response)
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
         mock_client.__aexit__ = AsyncMock(return_value=False)
-
-        # Capture params from get calls
-        original_get = mock_client.get
 
         async def capture_get(url, **kwargs):
             captured_params.append(kwargs.get("params", {}))
