@@ -38,28 +38,31 @@ created: 2026-03-25
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 09-01-01 | 01 | 1 | IDXD-01 | integration | `pytest tests/test_idx_fetcher.py -k download` | ❌ W0 | ⬜ pending |
-| 09-01-02 | 01 | 1 | IDXD-02 | unit | `pytest tests/test_idx_parser.py -k extract` | ❌ W0 | ⬜ pending |
-| 09-01-03 | 01 | 1 | IDXD-03 | unit | `pytest tests/test_idx_parser.py -k qoq` | ❌ W0 | ⬜ pending |
-| 09-02-01 | 02 | 1 | VALN-01 | unit | `pytest tests/test_valuation_engine.py -k dcf` | ❌ W0 | ⬜ pending |
-| 09-02-02 | 02 | 1 | VALN-02 | unit | `pytest tests/test_valuation_engine.py -k peer` | ❌ W0 | ⬜ pending |
-| 09-02-03 | 02 | 1 | VALN-03 | unit | `pytest tests/test_valuation_engine.py -k scenario` | ❌ W0 | ⬜ pending |
-| 09-02-04 | 02 | 1 | VALN-04 | unit | `pytest tests/test_valuation_engine.py -k margin_of_safety` | ❌ W0 | ⬜ pending |
-| 09-03-01 | 03 | 2 | TBOT-09 | integration | `pytest tests/test_bot_handlers.py -k valuation` | ❌ W0 | ⬜ pending |
-| 09-03-02 | 03 | 2 | REPT-03 | integration | `pytest tests/test_report_builder.py -k valuation_summary` | ❌ W0 | ⬜ pending |
-| 09-03-03 | 03 | 2 | VALN-05 | unit | `pytest tests/test_valuation_engine.py -k alert` | ❌ W0 | ⬜ pending |
+| 09-01-01 | 01 | 1 | IDXD-01 | unit | `pytest tests/test_data/test_idx_doc_fetcher.py -x` | W0 | pending |
+| 09-02-01 | 02 | 1 | IDXD-02 | unit | `pytest tests/test_llm/test_doc_parser.py -x` | W0 | pending |
+| 09-03-01 | 03 | 1 | VALN-01 | unit | `pytest tests/test_engines/test_valuation.py -k dcf` | W0 | pending |
+| 09-03-02 | 03 | 1 | VALN-02 | unit | `pytest tests/test_engines/test_valuation.py -k peer` | W0 | pending |
+| 09-03-03 | 03 | 1 | VALN-03 | unit | `pytest tests/test_engines/test_valuation.py -k "crypto or nvt or tvl"` | W0 | pending |
+| 09-03-04 | 03 | 1 | VALN-04 | unit | `pytest tests/test_engines/test_valuation.py -k margin_of_safety` | W0 | pending |
+| 09-04-01 | 04 | 2 | VALN-05 | unit | `pytest tests/test_data/test_pipeline_wiring.py -x` | W0 | pending |
+| 09-04-02 | 04 | 2 | VALN-05 | unit | `pytest tests/test_engines/test_valuation.py -k qoq` | W0 | pending |
+| 09-05-01 | 05 | 2 | TBOT-09 | unit | `pytest tests/test_bot/test_valuation_handler.py -x` | W0 | pending |
+| 09-05-02 | 05 | 2 | TBOT-13 | unit | `pytest tests/test_bot/test_fundamentals_handler.py -x` | W0 | pending |
+| 09-05-03 | 05 | 2 | REPT-03 | unit | `pytest tests/test_report/test_formatter_valuation.py -x` | W0 | pending |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: pending / green / red / flaky*
 
 ---
 
 ## Wave 0 Requirements
 
-- [ ] `tests/test_idx_fetcher.py` — stubs for IDXD-01 (download + storage)
-- [ ] `tests/test_idx_parser.py` — stubs for IDXD-02, IDXD-03 (extraction + QoQ)
-- [ ] `tests/test_valuation_engine.py` — stubs for VALN-01..05 (DCF, peer, scenario, MoS, alerts)
-- [ ] `tests/test_bot_handlers.py` — extend with /valuation handler stubs for TBOT-09
-- [ ] `tests/test_report_builder.py` — extend with valuation summary stubs for REPT-03
+- [ ] `tests/test_data/test_idx_doc_fetcher.py` -- stubs for IDXD-01 (download + storage)
+- [ ] `tests/test_llm/test_doc_parser.py` -- stubs for IDXD-02 (LLM extraction)
+- [ ] `tests/test_engines/test_valuation.py` -- stubs for VALN-01..05 (DCF, peer, scenario, MoS, alerts, crypto proxy)
+- [ ] `tests/test_data/test_pipeline_wiring.py` -- stubs for VALN-05 (pipeline wiring, fetch+parse+validate)
+- [ ] `tests/test_bot/test_valuation_handler.py` -- stubs for TBOT-09 (/valuation handler)
+- [ ] `tests/test_bot/test_fundamentals_handler.py` -- stubs for TBOT-13 (/fundamentals handler)
+- [ ] `tests/test_report/test_formatter_valuation.py` -- stubs for REPT-03 (valuation summary formatting)
 
 ---
 
