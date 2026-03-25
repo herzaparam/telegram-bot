@@ -29,6 +29,7 @@ dependencies = [
     "fredapi>=0.5.2",
     "asyncpraw>=7.2.0",
     "finnhub-python>=2.4.27",
+    "pymupdf4llm>=1.27.2.2",
 ]
 
 [dependency-groups]
@@ -52,5 +53,5 @@ strict = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["yfinance", "ccxt", "asyncpg", "pandas_ta_classic", "pmdarima", "feedparser", "fredapi", "asyncpraw", "finnhub"]
+module = ["yfinance", "ccxt", "asyncpg", "pandas_ta_classic", "pmdarima", "feedparser", "fredapi", "asyncpraw", "finnhub", "pymupdf4llm", "pymupdf", "fitz"]
 ignore_missing_imports = true
