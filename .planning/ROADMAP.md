@@ -178,10 +178,13 @@ Plans:
   3. All 15 engines produce a valid score/confidence/reasoning for each applicable asset in a single pipeline run
   4. Any engine that fails its data source returns score=0/confidence=0 — the pipeline completes the full run without that engine's contribution
   5. Per-engine accuracy is tracked for all 15 engines and visible in /scorecard
-**Plans**: 2 plans
+**Plans**: 5 plans
 Plans:
-- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
-- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
+- [ ] 10-01-PLAN.md — Dependencies (xgboost, onnxmltools, PyWavelets), DB models, Alembic migrations 009-011, config
+- [ ] 10-02-PLAN.md — Stub engines (Options, Game Theory) + OHLCV-only engines (Behavioral, Network, Emerging Methods)
+- [ ] 10-03-PLAN.md — Data fetchers (DeFiLlama on-chain, GitHub API) + engines (OnChain, Alternative Data)
+- [ ] 10-04-PLAN.md — ML/AI engine (feature engineering, ONNX inference, XGBoost+LSTM training scripts)
+- [ ] 10-05-PLAN.md — Wire all 8 new engines into analyze_stage, ingest_stage fetchers, integration tests
 
 ### Phase 11: Asset Discovery + Due Diligence
 **Goal**: The system scans beyond the watchlist to surface new opportunities and provides full due diligence reports on IDX stocks including ownership, management, and competitive positioning
@@ -231,6 +234,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Self-Evaluation Feedback Loop | 0/2 | Planning complete | - |
 | 8. Fundamental, Macro, Sentiment, and News Engines | 4/4 | Complete   | 2026-03-25 |
 | 9. IDX Documents + Valuation Engine | 0/5 | Planned    |  |
-| 10. Remaining Specialized Engines | 0/TBD | Not started | - |
+| 10. Remaining Specialized Engines | 0/5 | Planning complete | - |
 | 11. Asset Discovery + Due Diligence | 0/TBD | Not started | - |
 | 12. Portfolio Risk + Advanced Commands | 0/TBD | Not started | - |
