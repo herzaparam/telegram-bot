@@ -59,5 +59,29 @@ class Settings(BaseSettings):
     weight_mean_reversion: float = 0.35
     weight_arima: float = 0.30
 
+    # External API keys (optional -- engines degrade gracefully when missing)
+    fred_api_key: str = ""
+    finnhub_api_key: str = ""
+    reddit_client_id: str = ""
+    reddit_client_secret: str = ""
+
+    # Fundamental engine ratio weights (sum to 1.0) -- per D-04
+    weight_fundamental_pe: float = 0.25
+    weight_fundamental_pb: float = 0.15
+    weight_fundamental_roe: float = 0.25
+    weight_fundamental_revenue_growth: float = 0.15
+    weight_fundamental_dividend_yield: float = 0.10
+    weight_fundamental_debt_to_equity: float = 0.10
+
+    # Macro engine indicator weights (sum to 1.0)
+    weight_macro_fed_rate: float = 0.25
+    weight_macro_cpi: float = 0.25
+    weight_macro_dxy: float = 0.25
+    weight_macro_usd_idr: float = 0.25
+
+    # Sentiment engine source weights
+    weight_sentiment_fear_greed: float = 0.40
+    weight_sentiment_reddit: float = 0.60
+
 
 settings = Settings()
