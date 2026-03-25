@@ -25,17 +25,17 @@
 - [x] **ENGN-01**: Technical analysis engine (RSI, MACD, Bollinger, MA, volume) outputs score/confidence/reasoning
 - [x] **ENGN-02**: Fundamental analysis engine (P/E, P/B, revenue growth, ROE) for IDX stocks
 - [x] **ENGN-03**: Quantitative/statistical engine (momentum, mean reversion, ARIMA)
-- [ ] **ENGN-04**: ML/AI engine (XGBoost, LSTM via ONNX, ensemble)
+- [x] **ENGN-04**: ML/AI engine (XGBoost, LSTM via ONNX, ensemble)
 - [x] **ENGN-05**: Sentiment engine (Reddit, Stockbit, Fear & Greed)
-- [ ] **ENGN-06**: On-chain engine for crypto (TVL, whale tracking, exchange flows, NVT)
-- [ ] **ENGN-07**: Options engine (put/call ratio, max pain) — limited scope
-- [ ] **ENGN-08**: Behavioral engine (volume anomaly, herding detection)
+- [x] **ENGN-06**: On-chain engine for crypto (TVL, whale tracking, exchange flows, NVT)
+- [x] **ENGN-07**: Options engine (put/call ratio, max pain) — limited scope
+- [x] **ENGN-08**: Behavioral engine (volume anomaly, herding detection)
 - [x] **ENGN-09**: Event-driven engine (earnings calendar, BI meetings, halving)
-- [ ] **ENGN-10**: Alternative data engine (GitHub activity) for crypto
-- [ ] **ENGN-11**: Network/graph engine (correlation analysis between assets)
+- [x] **ENGN-10**: Alternative data engine (GitHub activity) for crypto
+- [x] **ENGN-11**: Network/graph engine (correlation analysis between assets)
 - [x] **ENGN-12**: Macro/economic engine (BI rate, Fed rate, CPI, DXY, rupiah)
-- [ ] **ENGN-13**: Game theory engine (order book imbalance, whale patterns)
-- [ ] **ENGN-14**: Emerging methods engine (fractal dimension, wavelet analysis)
+- [x] **ENGN-13**: Game theory engine (order book imbalance, whale patterns)
+- [x] **ENGN-14**: Emerging methods engine (fractal dimension, wavelet analysis)
 - [x] **ENGN-15**: Valuation engine (DCF, peer multiples, margin of safety) with fair value estimates
 
 ### LLM Decision Maker
@@ -167,17 +167,17 @@
 | ENGN-01 | Phase 3 | Complete |
 | ENGN-02 | Phase 8 | Complete |
 | ENGN-03 | Phase 3 | Complete |
-| ENGN-04 | Phase 10 | Pending |
+| ENGN-04 | Phase 10 | Complete |
 | ENGN-05 | Phase 8 | Complete |
-| ENGN-06 | Phase 10 | Pending |
-| ENGN-07 | Phase 10 | Pending |
-| ENGN-08 | Phase 10 | Pending |
+| ENGN-06 | Phase 10 | Complete |
+| ENGN-07 | Phase 10 | Complete |
+| ENGN-08 | Phase 10 | Complete |
 | ENGN-09 | Phase 8 | Complete |
-| ENGN-10 | Phase 10 | Pending |
-| ENGN-11 | Phase 10 | Pending |
+| ENGN-10 | Phase 10 | Complete |
+| ENGN-11 | Phase 10 | Complete |
 | ENGN-12 | Phase 8 | Complete |
-| ENGN-13 | Phase 10 | Pending |
-| ENGN-14 | Phase 10 | Pending |
+| ENGN-13 | Phase 10 | Complete |
+| ENGN-14 | Phase 10 | Complete |
 | ENGN-15 | Phase 9 | Complete |
 | LLM-01 | Phase 4 | Complete |
 | LLM-02 | Phase 4 | Complete |

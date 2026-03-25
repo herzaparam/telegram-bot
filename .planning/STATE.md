@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Phase 10 context gathered
-last_updated: "2026-03-25T16:45:13.319Z"
+status: Ready to execute
+stopped_at: Completed 10-02-PLAN.md
+last_updated: "2026-03-25T17:29:27.727Z"
 progress:
   total_phases: 12
   completed_phases: 9
-  total_plans: 27
-  completed_plans: 27
+  total_plans: 32
+  completed_plans: 28
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** The daily signal loop must work reliably: fetch data, run engines, produce LLM verdicts, and deliver a Telegram report every morning
-**Current focus:** Phase 09 — idx-documents-valuation-engine
+**Current focus:** Phase 10 — remaining-specialized-engines
 
 ## Current Position
 
-Phase: 10
-Plan: Not started
+Phase: 10 (remaining-specialized-engines) — EXECUTING
+Plan: 3 of 5
 
 ## Performance Metrics
 
@@ -73,6 +73,8 @@ Plan: Not started
 | Phase 09 P02 | 5min | 2 tasks | 3 files |
 | Phase 09 P04 | 6min | 2 tasks | 5 files |
 | Phase 09 P05 | 7min | 2 tasks | 10 files |
+| Phase 10 P01 | 4min | 2 tasks | 7 files |
+| Phase 10 P02 | 7min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -148,6 +150,11 @@ Recent decisions affecting current work:
 - [Phase 09]: Cross-validation compares PDF-extracted revenue/net_profit vs yfinance with 10% threshold
 - [Phase 09]: Bot reads valuation data from signals table indicators JSONB, not engine imports (two-process boundary)
 - [Phase 09]: ValuationEngine stores enriched indicators dict with fair_value, peer_comparison, sector, has_pdf_data for bot consumption
+- [Phase 10]: mypy overrides added for xgboost, onnxmltools, pywt (no py.typed stubs)
+- [Phase 10]: Stub engines document future data sources in data_quality.todo field
+- [Phase 10]: NetworkEngine receives pre-computed correlation_data via constructor (same as MacroEngine pattern)
+- [Phase 10]: EmergingMethodsEngine implements own _hurst_exponent locally to avoid circular imports
+- [Phase 10]: PyWavelets (pywt) added as dependency for wavelet decomposition
 
 ### Pending Todos
 
@@ -161,6 +168,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T16:45:13.310Z
-Stopped at: Phase 10 context gathered
-Resume file: .planning/phases/10-remaining-specialized-engines/10-CONTEXT.md
+Last session: 2026-03-25T17:29:27.723Z
+Stopped at: Completed 10-02-PLAN.md
+Resume file: None
