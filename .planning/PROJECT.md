@@ -28,7 +28,7 @@ The daily signal loop must work reliably: fetch data, run engines, produce LLM v
 - [ ] Valuation engine with DCF, peer comparison, and fair value estimates
 - [x] Self-evaluation feedback loop — review yesterday's decisions, extract lessons, improve over time — Validated in Phase 7: Self-Evaluation Feedback Loop
 - [ ] Indonesian financial document (laporan keuangan) PDF parsing with GPT
-- [ ] News-driven signals from Indonesian and global sources
+- [x] News-driven signals from Indonesian and global sources — Validated in Phase 8: Fundamental, Macro, Sentiment, and News Engines
 - [ ] Asset discovery — scan IHSG and crypto for unusual volume, breakouts, anomalies
 - [ ] Due diligence module (ownership, insider tracking, management quality, sector benchmarking)
 - [ ] Portfolio risk monitor (correlation matrix, concentration risk, VaR, stress testing)
@@ -69,4 +69,4 @@ The daily signal loop must work reliably: fetch data, run engines, produce LLM v
 | asyncpg for hot paths, SQLAlchemy for relational | Raw asyncpg ~0.1ms/query for price reads, SQLAlchemy for type safety elsewhere | — Pending |
 
 ---
-*Last updated: 2026-03-24 after Phase 5 (Telegram Bot & Daily Delivery) completion*
+*Last updated: 2026-03-25 after Phase 8 (Fundamental, Macro, Sentiment, and News Engines) completion*
