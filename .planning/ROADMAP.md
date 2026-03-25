@@ -166,7 +166,7 @@ Plans:
 - [x] 09-02-PLAN.md — pymupdf4llm dependency, LLM financial document parser with extraction prompt
 - [x] 09-03-PLAN.md — ValuationEngine (DCF, peer comparison, scenario analysis, crypto proxy)
 - [x] 09-04-PLAN.md — Pipeline wiring (fetch + analyze stages), QoQ ratio change detection
-- [ ] 09-05-PLAN.md — Bot commands (/valuation, /fundamentals), report formatter, daily report integration
+- [x] 09-05-PLAN.md — Bot commands (/valuation, /fundamentals), report formatter, daily report integration
 
 ### Phase 10: Remaining Specialized Engines
 **Goal**: The full 15-engine suite is operational — ML/AI prediction, on-chain crypto analysis, options flow, behavioral anomalies, network correlation, game theory order book, and emerging quantitative methods

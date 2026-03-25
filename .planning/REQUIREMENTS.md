@@ -78,17 +78,17 @@
 - [ ] **TBOT-06**: `/discover` shows today's opportunities
 - [x] **TBOT-07**: `/settings` configures notification time, categories
 - [ ] **TBOT-08**: `/backtest BTC 30d` runs historical signal replay
-- [ ] **TBOT-09**: `/valuation BBCA` shows DCF, peer comparison, fair value
+- [x] **TBOT-09**: `/valuation BBCA` shows DCF, peer comparison, fair value
 - [ ] **TBOT-10**: `/compare BBCA BBRI BMRI` side-by-side sector comparison
 - [ ] **TBOT-11**: `/duediligence BBCA` full DD report
 - [ ] **TBOT-12**: `/portfolio` portfolio risk overview
-- [ ] **TBOT-13**: `/fundamentals BBCA` deep ratio dashboard
+- [x] **TBOT-13**: `/fundamentals BBCA` deep ratio dashboard
 
 ### Daily Report
 
 - [x] **REPT-01**: Yesterday's scorecard (was I right/wrong, accuracy stats)
 - [x] **REPT-02**: Today's signal for each watchlist asset (all 15 categories + LLM verdict)
-- [ ] **REPT-03**: Valuation summary (fair value vs market price, margin of safety)
+- [x] **REPT-03**: Valuation summary (fair value vs market price, margin of safety)
 - [x] **REPT-04**: LLM reasoning for each decision
 - [x] **REPT-05**: Lessons applied today
 - [ ] **REPT-06**: Portfolio risk snapshot (concentration, correlation alerts)
@@ -205,14 +205,14 @@
 | TBOT-06 | Phase 11 | Pending |
 | TBOT-07 | Phase 5 | Complete |
 | TBOT-08 | Phase 12 | Pending |
-| TBOT-09 | Phase 9 | Pending |
+| TBOT-09 | Phase 9 | Complete |
 | TBOT-10 | Phase 11 | Pending |
 | TBOT-11 | Phase 11 | Pending |
 | TBOT-12 | Phase 12 | Pending |
-| TBOT-13 | Phase 9 | Pending |
+| TBOT-13 | Phase 9 | Complete |
 | REPT-01 | Phase 6 | Complete |
 | REPT-02 | Phase 5 | Complete |
-| REPT-03 | Phase 9 | Pending |
+| REPT-03 | Phase 9 | Complete |
 | REPT-04 | Phase 5 | Complete |
 | REPT-05 | Phase 7 | Complete |
 | REPT-06 | Phase 12 | Pending |

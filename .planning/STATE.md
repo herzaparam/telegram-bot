@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 09-04-PLAN.md
-last_updated: "2026-03-25T12:13:43.765Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 09-05-PLAN.md
+last_updated: "2026-03-25T12:14:29.142Z"
 progress:
   total_phases: 12
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 27
-  completed_plans: 26
+  completed_plans: 27
 ---
 
 # Project State
@@ -72,6 +72,7 @@ Plan: 5 of 5
 | Phase 09 P03 | 4min | 1 tasks | 2 files |
 | Phase 09 P02 | 5min | 2 tasks | 3 files |
 | Phase 09 P04 | 6min | 2 tasks | 5 files |
+| Phase 09 P05 | 7min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -145,6 +146,8 @@ Recent decisions affecting current work:
 - [Phase 09]: GPT-4o used for vision fallback (not GPT-4o-mini which lacks vision)
 - [Phase 09]: QoQ thresholds: 3pp for margins, 10% for revenue/profit, 15% for debt/cashflow
 - [Phase 09]: Cross-validation compares PDF-extracted revenue/net_profit vs yfinance with 10% threshold
+- [Phase 09]: Bot reads valuation data from signals table indicators JSONB, not engine imports (two-process boundary)
+- [Phase 09]: ValuationEngine stores enriched indicators dict with fair_value, peer_comparison, sector, has_pdf_data for bot consumption
 
 ### Pending Todos
 
@@ -158,6 +161,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T12:13:43.762Z
-Stopped at: Completed 09-04-PLAN.md
+Last session: 2026-03-25T12:14:29.139Z
+Stopped at: Completed 09-05-PLAN.md
 Resume file: None
