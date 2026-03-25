@@ -396,6 +396,56 @@ class FinancialData(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class OnChainData(Base):
+    """On-chain metrics for crypto assets (TVL, exchange flows)."""
+
+    __tablename__ = "on_chain_data"
+    __table_args__ = (UniqueConstraint("asset_id", "date", "metric", name="uq_onchain_asset_date_metric"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(Integer, ForeignKey("assets.id"), nullable=False)
+    date: Mapped[date] = mapped_column(Date, nullable=False)
+    metric: Mapped[str] = mapped_column(String(30), nullable=False)  # "tvl", "exchange_inflow", "exchange_outflow"
+    value: Mapped[float] = mapped_column(Float, nullable=False)
+    source: Mapped[str] = mapped_column(String(20), nullable=False)  # "defillama", "coingecko"
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class GitHubActivity(Base):
+    """GitHub repo activity metrics for crypto projects."""
+
+    __tablename__ = "github_activity"
+    __table_args__ = (UniqueConstraint("asset_id", "date", name="uq_github_activity_asset_date"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(Integer, ForeignKey("assets.id"), nullable=False)
+    date: Mapped[date] = mapped_column(Date, nullable=False)
+    repo: Mapped[str] = mapped_column(String(100), nullable=False)
+    stars: Mapped[int] = mapped_column(Integer, default=0)
+    forks: Mapped[int] = mapped_column(Integer, default=0)
+    weekly_commits: Mapped[int] = mapped_column(Integer, default=0)
+    contributors: Mapped[int] = mapped_column(Integer, default=0)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class MLPrediction(Base):
+    """Cached ML model predictions per asset per day."""
+
+    __tablename__ = "ml_predictions"
+    __table_args__ = (UniqueConstraint("asset_id", "date", name="uq_ml_predictions_asset_date"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(Integer, ForeignKey("assets.id"), nullable=False)
+    date: Mapped[date] = mapped_column(Date, nullable=False)
+    xgboost_pred: Mapped[float | None] = mapped_column(Float, nullable=True)
+    xgboost_prob: Mapped[float | None] = mapped_column(Float, nullable=True)
+    lstm_pred: Mapped[float | None] = mapped_column(Float, nullable=True)
+    lstm_prob: Mapped[float | None] = mapped_column(Float, nullable=True)
+    ensemble_score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    features_hash: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 # Seed data for the assets table
 SEED_ASSETS: list[dict[str, str | None]] = [
     # IDX stocks
