@@ -25,9 +25,9 @@ The daily signal loop must work reliably: fetch data, run engines, produce LLM v
 - [ ] 15-category signal analysis engines (technical, fundamental, sentiment, on-chain, macro, etc.)
 - [ ] Each engine outputs score (-1 to +1), confidence (0-1), and reasoning
 - [x] LLM final decision maker synthesizing all engine scores into a verdict (Phase 4)
-- [ ] Valuation engine with DCF, peer comparison, and fair value estimates
+- [x] Valuation engine with DCF, peer comparison, and fair value estimates — Validated in Phase 9: IDX Documents & Valuation Engine
 - [x] Self-evaluation feedback loop — review yesterday's decisions, extract lessons, improve over time — Validated in Phase 7: Self-Evaluation Feedback Loop
-- [ ] Indonesian financial document (laporan keuangan) PDF parsing with GPT
+- [x] Indonesian financial document (laporan keuangan) PDF parsing with GPT — Validated in Phase 9: IDX Documents & Valuation Engine
 - [x] News-driven signals from Indonesian and global sources — Validated in Phase 8: Fundamental, Macro, Sentiment, and News Engines
 - [ ] Asset discovery — scan IHSG and crypto for unusual volume, breakouts, anomalies
 - [ ] Due diligence module (ownership, insider tracking, management quality, sector benchmarking)
@@ -69,4 +69,4 @@ The daily signal loop must work reliably: fetch data, run engines, produce LLM v
 | asyncpg for hot paths, SQLAlchemy for relational | Raw asyncpg ~0.1ms/query for price reads, SQLAlchemy for type safety elsewhere | — Pending |
 
 ---
-*Last updated: 2026-03-25 after Phase 8 (Fundamental, Macro, Sentiment, and News Engines) completion*
+*Last updated: 2026-03-25 after Phase 9 (IDX Documents & Valuation Engine) completion*
