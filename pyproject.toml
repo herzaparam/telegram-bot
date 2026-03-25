@@ -21,6 +21,10 @@ dependencies = [
     "tenacity>=9.1.4",
     "uvicorn[standard]>=0.42.0",
     "yfinance>=1.2.0",
+    "feedparser>=6.0.12",
+    "fredapi>=0.5.2",
+    "asyncpraw>=7.2.0",
+    "finnhub-python>=2.4.27",
 ]
 
 [dependency-groups]
@@ -44,5 +48,5 @@ strict = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["yfinance", "ccxt", "asyncpg", "pandas_ta_classic", "pmdarima"]
+module = ["yfinance", "ccxt", "asyncpg", "pandas_ta_classic", "pmdarima", "feedparser", "fredapi", "asyncpraw", "finnhub"]
 ignore_missing_imports = true

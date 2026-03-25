@@ -309,6 +309,65 @@ class Lesson(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 
+class NewsEvent(Base):
+    """News headline from RSS feeds or Finnhub with optional LLM-scored impact."""
+
+    __tablename__ = "news_events"
+    __table_args__ = (UniqueConstraint("url", name="uq_news_events_url"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    headline: Mapped[str] = mapped_column(Text, nullable=False)
+    source: Mapped[str] = mapped_column(String(30), nullable=False)
+    url: Mapped[str] = mapped_column(Text, nullable=False)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    impact_score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    affected_assets: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)
+    category: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    raw_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    fetched_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class MacroData(Base):
+    """Cached FRED macro data series observations."""
+
+    __tablename__ = "macro_data"
+    __table_args__ = (
+        UniqueConstraint("series_id", "observation_date", name="uq_macro_data_series_date"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    series_id: Mapped[str] = mapped_column(String(30), nullable=False)
+    observation_date: Mapped[date] = mapped_column(Date, nullable=False)
+    value: Mapped[float] = mapped_column(Float, nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class StockFundamental(Base):
+    """Cached yfinance fundamental data per stock asset (weekly refresh)."""
+
+    __tablename__ = "stock_fundamentals"
+    __table_args__ = (
+        UniqueConstraint("asset_id", name="uq_stock_fundamentals_asset"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(Integer, ForeignKey("assets.id"), nullable=False)
+    trailing_pe: Mapped[float | None] = mapped_column(Float, nullable=True)
+    forward_pe: Mapped[float | None] = mapped_column(Float, nullable=True)
+    price_to_book: Mapped[float | None] = mapped_column(Float, nullable=True)
+    return_on_equity: Mapped[float | None] = mapped_column(Float, nullable=True)
+    revenue_growth: Mapped[float | None] = mapped_column(Float, nullable=True)
+    dividend_yield: Mapped[float | None] = mapped_column(Float, nullable=True)
+    debt_to_equity: Mapped[float | None] = mapped_column(Float, nullable=True)
+    fetched_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
 # Seed data for the assets table
 SEED_ASSETS: list[dict[str, str | None]] = [
     # IDX stocks
