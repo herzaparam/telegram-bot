@@ -152,7 +152,8 @@ async def test_send_telegram_message_error_returns_false():
 @pytest.mark.asyncio()
 async def test_send_daily_report_with_decisions(mock_settings, mock_session):
     """Test report with 3 watchlist assets and 3 decisions sends messages."""
-    with patch("src.data.report.send_telegram_message", new_callable=AsyncMock) as mock_send:
+    with patch("src.data.report.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+         patch("src.data.report._build_scorecard_section", new_callable=AsyncMock, return_value=""):
         mock_send.return_value = True
         await send_daily_report(mock_session, date(2026, 3, 24))
 
@@ -232,7 +233,8 @@ async def test_send_daily_report_empty_bot_token():
 @pytest.mark.asyncio()
 async def test_send_daily_report_contains_all_symbols(mock_settings, mock_session):
     """Test that report includes all 3 asset symbols in the message body."""
-    with patch("src.data.report.send_telegram_message", new_callable=AsyncMock) as mock_send:
+    with patch("src.data.report.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+         patch("src.data.report._build_scorecard_section", new_callable=AsyncMock, return_value=""):
         mock_send.return_value = True
         await send_daily_report(mock_session, date(2026, 3, 24))
 
@@ -294,7 +296,8 @@ async def test_message_splitting_many_decisions(mock_settings):
 
     session.execute = mock_execute
 
-    with patch("src.data.report.send_telegram_message", new_callable=AsyncMock) as mock_send:
+    with patch("src.data.report.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+         patch("src.data.report._build_scorecard_section", new_callable=AsyncMock, return_value=""):
         mock_send.return_value = True
         await send_daily_report(session, date(2026, 3, 24))
         # With 2 chat IDs and 20 long cards, expect multiple messages per chat

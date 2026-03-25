@@ -96,14 +96,18 @@ class TestAnalyzeStage:
             "src.data.analyze._load_latest_macro", new_callable=AsyncMock, return_value=None,
         ), patch(
             "src.data.analyze._load_recent_news", new_callable=AsyncMock, return_value=[],
+        ), patch(
+            "src.data.analyze._load_financial_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_peer_data", new_callable=AsyncMock, return_value=None,
         ), patch("src.data.analyze.signal_repo") as mock_repo:
-            mock_repo.upsert_signals = AsyncMock(return_value=6)
+            mock_repo.upsert_signals = AsyncMock(return_value=7)
             await analyze_stage(session, mock_stock_asset)
             mock_repo.upsert_signals.assert_called_once()
             call_args = mock_repo.upsert_signals.call_args
             assert call_args[0][1] == 1  # asset_id
-            # Stock asset now has 6 engines (technical, quantitative, fundamental, macro, sentiment, event)
-            assert len(call_args[0][3]) == 6
+            # Stock asset now has 7 engines (technical, quantitative, fundamental, macro, sentiment, event, valuation)
+            assert len(call_args[0][3]) == 7
 
     @pytest.mark.asyncio
     async def test_engine_failure_still_stores_other(self, mock_stock_asset):
@@ -127,6 +131,10 @@ class TestAnalyzeStage:
         ), patch(
             "src.data.analyze._load_recent_news", new_callable=AsyncMock, return_value=[],
         ), patch(
+            "src.data.analyze._load_financial_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_peer_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
             "src.data.analyze.TechnicalEngine"
         ) as MockTech, patch(
             "src.data.analyze.signal_repo"
@@ -138,13 +146,13 @@ class TestAnalyzeStage:
             mock_engine.analyze.side_effect = RuntimeError("crash")
             MockTech.return_value = mock_engine
 
-            mock_repo.upsert_signals = AsyncMock(return_value=6)
+            mock_repo.upsert_signals = AsyncMock(return_value=7)
             await analyze_stage(session, mock_stock_asset)
-            # Should still call upsert with 6 signals (1 failed + 5 from other engines)
+            # Should still call upsert with 7 signals (1 failed + 6 from other engines)
             mock_repo.upsert_signals.assert_called_once()
             call_args = mock_repo.upsert_signals.call_args
             signals = call_args[0][3]
-            assert len(signals) == 6
+            assert len(signals) == 7
             # One should be the failed signal
             failed = [s for s in signals if s.score == 0.0 and "failed" in s.reasoning.lower()]
             assert len(failed) >= 1
@@ -169,10 +177,14 @@ class TestAnalyzeStage:
             "src.data.analyze._load_latest_macro", new_callable=AsyncMock, return_value=None,
         ), patch(
             "src.data.analyze._load_recent_news", new_callable=AsyncMock, return_value=[],
+        ), patch(
+            "src.data.analyze._load_financial_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_peer_data", new_callable=AsyncMock, return_value=None,
         ), patch("src.data.analyze.signal_repo") as mock_repo, patch(
             "src.data.analyze.gc"
         ) as mock_gc:
-            mock_repo.upsert_signals = AsyncMock(return_value=6)
+            mock_repo.upsert_signals = AsyncMock(return_value=7)
             await analyze_stage(session, mock_stock_asset)
             mock_gc.collect.assert_called_once()
 
