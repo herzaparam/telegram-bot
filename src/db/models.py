@@ -309,6 +309,55 @@ class Lesson(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 
+class NewsEvent(Base):
+    """News headline with LLM-scored impact."""
+
+    __tablename__ = "news_events"
+    __table_args__ = (UniqueConstraint("url", name="uq_news_events_url"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    headline: Mapped[str] = mapped_column(Text, nullable=False)
+    source: Mapped[str] = mapped_column(String(50), nullable=False)  # "kontan", "cnbc_id", "bisnis", "finnhub"
+    url: Mapped[str] = mapped_column(Text, nullable=False)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    impact_score: Mapped[float | None] = mapped_column(Float, nullable=True)  # -1.0 to +1.0, set by LLM
+    affected_assets: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)  # {"BBCA": 0.7, "BTC": -0.3}
+    category: Mapped[str | None] = mapped_column(String(30), nullable=True)  # "central_bank", "earnings", "regulation", "halving", "macro", "sector", "company", "market", "other"
+    raw_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class MacroData(Base):
+    """Cached macro economic indicator values from FRED."""
+
+    __tablename__ = "macro_data"
+    __table_args__ = (UniqueConstraint("series_id", "observation_date", name="uq_macro_data_series_date"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    series_id: Mapped[str] = mapped_column(String(30), nullable=False)  # "DFF", "CPIAUCSL", "DTWEXBGS", "CCUSMA02IDM618N"
+    observation_date: Mapped[date] = mapped_column(Date, nullable=False)
+    value: Mapped[float] = mapped_column(Float, nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class StockFundamental(Base):
+    """Cached fundamental data from yfinance .info dict. Weekly refresh per D-02."""
+
+    __tablename__ = "stock_fundamentals"
+    __table_args__ = (UniqueConstraint("asset_id", name="uq_stock_fundamentals_asset"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(Integer, ForeignKey("assets.id"), nullable=False)
+    trailing_pe: Mapped[float | None] = mapped_column(Float, nullable=True)
+    forward_pe: Mapped[float | None] = mapped_column(Float, nullable=True)
+    price_to_book: Mapped[float | None] = mapped_column(Float, nullable=True)
+    return_on_equity: Mapped[float | None] = mapped_column(Float, nullable=True)
+    revenue_growth: Mapped[float | None] = mapped_column(Float, nullable=True)
+    dividend_yield: Mapped[float | None] = mapped_column(Float, nullable=True)
+    debt_to_equity: Mapped[float | None] = mapped_column(Float, nullable=True)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 # Seed data for the assets table
 SEED_ASSETS: list[dict[str, str | None]] = [
     # IDX stocks
