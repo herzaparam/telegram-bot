@@ -12,6 +12,7 @@ from datetime import UTC, date, datetime, timedelta
 from typing import cast
 
 import asyncpg
+import httpx
 import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,11 +21,13 @@ from src.config import settings
 from src.data.alerts import AlertCollector
 from src.data.base import BaseFetcher
 from src.data.crypto import CryptoFetcher
+from src.data.idx_doc_fetcher import fetch_idx_docs
 from src.data.idx_stocks import IDXStockFetcher
 from src.data.staleness import check_staleness
 from src.data.validation import validate_rows
-from src.db.models import Asset, BackoffState
+from src.db.models import Asset, BackoffState, FinancialData, FinancialDoc
 from src.db.price_repo import get_latest_date, upsert_prices
+from src.llm.doc_parser import parse_financial_doc
 from src.pipeline.tiers import handle_source_failure
 
 logger = structlog.get_logger(__name__)
@@ -131,6 +134,114 @@ async def _update_backoff_failure(session: AsyncSession, source: str) -> None:
         state.last_failure_at = datetime.now(UTC)
         state.current_delay_seconds = min(state.current_delay_seconds * 2, 300.0)
         await session.commit()
+
+
+def _period_to_date(period: str) -> date:
+    """Convert period string like 'Q3 2025' or 'FY 2025' to a period-end date.
+
+    Q1 -> March 31, Q2 -> June 30, Q3 -> September 30, Q4/FY -> December 31.
+    """
+    parts = period.strip().split()
+    if len(parts) < 2:
+        return date.today()
+
+    prefix = parts[0].upper()
+    try:
+        year = int(parts[-1])
+    except ValueError:
+        year = date.today().year
+
+    quarter_end = {
+        "Q1": (year, 3, 31),
+        "Q2": (year, 6, 30),
+        "Q3": (year, 9, 30),
+        "Q4": (year, 12, 31),
+        "FY": (year, 12, 31),
+    }
+
+    y, m, d = quarter_end.get(prefix, (year, 12, 31))
+    return date(y, m, d)
+
+
+async def _fetch_and_parse_docs(session: AsyncSession, asset: Asset) -> None:
+    """Fetch IDX financial docs and parse pending ones.
+
+    1. Calls fetch_idx_docs to download new PDFs.
+    2. On fetch exception: logs error and sends Telegram alert (D-05).
+    3. Queries pending FinancialDoc rows and parses each via LLM.
+    4. Creates FinancialData rows for each parsed metric.
+
+    Args:
+        session: SQLAlchemy async session.
+        asset: Stock asset to process.
+    """
+    log = logger.bind(component="doc_pipeline", asset=asset.symbol)
+
+    # 1. Fetch new docs (with Telegram alert on failure per D-05)
+    try:
+        await fetch_idx_docs(session, asset)
+    except Exception as exc:
+        log.error("idx_doc_fetch_failed", asset=asset.symbol, error=str(exc))
+        # Send Telegram alert per D-05
+        try:
+            token = settings.telegram_bot_token.get_secret_value()
+            chat_id = settings.telegram_chat_id
+            if token and chat_id:
+                alert_text = f"IDX doc fetch failed for {asset.symbol}: {exc}"
+                url = f"https://api.telegram.org/bot{token}/sendMessage"
+                async with httpx.AsyncClient(timeout=10.0) as client:
+                    await client.post(url, json={"chat_id": chat_id, "text": alert_text})
+        except Exception:
+            log.warning("telegram_alert_failed", asset=asset.symbol)
+
+    # 2. Parse pending docs
+    try:
+        result = await session.execute(
+            select(FinancialDoc)
+            .where(FinancialDoc.asset_id == asset.id)
+            .where(FinancialDoc.parse_status == "pending")
+        )
+        pending_docs = result.scalars().all()
+
+        for doc in pending_docs:
+            parsed = await parse_financial_doc(doc.file_path, asset.symbol)
+
+            if parsed is None:
+                doc.parse_status = "failed"
+                continue
+
+            # Create FinancialData rows for each field
+            period_str = parsed.get("period", "")
+            period_dt = _period_to_date(period_str)
+            # Normalize period string (e.g. "Q3 2025" -> "Q3-2025")
+            period_label = period_str.replace(" ", "-") if period_str else ""
+
+            text_fields = {"management_outlook", "currency_unit"}
+            skip_fields = {"period", "currency_unit"}
+
+            for key, value in parsed.items():
+                if key in skip_fields:
+                    continue
+                if value is None:
+                    continue
+
+                fd = FinancialData(
+                    doc_id=doc.id,
+                    asset_id=asset.id,
+                    metric_name=key,
+                    metric_value=float(value) if key not in text_fields and isinstance(value, (int, float)) else None,
+                    metric_text=str(value) if key in text_fields else None,
+                    period=period_label,
+                    period_date=period_dt,
+                )
+                session.add(fd)
+
+            doc.parse_status = "parsed"
+            doc.parsed_at = datetime.now(UTC)
+
+        await session.flush()
+    except Exception as exc:
+        log.error("doc_parse_loop_failed", asset=asset.symbol, error=str(exc))
 
 
 async def ingest_stage(session: AsyncSession, asset: Asset) -> None:
@@ -247,3 +358,7 @@ async def ingest_stage(session: AsyncSession, asset: Asset) -> None:
 
     finally:
         await conn.close()
+
+    # Fetch and parse IDX financial docs for stock assets only
+    if asset.asset_type == "stock":
+        await _fetch_and_parse_docs(session, asset)

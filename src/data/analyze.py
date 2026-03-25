@@ -10,7 +10,7 @@ import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db.models import Asset, MacroData, NewsEvent, PriceHistory, StockFundamental
+from src.db.models import Asset, FinancialData, MacroData, NewsEvent, PriceHistory, StockFundamental
 from src.db.signal_repo import signal_repo
 from src.engines.base import BaseEngine, Signal
 from src.engines.event import EventEngine
@@ -19,6 +19,7 @@ from src.engines.macro import MacroEngine
 from src.engines.quantitative import QuantitativeEngine
 from src.engines.sentiment import SentimentEngine
 from src.engines.technical import TechnicalEngine
+from src.engines.valuation import IDX_SECTOR_MAP, ValuationEngine
 
 logger = structlog.get_logger(__name__)
 
@@ -38,6 +39,11 @@ def _get_engines_for_asset(
     macro_data: dict[str, float] | None = None,
     sentiment_data: object | None = None,
     news_events: list[dict[str, object]] | None = None,
+    financial_data: list[dict] | None = None,  # type: ignore[type-arg]
+    peer_data: list[dict] | None = None,  # type: ignore[type-arg]
+    shares_outstanding: float | None = None,
+    nvt_data: dict[str, float] | None = None,
+    tvl_data: dict[str, float] | None = None,
 ) -> list[BaseEngine]:
     """Return engines applicable to this asset type."""
     all_engines: list[BaseEngine] = [
@@ -47,6 +53,14 @@ def _get_engines_for_asset(
         MacroEngine(macro_data=macro_data),
         SentimentEngine(sentiment_data=sentiment_data),
         EventEngine(news_events=news_events),
+        ValuationEngine(
+            financial_data=financial_data,
+            peer_data=peer_data,
+            macro_rates=macro_data,
+            shares_outstanding=shares_outstanding,
+            nvt_data=nvt_data,
+            tvl_data=tvl_data,
+        ),
     ]
     return [
         e for e in all_engines
@@ -205,6 +219,153 @@ async def _load_recent_news(session: AsyncSession) -> list[dict[str, object]]:
     ]
 
 
+async def _load_financial_data(
+    session: AsyncSession, asset: Asset,
+) -> list[dict] | None:  # type: ignore[type-arg]
+    """Load parsed financial data for an asset from the financial_data table.
+
+    Groups metrics by period into a list of dicts ordered by period_date DESC.
+
+    Args:
+        session: Async SQLAlchemy session.
+        asset: Asset to load data for.
+
+    Returns:
+        List of period dicts like [{"period": "Q3-2025", "revenue": 1e12, ...}],
+        or None if no data found.
+    """
+    result = await session.execute(
+        select(FinancialData)
+        .where(FinancialData.asset_id == asset.id)
+        .order_by(FinancialData.period_date.desc())
+        .limit(20)
+    )
+    rows = result.scalars().all()
+
+    if not rows:
+        return None
+
+    # Group by period
+    periods: dict[str, dict] = {}  # type: ignore[type-arg]
+    for row in rows:
+        if row.period not in periods:
+            periods[row.period] = {"period": row.period}
+        if row.metric_value is not None:
+            periods[row.period][row.metric_name] = row.metric_value
+        elif row.metric_text is not None:
+            periods[row.period][row.metric_name] = row.metric_text
+
+    return list(periods.values())
+
+
+async def _load_peer_data(
+    session: AsyncSession, asset: Asset,
+) -> list[dict] | None:  # type: ignore[type-arg]
+    """Load peer metrics for same-sector stocks from StockFundamental.
+
+    Looks up sector from IDX_SECTOR_MAP, finds peer assets,
+    and computes sector averages for P/E and P/B.
+
+    Args:
+        session: Async SQLAlchemy session.
+        asset: Asset to find peers for.
+
+    Returns:
+        List of dicts with sector averages as first entry, or None.
+    """
+    sector = IDX_SECTOR_MAP.get(asset.symbol)
+    if not sector:
+        return None
+
+    # Find all symbols in same sector
+    peer_symbols = [s for s, sec in IDX_SECTOR_MAP.items() if sec == sector]
+    if not peer_symbols:
+        return None
+
+    # Query assets matching peer symbols
+    result = await session.execute(
+        select(Asset).where(Asset.symbol.in_(peer_symbols))
+    )
+    peer_assets = result.scalars().all()
+    peer_ids = [a.id for a in peer_assets]
+
+    if not peer_ids:
+        return None
+
+    # Query StockFundamental for peer assets
+    fund_result = await session.execute(
+        select(StockFundamental).where(StockFundamental.asset_id.in_(peer_ids))
+    )
+    funds = fund_result.scalars().all()
+
+    if not funds:
+        return None
+
+    # Compute sector averages
+    pe_vals = [f.trailing_pe for f in funds if f.trailing_pe is not None]
+    pb_vals = [f.price_to_book for f in funds if f.price_to_book is not None]
+
+    avg_pe = sum(pe_vals) / len(pe_vals) if pe_vals else None
+    avg_pb = sum(pb_vals) / len(pb_vals) if pb_vals else None
+
+    sector_avg: dict[str, float] = {}
+    if avg_pe is not None:
+        sector_avg["pe"] = avg_pe
+    if avg_pb is not None:
+        sector_avg["pb"] = avg_pb
+
+    if not sector_avg:
+        return None
+
+    return [sector_avg]
+
+
+def _cross_validate(
+    financial_data: list[dict],  # type: ignore[type-arg]
+    yf_fundamentals: dict,  # type: ignore[type-arg]
+) -> list[str]:
+    """Cross-validate PDF-extracted financials against yfinance market data.
+
+    Flags discrepancies >10% between extracted values and yfinance values.
+
+    Args:
+        financial_data: List of period dicts (latest first).
+        yf_fundamentals: Dict from yfinance info with totalRevenue, netIncome.
+
+    Returns:
+        List of warning strings for values differing >10%.
+    """
+    if not financial_data or not yf_fundamentals:
+        return []
+
+    latest = financial_data[0]
+    warnings: list[str] = []
+
+    comparisons = [
+        ("revenue", "totalRevenue", "Revenue"),
+        ("net_profit", "netIncome", "Net profit"),
+    ]
+
+    for pdf_key, yf_key, label in comparisons:
+        pdf_val = latest.get(pdf_key)
+        yf_val = yf_fundamentals.get(yf_key)
+
+        if pdf_val is None or yf_val is None:
+            continue
+        if not isinstance(pdf_val, (int, float)) or not isinstance(yf_val, (int, float)):
+            continue
+        if pdf_val == 0:
+            continue
+
+        diff_pct = abs(pdf_val - yf_val) / abs(pdf_val) * 100
+        if diff_pct > 10.0:
+            warnings.append(
+                f"{label} differs from market data by {diff_pct:.1f}%"
+            )
+
+    return warnings
+
+
 async def analyze_stage(session: AsyncSession, asset: Asset) -> None:
     """Analyze stage matching StageFunc signature.
 
@@ -235,6 +396,24 @@ async def analyze_stage(session: AsyncSession, asset: Asset) -> None:
     macro_data = await _load_latest_macro(session)
     news_events = await _load_recent_news(session)
 
+    # Load valuation data
+    financial_data = None
+    peer_data = None
+    nvt_data = None
+    tvl_data = None
+
+    if asset.asset_type == "stock":
+        financial_data = await _load_financial_data(session, asset)
+        peer_data = await _load_peer_data(session, asset)
+    else:
+        # Crypto: NVT proxy data from price data if available
+        if not df.empty and "close" in df.columns and "volume" in df.columns:
+            close = float(df["close"].iloc[-1])
+            vol = float(df["volume"].iloc[-1])
+            if close > 0 and vol > 0:
+                nvt_data = {"market_cap": close * vol, "volume_24h": vol}
+        # DeFi crypto: tvl_data (per D-13) -- passed as None, ValuationEngine handles gracefully
+
     # 3. Run engines sequentially (CPU-bound)
     engines = _get_engines_for_asset(
         asset,
@@ -242,6 +421,10 @@ async def analyze_stage(session: AsyncSession, asset: Asset) -> None:
         macro_data=macro_data,
         sentiment_data=_sentiment_cache,
         news_events=news_events,
+        financial_data=financial_data,
+        peer_data=peer_data,
+        nvt_data=nvt_data,
+        tvl_data=tvl_data,
     )
     signals: list[Signal] = []
 
