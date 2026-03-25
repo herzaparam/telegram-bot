@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 08-03-PLAN.md
-last_updated: "2026-03-25T09:51:02.458Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 08-04-PLAN.md
+last_updated: "2026-03-25T10:09:20.355Z"
 progress:
   total_phases: 12
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 22
-  completed_plans: 21
+  completed_plans: 22
 ---
 
 # Project State
@@ -67,6 +67,7 @@ Plan: 4 of 4
 | Phase 08 P01 | 2min | 2 tasks | 5 files |
 | Phase 08 P02 | 5min | 2 tasks | 11 files |
 | Phase 08 P03 | 8min | 2 tasks | 10 files |
+| Phase 08 P04 | 11min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,9 @@ Recent decisions affecting current work:
 - [Phase 08]: FundamentalEngine returns score=0/confidence=0 with 'not applicable for crypto' when fundamentals=None (D-03)
 - [Phase 08]: MacroEngine uses _is_stock_symbol() heuristic to differentiate IDX stocks from crypto for reasoning emphasis
 - [Phase 08]: SentimentEngine duck-types SentimentSnapshot via getattr() to avoid circular imports
+- [Phase 08]: analyze_stage loads fundamentals only for stock assets (conditional check before _load_fundamentals)
+- [Phase 08]: _sentiment_cache module global in analyze.py, set by fetch_global_data -- avoids DB storage for ephemeral SentimentSnapshot
+- [Phase 08]: News digest appended as last card in report cards list (D-19 bottom-of-report placement)
 
 ### Pending Todos
 
@@ -144,6 +148,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T09:51:02.455Z
-Stopped at: Completed 08-03-PLAN.md
+Last session: 2026-03-25T10:09:20.352Z
+Stopped at: Completed 08-04-PLAN.md
 Resume file: None

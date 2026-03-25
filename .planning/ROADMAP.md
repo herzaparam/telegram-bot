@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: Telegram Bot + Daily Delivery** - Watchlist management, report commands, scheduled delivery; completes the core daily signal loop
 - [ ] **Phase 6: Accuracy Tracking + Scorecard** - Decision tracking vs actual prices, per-engine stats, /scorecard command; validates signal quality
 - [ ] **Phase 7: Self-Evaluation Feedback Loop** - LLM lesson extraction, lesson injection into decisions, /lessons command; the primary product differentiator
-- [ ] **Phase 8: Fundamental, Macro, Sentiment, and News Engines** - Four additional engines that deepen analysis for both asset classes
+- [x] **Phase 8: Fundamental, Macro, Sentiment, and News Engines** - Four additional engines that deepen analysis for both asset classes (completed 2026-03-25)
 - [ ] **Phase 9: IDX Documents + Valuation Engine** - PDF laporan keuangan parsing, DCF and peer analysis, /valuation and /fundamentals commands
 - [ ] **Phase 10: Remaining Specialized Engines** - ML/AI, on-chain, options, behavioral, quantitative, network, game theory, and emerging methods engines
 - [ ] **Phase 11: Asset Discovery + Due Diligence** - IHSG and crypto scanning, sector benchmarking, insider tracking, /discover and /duediligence commands
@@ -148,7 +148,7 @@ Plans:
 - [x] 08-01-PLAN.md — Dependencies, config extensions, DB models (NewsEvent, MacroData, StockFundamental), Alembic migration 007
 - [x] 08-02-PLAN.md — Data fetchers: fundamental (yfinance), macro (FRED), news (RSS+Finnhub), sentiment (Fear&Greed+Reddit)
 - [x] 08-03-PLAN.md — Four engines (Fundamental, Macro, Sentiment, Event) and LLM news impact scorer
-- [ ] 08-04-PLAN.md — Wiring: analyze_stage with 6 engines, global data fetch in pipeline, news digest in daily report
+- [x] 08-04-PLAN.md — Wiring: analyze_stage with 6 engines, global data fetch in pipeline, news digest in daily report
 
 ### Phase 9: IDX Documents + Valuation Engine
 **Goal**: The system parses Indonesian financial PDFs directly from IDX and produces DCF, peer comparison, and scenario valuation — users can query fair value for any IDX stock
@@ -226,7 +226,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. Telegram Bot + Daily Delivery | 2/3 | In Progress|  |
 | 6. Accuracy Tracking + Scorecard | 0/2 | Planning complete | - |
 | 7. Self-Evaluation Feedback Loop | 0/2 | Planning complete | - |
-| 8. Fundamental, Macro, Sentiment, and News Engines | 3/4 | In Progress|  |
+| 8. Fundamental, Macro, Sentiment, and News Engines | 4/4 | Complete   | 2026-03-25 |
 | 9. IDX Documents + Valuation Engine | 0/TBD | Not started | - |
 | 10. Remaining Specialized Engines | 0/TBD | Not started | - |
 | 11. Asset Discovery + Due Diligence | 0/TBD | Not started | - |

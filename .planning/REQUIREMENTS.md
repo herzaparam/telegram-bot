@@ -66,7 +66,7 @@
 - [x] **NEWS-01**: System ingests Indonesian financial news (Kontan, CNBC Indonesia, Bisnis) via RSS
 - [x] **NEWS-02**: System ingests global crypto/financial news (Finnhub)
 - [x] **NEWS-03**: LLM scores news impact per asset
-- [ ] **NEWS-04**: Daily digest of relevant news included in report
+- [x] **NEWS-04**: Daily digest of relevant news included in report
 
 ### Telegram Bot
 
@@ -196,7 +196,7 @@
 | NEWS-01 | Phase 8 | Complete |
 | NEWS-02 | Phase 8 | Complete |
 | NEWS-03 | Phase 8 | Complete |
-| NEWS-04 | Phase 8 | Pending |
+| NEWS-04 | Phase 8 | Complete |
 | TBOT-01 | Phase 5 | Complete |
 | TBOT-02 | Phase 5 | Complete |
 | TBOT-03 | Phase 5 | Complete |
