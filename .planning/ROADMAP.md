@@ -160,10 +160,13 @@ Plans:
   3. /valuation BBCA returns a DCF estimate, comparable company analysis, bull/base/bear scenario returns, and margin of safety versus current price
   4. The daily report includes a valuation summary showing fair value vs market price and margin of safety for each IDX stock
   5. Quarter-over-quarter ratio changes trigger alerts when they exceed defined thresholds
-**Plans**: 2 plans
+**Plans**: 5 plans
 Plans:
-- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
-- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
+- [ ] 09-01-PLAN.md — DB models (FinancialDoc, FinancialData), Alembic migration 008, IDX document fetcher
+- [ ] 09-02-PLAN.md — pymupdf4llm dependency, LLM financial document parser with extraction prompt
+- [ ] 09-03-PLAN.md — ValuationEngine (DCF, peer comparison, scenario analysis, crypto proxy)
+- [ ] 09-04-PLAN.md — Pipeline wiring (fetch + analyze stages), QoQ ratio change detection
+- [ ] 09-05-PLAN.md — Bot commands (/valuation, /fundamentals), report formatter, daily report integration
 
 ### Phase 10: Remaining Specialized Engines
 **Goal**: The full 15-engine suite is operational — ML/AI prediction, on-chain crypto analysis, options flow, behavioral anomalies, network correlation, game theory order book, and emerging quantitative methods
@@ -215,7 +218,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -227,7 +230,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Accuracy Tracking + Scorecard | 0/2 | Planning complete | - |
 | 7. Self-Evaluation Feedback Loop | 0/2 | Planning complete | - |
 | 8. Fundamental, Macro, Sentiment, and News Engines | 4/4 | Complete   | 2026-03-25 |
-| 9. IDX Documents + Valuation Engine | 0/TBD | Not started | - |
+| 9. IDX Documents + Valuation Engine | 0/5 | Planning complete | - |
 | 10. Remaining Specialized Engines | 0/TBD | Not started | - |
 | 11. Asset Discovery + Due Diligence | 0/TBD | Not started | - |
 | 12. Portfolio Risk + Advanced Commands | 0/TBD | Not started | - |
