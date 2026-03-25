@@ -64,6 +64,7 @@ class Settings(BaseSettings):
     finnhub_api_key: str = ""
     reddit_client_id: str = ""
     reddit_client_secret: str = ""
+    github_token: str = ""  # Optional -- 60 req/hr without, 5000 with
 
     # Fundamental engine ratio weights (sum to 1.0) -- per D-04
     weight_fundamental_pe: float = 0.25

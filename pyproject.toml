@@ -30,6 +30,9 @@ dependencies = [
     "asyncpraw>=7.2.0",
     "finnhub-python>=2.4.27",
     "pymupdf4llm>=1.27.2.2",
+    "xgboost>=3.2.0",
+    "onnxmltools>=1.16.0",
+    "pywavelets>=1.9.0",
 ]
 
 [dependency-groups]
@@ -53,5 +56,5 @@ strict = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["yfinance", "ccxt", "asyncpg", "pandas_ta_classic", "pmdarima", "feedparser", "fredapi", "asyncpraw", "finnhub", "pymupdf4llm", "pymupdf", "fitz"]
+module = ["yfinance", "ccxt", "asyncpg", "pandas_ta_classic", "pmdarima", "feedparser", "fredapi", "asyncpraw", "finnhub", "pymupdf4llm", "pymupdf", "fitz", "xgboost", "onnxmltools", "pywt"]
 ignore_missing_imports = true
