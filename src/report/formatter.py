@@ -24,6 +24,20 @@ VERDICT_EMOJI: dict[str, str] = {
 
 DEFAULT_EMOJI = "\u26aa"  # white circle for unknown/fallback
 
+VALUATION_EMOJI: dict[str, str] = {
+    "undervalued": "\U0001f7e2",   # green circle (margin > 20%)
+    "fair": "\U0001f7e1",          # yellow circle (-5% to 20%)
+    "overvalued": "\U0001f534",    # red circle (< -5%)
+}
+TREND_EMOJI: dict[str, str] = {
+    "up": "\u2b06\ufe0f",         # up arrow
+    "down": "\u2b07\ufe0f",       # down arrow
+    "flat": "\u2796",              # minus
+}
+WARNING_EMOJI = "\u26a0\ufe0f"
+CHART_EMOJI = "\U0001f4ca"
+INFO_EMOJI = "\u2139\ufe0f"
+
 
 def _truncate_reasoning(text: str, max_len: int = 100) -> str:
     """Truncate text at word boundary, appending '...' if needed."""
@@ -540,6 +554,250 @@ def format_news_digest(
 def format_scorecard_error() -> str:
     """Format scorecard error message per UI-SPEC copywriting."""
     return "\u26a0\ufe0f Failed to load scorecard data. Try again in a few minutes."
+
+
+def format_idr(value: float) -> str:
+    """Format IDR value with unit abbreviation. Rp 2.1T, Rp 450B, Rp 12.3M."""
+    abs_val = abs(value)
+    sign = "-" if value < 0 else ""
+    if abs_val >= 1_000_000_000_000:
+        return f"{sign}Rp {abs_val / 1_000_000_000_000:.1f}T"
+    if abs_val >= 1_000_000_000:
+        return f"{sign}Rp {abs_val / 1_000_000_000:.0f}B"
+    if abs_val >= 1_000_000:
+        return f"{sign}Rp {abs_val / 1_000_000:.1f}M"
+    return f"{sign}Rp {abs_val:,.0f}"
+
+
+def _margin_emoji(margin: float) -> str:
+    """Return valuation emoji based on margin of safety percentage."""
+    if margin > 0.20:
+        return VALUATION_EMOJI["undervalued"]
+    if margin >= -0.05:
+        return VALUATION_EMOJI["fair"]
+    return VALUATION_EMOJI["overvalued"]
+
+
+def _peer_rank_label(value: float, sector_avg: float) -> str:
+    """Return peer rank label based on comparison to sector median."""
+    if sector_avg <= 0:
+        return "fair"
+    ratio = value / sector_avg
+    if ratio < 0.85:
+        return "cheap"
+    if ratio > 1.15:
+        return "expensive"
+    return "fair"
+
+
+def format_valuation_detail(
+    symbol: str,
+    asset_name: str,
+    current_price: float,
+    fair_value: float,
+    margin_of_safety: float,
+    scenarios: dict[str, dict[str, float]] | None,
+    peer_comparison: dict[str, dict] | None,
+    sector: str | None,
+    period: str,
+    last_updated: str,
+    has_pdf_data: bool = True,
+) -> str:
+    """Format /valuation command response per UI-SPEC TBOT-09.
+
+    When has_pdf_data=False, uses the "No Data Response" template.
+    """
+    escaped_symbol = html.escape(symbol)
+    escaped_name = html.escape(asset_name)
+
+    if not has_pdf_data:
+        # No Data Response template
+        emoji = _margin_emoji(margin_of_safety)
+        margin_pct = f"{margin_of_safety * 100:+.0f}"
+        lines = [
+            f"<b>Valuation -- {escaped_symbol} ({escaped_name})</b>",
+            "",
+            f"<b>Current Price:</b> Rp {current_price:,.0f}",
+            f"<b>Estimated Fair Value:</b> Rp {fair_value:,.0f}",
+            f"<b>Margin of Safety:</b> {emoji} {margin_pct}%",
+            "",
+            f"{WARNING_EMOJI} <i>Estimated from market data only -- no financial reports parsed yet. Accuracy is limited.</i>",
+            "",
+            f"Use /fundamentals {escaped_symbol} for available ratio data.",
+        ]
+        return "\n".join(lines)
+
+    # Full valuation response
+    emoji = _margin_emoji(margin_of_safety)
+    margin_pct = f"{margin_of_safety * 100:+.0f}"
+
+    lines = [
+        f"<b>Valuation -- {escaped_symbol} ({escaped_name})</b>",
+        "",
+        f"<b>Current Price:</b> Rp {current_price:,.0f}",
+        f"<b>Fair Value (DCF):</b> Rp {fair_value:,.0f}",
+        f"<b>Margin of Safety:</b> {emoji} {margin_pct}%",
+    ]
+
+    # Scenario analysis
+    if scenarios:
+        lines.append("")
+        lines.append("<b>Scenario Analysis</b>")
+        for label, weight in [("Bull", "25%"), ("Base", "50%"), ("Bear", "25%")]:
+            key = label.lower()
+            if key in scenarios:
+                sc = scenarios[key]
+                sc_value = sc.get("value", 0)
+                sc_return = sc.get("return_pct", 0)
+                return_str = f"{sc_return * 100:+.1f}"
+                lines.append(f"{label} ({weight}): Rp {sc_value:,.0f} ({return_str}%)")
+
+    # Peer comparison
+    if peer_comparison and sector:
+        lines.append("")
+        lines.append(f"<b>Peer Comparison ({html.escape(sector)})</b>")
+        for metric_label, metric_key in [("P/E", "pe"), ("P/B", "pb"), ("EV/EBITDA", "ev_ebitda")]:
+            if metric_key in peer_comparison:
+                pc = peer_comparison[metric_key]
+                val = pc.get("value", 0)
+                avg = pc.get("sector_avg", 0)
+                rank = pc.get("rank") or _peer_rank_label(val, avg)
+                lines.append(f"{metric_label}: {val:.1f} (sector avg {avg:.1f}) -- {rank}")
+
+    lines.append("")
+    lines.append(f"<i>Based on {html.escape(period)} financials. Last updated {html.escape(last_updated)}.</i>")
+
+    return "\n".join(lines)
+
+
+def format_fundamentals_dashboard(
+    symbol: str,
+    asset_name: str,
+    profitability: dict[str, dict],
+    valuation_ratios: dict[str, float],
+    leverage: dict[str, dict],
+    cash_flow: dict[str, float],
+    source_label: str,
+    period: str,
+    cross_validation_warnings: list[str] | None = None,
+) -> str:
+    """Format /fundamentals command response per UI-SPEC TBOT-13."""
+    escaped_symbol = html.escape(symbol)
+    escaped_name = html.escape(asset_name)
+
+    lines = [
+        f"{CHART_EMOJI} <b>Fundamentals -- {escaped_symbol} ({escaped_name})</b>",
+    ]
+
+    # Profitability section
+    if profitability:
+        lines.append("")
+        lines.append("<b>Profitability</b>")
+        label_map = {
+            "net_margin": "Net Margin",
+            "roe": "ROE",
+            "gross_margin": "Gross Margin",
+        }
+        for key in ("net_margin", "roe", "gross_margin"):
+            if key in profitability:
+                p = profitability[key]
+                value_pct = f"{p.get('value', 0) * 100:.1f}"
+                trend = TREND_EMOJI.get(str(p.get("trend", "flat")), TREND_EMOJI["flat"])
+                qoq = p.get("qoq_change", 0)
+                qoq_str = f"{qoq * 100:+.1f}pp"
+                lines.append(f"{label_map.get(key, key)}: {value_pct}% {trend} ({qoq_str})")
+
+    # Valuation ratios section
+    if valuation_ratios:
+        lines.append("")
+        lines.append("<b>Valuation Ratios</b>")
+        ratio_labels = {"pe": "P/E", "pb": "P/B", "ev_ebitda": "EV/EBITDA"}
+        for key in ("pe", "pb", "ev_ebitda"):
+            if key in valuation_ratios:
+                val = valuation_ratios[key]
+                lines.append(f"{ratio_labels.get(key, key)}: {val:.1f}")
+
+    # Leverage section
+    if leverage:
+        lines.append("")
+        lines.append("<b>Leverage</b>")
+        lev_labels = {"debt_equity": "Debt/Equity"}
+        for key in ("debt_equity",):
+            if key in leverage:
+                lv = leverage[key]
+                val = lv.get("value", 0)
+                trend = TREND_EMOJI.get(str(lv.get("trend", "flat")), TREND_EMOJI["flat"])
+                qoq = lv.get("qoq_change", 0)
+                qoq_str = f"{qoq * 100:+.1f}%"
+                lines.append(f"{lev_labels.get(key, key)}: {val:.2f} {trend} ({qoq_str})")
+
+    # Cash flow section
+    if cash_flow:
+        lines.append("")
+        lines.append("<b>Cash Flow</b>")
+        cf_labels = {"operating_cf": "Operating CF", "fcf": "Free Cash Flow", "capex": "Capex"}
+        for key in ("operating_cf", "fcf", "capex"):
+            if key in cash_flow:
+                lines.append(f"{cf_labels.get(key, key)}: {format_idr(cash_flow[key])}")
+
+    # Cross-validation warnings (D-09)
+    if cross_validation_warnings:
+        lines.append("")
+        for warn in cross_validation_warnings:
+            lines.append(f"{WARNING_EMOJI} <i>{html.escape(warn)}</i>")
+
+    lines.append("")
+    lines.append(f"<i>Source: {html.escape(source_label)}. Period: {html.escape(period)}.</i>")
+
+    return "\n".join(lines)
+
+
+def format_valuation_summary(
+    stocks: list[dict],
+) -> str:
+    """Format daily report valuation summary section per UI-SPEC REPT-03.
+
+    Args:
+        stocks: List of dicts with keys: symbol, price, fair_value, margin, has_pdf, qoq_alerts.
+
+    Returns:
+        Formatted HTML string. Empty string if stocks list is empty.
+    """
+    if not stocks:
+        return ""
+
+    lines = ["<b>Valuation Summary</b>", ""]
+    has_estimate = False
+
+    for stock in stocks:
+        symbol = stock["symbol"]
+        price = stock["price"]
+        fair_value = stock["fair_value"]
+        margin = stock["margin"]
+        has_pdf = stock.get("has_pdf", True)
+
+        emoji = _margin_emoji(margin)
+        margin_pct = f"{margin * 100:+.0f}"
+
+        price_str = f"Rp {price:,.0f}"
+        fv_str = f"Rp {fair_value:,.0f}"
+
+        if not has_pdf:
+            fv_str += "*"
+            has_estimate = True
+
+        lines.append(f"{symbol}: {price_str} | FV {fv_str} | {emoji} {margin_pct}% MoS")
+
+        # QoQ alert lines (max 2 per stock)
+        qoq_alerts = stock.get("qoq_alerts") or []
+        for alert in qoq_alerts[:2]:
+            lines.append(f"{WARNING_EMOJI} {html.escape(str(alert))}")
+
+    if has_estimate:
+        lines.append("")
+        lines.append("<i>* Estimated from market data</i>")
+
+    return "\n".join(lines)
 
 
 def format_watchlist_message(assets: list[tuple[str, str, str]]) -> str:
