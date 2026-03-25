@@ -448,6 +448,95 @@ def format_lessons_applied(
     return "\n".join(lines)
 
 
+def format_news_digest(
+    news_items: list[dict[str, object]],
+) -> str:
+    """Format the News & Events section for the daily report.
+
+    Per D-19: Separate section at bottom of report. Top 5-10 high-impact
+    headlines grouped by category. Each shows headline + source + affected
+    assets + impact direction.
+
+    Args:
+        news_items: List of dicts with keys: headline, source, category,
+                    impact_score, affected_assets.
+
+    Returns:
+        HTML-formatted string. Empty string if no news items.
+    """
+    if not news_items:
+        return ""
+
+    # Filter items with a non-None impact_score, sort by absolute score descending, take top 10
+    scored = [n for n in news_items if n.get("impact_score") is not None]
+    scored.sort(key=lambda n: abs(float(n.get("impact_score", 0))), reverse=True)
+    top = scored[:10]
+
+    if not top:
+        return ""
+
+    # Group by category
+    by_category: dict[str, list[dict[str, object]]] = {}
+    for item in top:
+        cat = str(item.get("category", "other"))
+        by_category.setdefault(cat, []).append(item)
+
+    # Category display order and labels
+    cat_labels = {
+        "central_bank": "Central Bank",
+        "earnings": "Earnings",
+        "regulation": "Regulation",
+        "halving": "Crypto Events",
+        "macro": "Macro",
+        "sector": "Sector",
+        "company": "Company",
+        "market": "Market",
+        "other": "Other",
+    }
+    cat_order = [
+        "central_bank",
+        "earnings",
+        "regulation",
+        "halving",
+        "macro",
+        "sector",
+        "company",
+        "market",
+        "other",
+    ]
+
+    lines: list[str] = ["<b>News &amp; Events</b>", ""]
+
+    for cat in cat_order:
+        items = by_category.get(cat)
+        if not items:
+            continue
+        label = cat_labels.get(cat, cat.title())
+        lines.append(f"<b>{label}</b>")
+        for item in items:
+            headline_text = html.escape(str(item.get("headline", ""))[:120])
+            source_text = html.escape(str(item.get("source", "")))
+            impact = float(item.get("impact_score", 0))
+            direction = (
+                "\U0001f7e2" if impact > 0.1
+                else "\U0001f534" if impact < -0.1
+                else "\u26aa"
+            )
+
+            # Affected assets
+            affected = item.get("affected_assets") or {}
+            if isinstance(affected, dict) and affected:
+                assets_str = ", ".join(sorted(affected.keys())[:5])
+            else:
+                assets_str = "general"
+
+            lines.append(f"{direction} {headline_text}")
+            lines.append(f"   <i>{source_text} | {assets_str}</i>")
+        lines.append("")
+
+    return "\n".join(lines).rstrip()
+
+
 def format_scorecard_error() -> str:
     """Format scorecard error message per UI-SPEC copywriting."""
     return "\u26a0\ufe0f Failed to load scorecard data. Try again in a few minutes."

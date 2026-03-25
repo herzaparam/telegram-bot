@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import asyncio
 from collections import Counter
-from datetime import date
+from datetime import date, datetime
 
 import httpx
 import structlog
@@ -18,11 +18,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
 from src.db.evaluation_repo import evaluation_repo
-from src.db.models import Asset, DailyDecision, Evaluation, Watchlist
+from src.db.models import Asset, DailyDecision, Evaluation, NewsEvent, Watchlist
 from src.report.formatter import (
     EvalDisplayItem,
     format_asset_card,
     format_lessons_applied,
+    format_news_digest,
     format_report_header,
     format_scorecard_section,
     split_report,
@@ -265,6 +266,31 @@ async def send_daily_report(
         if lessons_text:
             card = card + "\n" + lessons_text
         cards.append(card)
+
+    # Query today's scored news events and append news digest (D-19)
+    try:
+        news_result = await session.execute(
+            select(NewsEvent)
+            .where(NewsEvent.fetched_at >= datetime.combine(run_date, datetime.min.time()))
+            .where(NewsEvent.impact_score.isnot(None))
+            .order_by(NewsEvent.impact_score.desc())
+        )
+        news_rows = news_result.scalars().all()
+        news_items = [
+            {
+                "headline": r.headline,
+                "source": r.source,
+                "category": r.category,
+                "impact_score": r.impact_score,
+                "affected_assets": r.affected_assets,
+            }
+            for r in news_rows
+        ]
+        news_section = format_news_digest(news_items)
+        if news_section:
+            cards.append(news_section)
+    except Exception:
+        logger.debug("news_digest_failed", exc_info=True)
 
     # Split into messages respecting 4096-char limit
     messages = split_report(header, cards)
