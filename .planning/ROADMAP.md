@@ -180,10 +180,10 @@ Plans:
   5. Per-engine accuracy is tracked for all 15 engines and visible in /scorecard
 **Plans**: 5 plans
 Plans:
-- [ ] 10-01-PLAN.md — Dependencies (xgboost, onnxmltools, PyWavelets), DB models, Alembic migrations 009-011, config
+- [x] 10-01-PLAN.md — Dependencies (xgboost, onnxmltools, PyWavelets), DB models, Alembic migrations 009-011, config
 - [x] 10-02-PLAN.md — Stub engines (Options, Game Theory) + OHLCV-only engines (Behavioral, Network, Emerging Methods)
 - [ ] 10-03-PLAN.md — Data fetchers (DeFiLlama on-chain, GitHub API) + engines (OnChain, Alternative Data)
-- [ ] 10-04-PLAN.md — ML/AI engine (feature engineering, ONNX inference, XGBoost+LSTM training scripts)
+- [x] 10-04-PLAN.md — ML/AI engine (feature engineering, ONNX inference, XGBoost+LSTM training scripts)
 - [ ] 10-05-PLAN.md — Wire all 8 new engines into analyze_stage, ingest_stage fetchers, integration tests
 
 ### Phase 11: Asset Discovery + Due Diligence
@@ -234,6 +234,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Self-Evaluation Feedback Loop | 0/2 | Planning complete | - |
 | 8. Fundamental, Macro, Sentiment, and News Engines | 4/4 | Complete   | 2026-03-25 |
 | 9. IDX Documents + Valuation Engine | 0/5 | Planned    |  |
-| 10. Remaining Specialized Engines | 1/5 | In Progress|  |
+| 10. Remaining Specialized Engines | 3/5 | In Progress|  |
 | 11. Asset Discovery + Due Diligence | 0/TBD | Not started | - |
 | 12. Portfolio Risk + Advanced Commands | 0/TBD | Not started | - |
