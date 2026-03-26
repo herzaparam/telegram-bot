@@ -160,7 +160,7 @@ Plans:
   3. /valuation BBCA returns a DCF estimate, comparable company analysis, bull/base/bear scenario returns, and margin of safety versus current price
   4. The daily report includes a valuation summary showing fair value vs market price and margin of safety for each IDX stock
   5. Quarter-over-quarter ratio changes trigger alerts when they exceed defined thresholds
-**Plans**: 5 plans
+**Plans**: 6 plans
 Plans:
 - [x] 09-01-PLAN.md — DB models (FinancialDoc, FinancialData), Alembic migration 008, IDX document fetcher
 - [x] 09-02-PLAN.md — pymupdf4llm dependency, LLM financial document parser with extraction prompt
@@ -178,7 +178,7 @@ Plans:
   3. All 15 engines produce a valid score/confidence/reasoning for each applicable asset in a single pipeline run
   4. Any engine that fails its data source returns score=0/confidence=0 — the pipeline completes the full run without that engine's contribution
   5. Per-engine accuracy is tracked for all 15 engines and visible in /scorecard
-**Plans**: 5 plans
+**Plans**: 6 plans
 Plans:
 - [x] 10-01-PLAN.md — Dependencies (xgboost, onnxmltools, PyWavelets), DB models, Alembic migrations 009-011, config
 - [x] 10-02-PLAN.md — Stub engines (Options, Game Theory) + OHLCV-only engines (Behavioral, Network, Emerging Methods)
@@ -196,13 +196,14 @@ Plans:
   3. /duediligence BBCA returns a report including sector benchmarking, insider ownership changes, management quality score, and competitive positioning
   4. The LLM incorporates due diligence flags (insider selling, management changes, earnings quality warnings) when they exist for an asset
   5. /compare BBCA BBRI BMRI returns a side-by-side sector comparison across key metrics
-**Plans**: 5 plans
+**Plans**: 6 plans
 Plans:
 - [x] 11-01-PLAN.md — DB models (DiscoveryCandidate, OwnershipSnapshot, DueDiligenceReport), Alembic migrations 012-013, IDX sector map expansion
-- [ ] 11-02-PLAN.md — Discovery scanner (IDX batch scanning, crypto CoinGecko scanning, trigger detection, composite scoring)
+- [x] 11-02-PLAN.md — Discovery scanner (IDX batch scanning, crypto CoinGecko scanning, trigger detection, composite scoring)
 - [x] 11-03-PLAN.md — Due diligence computation (sector benchmarking, management quality, ownership fetcher, competitive positioning, DD flags)
-- [ ] 11-04-PLAN.md — Pipeline wiring (discovery scan, DD computation, LLM DD flags, daily report New Opportunities section)
+- [x] 11-04-PLAN.md — Pipeline wiring (discovery scan, DD computation, LLM DD flags, daily report New Opportunities section)
 - [ ] 11-05-PLAN.md — Bot commands (/discover, /duediligence, /compare) with handler tests
+- [ ] 11-06-PLAN.md — Gap closure: fix DD flags regression in decide.py, remove net_margin from compare table
 
 ### Phase 12: Portfolio Risk + Advanced Commands
 **Goal**: Users can monitor their portfolio's risk exposure with correlation alerts, VaR estimates, and stress tests — and access historical backtesting and deep ratio analysis
@@ -238,5 +239,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 8. Fundamental, Macro, Sentiment, and News Engines | 4/4 | Complete   | 2026-03-25 |
 | 9. IDX Documents + Valuation Engine | 0/5 | Planned    |  |
 | 10. Remaining Specialized Engines | 4/5 | Complete    | 2026-03-26 |
-| 11. Asset Discovery + Due Diligence | 2/5 | In Progress|  |
+| 11. Asset Discovery + Due Diligence | 4/5 | In Progress|  |
 | 12. Portfolio Risk + Advanced Commands | 0/TBD | Not started | - |
