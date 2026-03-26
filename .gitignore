@@ -5,6 +5,7 @@ dist/
 build/
 .venv/
 .env
+.env.*.local
 *.egg
 .mypy_cache/
 .pytest_cache/

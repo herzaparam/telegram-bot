@@ -23,7 +23,7 @@ services:
       start_period: 10s
 
   bot:
-    build: .
+    image: ${IMAGE:-ghcr.io/herzaparam/telegram-bot:latest}
     command: uv run python -m src.bot.main
     deploy:
       resources:
@@ -44,7 +44,7 @@ services:
       - "8000:8000"
 
   pipeline:
-    build: .
+    image: ${IMAGE:-ghcr.io/herzaparam/telegram-bot:latest}
     command: uv run python -m src.pipeline.main
     deploy:
       resources:
