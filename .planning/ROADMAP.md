@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 7: Self-Evaluation Feedback Loop** - LLM lesson extraction, lesson injection into decisions, /lessons command; the primary product differentiator
 - [x] **Phase 8: Fundamental, Macro, Sentiment, and News Engines** - Four additional engines that deepen analysis for both asset classes (completed 2026-03-25)
 - [ ] **Phase 9: IDX Documents + Valuation Engine** - PDF laporan keuangan parsing, DCF and peer analysis, /valuation and /fundamentals commands
-- [ ] **Phase 10: Remaining Specialized Engines** - ML/AI, on-chain, options, behavioral, quantitative, network, game theory, and emerging methods engines
+- [x] **Phase 10: Remaining Specialized Engines** - ML/AI, on-chain, options, behavioral, quantitative, network, game theory, and emerging methods engines (completed 2026-03-26)
 - [ ] **Phase 11: Asset Discovery + Due Diligence** - IHSG and crypto scanning, sector benchmarking, insider tracking, /discover and /duediligence commands
 - [ ] **Phase 12: Portfolio Risk + Advanced Commands** - Correlation matrix, VaR, stress testing, enhanced fundamentals, /portfolio and /backtest commands
 
@@ -182,7 +182,7 @@ Plans:
 Plans:
 - [x] 10-01-PLAN.md — Dependencies (xgboost, onnxmltools, PyWavelets), DB models, Alembic migrations 009-011, config
 - [x] 10-02-PLAN.md — Stub engines (Options, Game Theory) + OHLCV-only engines (Behavioral, Network, Emerging Methods)
-- [ ] 10-03-PLAN.md — Data fetchers (DeFiLlama on-chain, GitHub API) + engines (OnChain, Alternative Data)
+- [x] 10-03-PLAN.md — Data fetchers (DeFiLlama on-chain, GitHub API) + engines (OnChain, Alternative Data)
 - [x] 10-04-PLAN.md — ML/AI engine (feature engineering, ONNX inference, XGBoost+LSTM training scripts)
 - [ ] 10-05-PLAN.md — Wire all 8 new engines into analyze_stage, ingest_stage fetchers, integration tests
 
@@ -234,6 +234,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Self-Evaluation Feedback Loop | 0/2 | Planning complete | - |
 | 8. Fundamental, Macro, Sentiment, and News Engines | 4/4 | Complete   | 2026-03-25 |
 | 9. IDX Documents + Valuation Engine | 0/5 | Planned    |  |
-| 10. Remaining Specialized Engines | 3/5 | In Progress|  |
+| 10. Remaining Specialized Engines | 4/5 | Complete    | 2026-03-26 |
 | 11. Asset Discovery + Due Diligence | 0/TBD | Not started | - |
 | 12. Portfolio Risk + Advanced Commands | 0/TBD | Not started | - |

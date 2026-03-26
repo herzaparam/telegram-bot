@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 10-04-PLAN.md
-last_updated: "2026-03-25T17:43:12.037Z"
+status: Ready to plan
+stopped_at: Completed 10-05-PLAN.md
+last_updated: "2026-03-26T03:05:37.108Z"
 progress:
   total_phases: 12
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 32
-  completed_plans: 30
+  completed_plans: 32
 ---
 
 # Project State
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 
 ## Current Position
 
-Phase: 10 (remaining-specialized-engines) — EXECUTING
-Plan: 4 of 5
+Phase: 11
+Plan: Not started
 
 ## Performance Metrics
 
@@ -76,6 +76,8 @@ Plan: 4 of 5
 | Phase 10 P01 | 4min | 2 tasks | 7 files |
 | Phase 10 P02 | 7min | 2 tasks | 10 files |
 | Phase 10 P04 | 5min | 2 tasks | 9 files |
+| Phase 10 P03 | 4min | 2 tasks | 8 files |
+| Phase 10 P05 | 11min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -157,6 +159,10 @@ Recent decisions affecting current work:
 - [Phase 10]: EmergingMethodsEngine implements own _hurst_exponent locally to avoid circular imports
 - [Phase 10]: PyWavelets (pywt) added as dependency for wavelet decomposition
 - [Phase 10]: Separated _create_session factory for testability of ONNX inference
+- [Phase 10]: TVL-only scoring first; exchange flow data optional (CoinGecko Pro may be needed)
+- [Phase 10]: AlternativeDataEngine confidence fixed at 0.25 (supplementary signal, not primary)
+- [Phase 10]: Stock gets 13 engines (onchain/alternative crypto-only), crypto gets 14 (options stock-only); all 15 categories covered across both types
+- [Phase 10]: Stub engines (options, game_theory) show N/A in /scorecard Engine Breakdown per D-24
 
 ### Pending Todos
 
@@ -170,6 +176,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T17:43:12.033Z
-Stopped at: Completed 10-04-PLAN.md
+Last session: 2026-03-26T02:56:08.817Z
+Stopped at: Completed 10-05-PLAN.md
 Resume file: None
