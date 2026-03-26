@@ -39,6 +39,28 @@ CHART_EMOJI = "\U0001f4ca"
 INFO_EMOJI = "\u2139\ufe0f"
 
 
+DISCOVERY_EMOJI = "\U0001f50d"  # magnifying glass
+TRIGGER_ICONS: dict[str, str] = {
+    "volume_spike": "\U0001f4c8",      # chart increasing
+    "price_breakout": "\U0001f680",    # rocket
+    "momentum_surge": "\u26a1",        # lightning
+    "statistical_anomaly": "\u2728",   # sparkles
+}
+SECTOR_ABOVE_EMOJI = "\U0001f7e2"   # green circle
+SECTOR_BELOW_EMOJI = "\U0001f534"   # red circle
+SECTOR_AT_EMOJI = "\U0001f7e1"      # yellow circle
+MGMT_EMOJI: dict[str, str] = {
+    "Excellent": "\u2b50",
+    "Good": "\U0001f44d",
+    "Fair": "\U0001f610",
+    "Weak": "\u26a0\ufe0f",
+    "Insufficient data": "\u2139\ufe0f",
+}
+CROWN_EMOJI = "\U0001f451"
+OWNERSHIP_UP = "\u2b06\ufe0f"
+OWNERSHIP_DOWN = "\u2b07\ufe0f"
+
+
 def _truncate_reasoning(text: str, max_len: int = 100) -> str:
     """Truncate text at word boundary, appending '...' if needed."""
     if len(text) <= max_len:
@@ -842,5 +864,289 @@ def format_watchlist_message(assets: list[tuple[str, str, str]]) -> str:
         escaped_name = html.escape(name)
         escaped_exchange = html.escape(exchange)
         lines.append(f"{i}. <b>{escaped_symbol}</b> - {escaped_name} ({escaped_exchange})")
+
+    return "\n".join(lines)
+
+
+def format_discovery_card(candidate: dict) -> str:
+    """Format a single discovery card for Telegram HTML.
+
+    Args:
+        candidate: Dict with keys: symbol, name, asset_type, composite_score,
+                   triggers, current_price, price_change_pct, volume_ratio.
+
+    Returns:
+        HTML-formatted discovery card string.
+    """
+    symbol = html.escape(str(candidate.get("symbol", "")))
+    name = html.escape(str(candidate.get("name", "")))
+    asset_type = candidate.get("asset_type", "stock")
+    score = candidate.get("composite_score", 0.0)
+    price = candidate.get("current_price", 0.0)
+    change_pct = candidate.get("price_change_pct", 0.0)
+    triggers = candidate.get("triggers", [])
+
+    # Price formatting: IDX stocks use Rp, crypto uses $
+    if asset_type == "stock":
+        price_str = f"Rp {price:,.0f}"
+    else:
+        price_str = f"${price:,.2f}"
+
+    change_sign = "+" if change_pct >= 0 else ""
+    change_str = f"{change_sign}{change_pct:.1f}%"
+
+    # Sort triggers by score descending, take top 3
+    sorted_triggers = sorted(triggers, key=lambda t: t.get("score", 0), reverse=True)[:3]
+
+    # Use the first trigger's emoji as the card header emoji
+    first_trigger_type = sorted_triggers[0].get("type", "") if sorted_triggers else ""
+    header_emoji = TRIGGER_ICONS.get(first_trigger_type, DISCOVERY_EMOJI)
+
+    # Format trigger list
+    trigger_parts = []
+    for t in sorted_triggers:
+        t_type = t.get("type", "unknown")
+        t_name = t.get("name", t_type.replace("_", " ").title())
+        t_emoji = TRIGGER_ICONS.get(t_type, DISCOVERY_EMOJI)
+        trigger_parts.append(f"{t_emoji} {html.escape(t_name)}")
+    triggers_str = ", ".join(trigger_parts) if trigger_parts else "none"
+
+    return (
+        f"{header_emoji} <b>{symbol}</b> ({name}) [{asset_type}]\n"
+        f"   Score: {score:.2f} | Price: {price_str} ({change_str})\n"
+        f"   Triggers: {triggers_str}"
+    )
+
+
+def format_discovery_section(candidates: list[dict]) -> str:
+    """Format the New Opportunities section for the daily report.
+
+    Takes top 5 candidates and formats as discovery cards.
+    Returns empty string if no candidates (section omitted per UI-SPEC).
+
+    Args:
+        candidates: List of discovery candidate dicts.
+
+    Returns:
+        HTML-formatted section string, or empty string if no candidates.
+    """
+    if not candidates:
+        return ""
+
+    from datetime import date as date_type
+
+    top = candidates[:5]
+    scan_date = date_type.today().isoformat()
+
+    lines = [f"<b>{DISCOVERY_EMOJI} New Opportunities</b>", scan_date]
+    for candidate in top:
+        lines.append("")
+        lines.append(format_discovery_card(candidate))
+
+    return "\n".join(lines)
+
+
+def _sector_comparison_emoji(value: float, median: float, lower_is_better: bool = False) -> tuple[str, str]:
+    """Return emoji and label for sector median comparison.
+
+    Args:
+        value: The metric value.
+        median: The sector median.
+        lower_is_better: If True, invert coloring (for D/E ratio).
+
+    Returns:
+        Tuple of (emoji, label).
+    """
+    if median == 0:
+        return SECTOR_AT_EMOJI, "at median"
+    ratio = value / median
+    if ratio > 1.10:
+        if lower_is_better:
+            return SECTOR_BELOW_EMOJI, "above"
+        return SECTOR_ABOVE_EMOJI, "above"
+    if ratio < 0.90:
+        if lower_is_better:
+            return SECTOR_ABOVE_EMOJI, "below"
+        return SECTOR_BELOW_EMOJI, "below"
+    return SECTOR_AT_EMOJI, "at median"
+
+
+def format_dd_report(symbol: str, name: str, dd_data: dict) -> str:
+    """Format a full due diligence report per UI-SPEC /duediligence template.
+
+    Args:
+        symbol: Ticker symbol.
+        name: Company name.
+        dd_data: Dict with keys: sector, sector_rank, management_quality,
+                 ownership_changes, competitive_position.
+
+    Returns:
+        HTML-formatted DD report string.
+    """
+    escaped_symbol = html.escape(symbol)
+    escaped_name = html.escape(name)
+    sector = dd_data.get("sector", "Unknown")
+
+    lines = [
+        f"<b>{CHART_EMOJI} Due Diligence: {escaped_symbol}</b>",
+        f"{escaped_name} | Sector: {html.escape(sector)}",
+    ]
+
+    # Sector Ranking
+    sector_rank = dd_data.get("sector_rank", {})
+    if sector_rank:
+        lines.append("")
+        lines.append("<b>Sector Ranking</b>")
+        metrics = [
+            ("P/E", "pe", False),
+            ("P/B", "pb", False),
+            ("ROE", "roe", False),
+            ("Net Margin", "net_margin", False),
+            ("Debt/Equity", "debt_to_equity", True),
+        ]
+        for label, key, lower_better in metrics:
+            metric_data = sector_rank.get(key, {})
+            value = metric_data.get("value", 0)
+            median = metric_data.get("median", 0)
+            emoji, vs_label = _sector_comparison_emoji(value, median, lower_is_better=lower_better)
+            if key in ("roe", "net_margin"):
+                lines.append(f"  {label}: {value:.1f}% ({emoji} {vs_label})")
+            else:
+                lines.append(f"  {label}: {value:.1f} ({emoji} {vs_label})")
+
+    # Management Quality
+    mgmt = dd_data.get("management_quality", {})
+    if mgmt:
+        lines.append("")
+        lines.append("<b>Management Quality</b>")
+        quality_label = mgmt.get("label", "Insufficient data")
+        quality_emoji = MGMT_EMOJI.get(quality_label, INFO_EMOJI)
+        score = mgmt.get("score", 0)
+        cagr = mgmt.get("revenue_cagr", 0)
+        roe_trend = mgmt.get("roe_trend", "stable")
+        lines.append(f"  {quality_emoji} {quality_label} ({score:.2f}/1.00)")
+        lines.append(f"  Revenue CAGR: {cagr:.1f}%")
+        lines.append(f"  ROE Trend: {html.escape(str(roe_trend))}")
+
+    # Ownership
+    ownership = dd_data.get("ownership_changes", {})
+    if ownership:
+        lines.append("")
+        lines.append("<b>Ownership</b>")
+        holders = ownership.get("holders", [])
+        if holders:
+            lines.append("  Top Holders:")
+            for holder in holders[:5]:
+                holder_name = html.escape(str(holder.get("name", "Unknown")))
+                pct = holder.get("pct", 0)
+                delta = holder.get("delta", 0)
+                change_emoji = OWNERSHIP_UP if delta >= 0 else OWNERSHIP_DOWN
+                delta_sign = "+" if delta >= 0 else ""
+                lines.append(f"  - {holder_name}: {pct:.1f}% {change_emoji} ({delta_sign}{delta:.1f}%)")
+        last_updated = ownership.get("last_updated", "")
+        if last_updated:
+            lines.append(f"  Last updated: {html.escape(str(last_updated))}")
+
+    # Competitive Position
+    comp = dd_data.get("competitive_position", {})
+    if comp:
+        lines.append("")
+        lines.append("<b>Competitive Position</b>")
+        rank = comp.get("rank", 0)
+        total = comp.get("total", 0)
+        metric = comp.get("metric", "composite score")
+        moat = comp.get("moat_summary", "N/A")
+        lines.append(f"  Sector rank: #{rank} of {total} ({html.escape(str(metric))})")
+        lines.append(f"  Moat indicators: {html.escape(str(moat))}")
+
+    return "\n".join(lines)
+
+
+def format_compare_table(symbols: list[str], data: list[dict], sector: str) -> str:
+    """Format side-by-side comparison per UI-SPEC /compare template.
+
+    Args:
+        symbols: List of ticker symbols.
+        data: List of dicts with keys: symbol, pe, pb, roe, net_margin,
+              debt_to_equity, revenue_cagr.
+        sector: Sector name for header.
+
+    Returns:
+        HTML-formatted comparison table string.
+    """
+    if not data:
+        return ""
+
+    escaped_sector = html.escape(sector)
+
+    # Build data lookup
+    by_symbol = {d["symbol"]: d for d in data}
+
+    # Metrics config: (label, key, higher_is_better)
+    metrics = [
+        ("P/E", "pe", False),
+        ("P/B", "pb", False),
+        ("ROE %", "roe", True),
+        ("Net Mgn %", "net_margin", True),
+        ("D/E", "debt_to_equity", False),
+        ("Rev CAGR %", "revenue_cagr", True),
+    ]
+
+    # Compute median for each metric
+    medians: dict[str, float] = {}
+    for _, key, _ in metrics:
+        vals = [d.get(key, 0) for d in data if d.get(key) is not None]
+        if vals:
+            sorted_vals = sorted(vals)
+            mid = len(sorted_vals) // 2
+            if len(sorted_vals) % 2 == 0:
+                medians[key] = (sorted_vals[mid - 1] + sorted_vals[mid]) / 2
+            else:
+                medians[key] = sorted_vals[mid]
+        else:
+            medians[key] = 0
+
+    # Column width
+    col_w = 8
+    label_w = 10
+
+    # Header
+    header_cols = "".join(f" | {html.escape(s):>{col_w - 3}s}" for s in symbols)
+    header_cols += f" | {'Median':>{col_w - 3}s}"
+    sep_cols = "".join(f"|{'-' * col_w}" for _ in range(len(symbols) + 1))
+
+    lines = [
+        f"<b>{CHART_EMOJI} Sector Comparison</b>",
+        f"Sector: {escaped_sector}",
+        "",
+        "<pre>",
+        f"{'Metric':<{label_w}s}{header_cols}",
+        f"{'-' * label_w}{sep_cols}",
+    ]
+
+    for label, key, higher_better in metrics:
+        vals = [(s, by_symbol.get(s, {}).get(key, 0)) for s in symbols]
+
+        # Find best value
+        numeric_vals = [v for _, v in vals if v is not None]
+        if numeric_vals:
+            best_val = max(numeric_vals) if higher_better else min(numeric_vals)
+        else:
+            best_val = None
+
+        row = f"{label:<{label_w}s}"
+        for sym, val in vals:
+            val_str = f"{val:.1f}" if val is not None else "N/A"
+            crown = CROWN_EMOJI if val is not None and val == best_val else ""
+            cell = f"{val_str}{crown}"
+            row += f" | {cell:>{col_w - 3}s}"
+
+        med_val = medians.get(key, 0)
+        row += f" | {med_val:>{col_w - 3}.1f}"
+        lines.append(row)
+
+    lines.append("</pre>")
+    lines.append("")
+    lines.append(f"{CROWN_EMOJI} = best in row")
 
     return "\n".join(lines)

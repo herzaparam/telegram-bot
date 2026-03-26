@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.llm.prompts import _SYSTEM_PROMPT, build_decision_prompt
+from src.llm.prompts import _SYSTEM_PROMPT, _format_engine_data, build_decision_prompt
 
 
 def _make_asset(
@@ -143,3 +143,59 @@ class TestLessonPrompt:
         user_content = messages[1]["content"]
         assert "ASSET-SPECIFIC LESSONS" not in user_content
         assert "GENERAL LESSONS" not in user_content
+
+
+class TestDDFlags:
+    """Tests for DD flags injection into decision prompt."""
+
+    def test_dd_flags_in_prompt(self) -> None:
+        """DD flags appear in formatted prompt with severity and message."""
+        asset = _make_asset()
+        flags = [
+            {"type": "insider_selling", "severity": "warning", "message": "Major holder decreased 8%"},
+        ]
+        result = _format_engine_data(asset, [], [], dd_flags=flags)
+        assert "DUE DILIGENCE FLAGS:" in result
+        assert "[WARNING]" in result
+        assert "Major holder decreased 8%" in result
+
+    def test_dd_flags_multiple(self) -> None:
+        """Multiple DD flags all appear."""
+        asset = _make_asset()
+        flags = [
+            {"severity": "warning", "message": "Insider selling detected"},
+            {"severity": "info", "message": "New institutional buyer"},
+        ]
+        result = _format_engine_data(asset, [], [], dd_flags=flags)
+        assert "[WARNING]" in result
+        assert "[INFO]" in result
+        assert "Insider selling detected" in result
+        assert "New institutional buyer" in result
+
+    def test_dd_flags_none_omits_section(self) -> None:
+        """No DD flags means no DUE DILIGENCE FLAGS section."""
+        asset = _make_asset()
+        result = _format_engine_data(asset, [], [], dd_flags=None)
+        assert "DUE DILIGENCE FLAGS" not in result
+
+    def test_dd_flags_empty_list_omits_section(self) -> None:
+        """Empty DD flags list means no DUE DILIGENCE FLAGS section."""
+        asset = _make_asset()
+        result = _format_engine_data(asset, [], [], dd_flags=[])
+        assert "DUE DILIGENCE FLAGS" not in result
+
+    def test_dd_flags_passed_through_build_decision_prompt(self) -> None:
+        """build_decision_prompt passes dd_flags through to _format_engine_data."""
+        asset = _make_asset()
+        flags = [{"severity": "critical", "message": "High debt warning"}]
+        messages = build_decision_prompt(asset, [], [], dd_flags=flags)
+        user_content = messages[1]["content"]
+        assert "DUE DILIGENCE FLAGS:" in user_content
+        assert "[CRITICAL]" in user_content
+
+    def test_dd_flags_default_severity(self) -> None:
+        """Missing severity defaults to INFO."""
+        asset = _make_asset()
+        flags = [{"message": "Some info without severity"}]
+        result = _format_engine_data(asset, [], [], dd_flags=flags)
+        assert "[INFO]" in result

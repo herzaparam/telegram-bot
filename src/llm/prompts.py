@@ -45,6 +45,7 @@ def _format_engine_data(
     signals: list[SignalRecord],
     contradictions: list[str],
     lessons: list[dict[str, object]] | None = None,
+    dd_flags: list[dict[str, str]] | None = None,
 ) -> str:
     """Build the user message content with engine data.
 
@@ -53,6 +54,7 @@ def _format_engine_data(
         signals: List of signal records from engines.
         contradictions: List of contradiction description strings.
         lessons: Optional list of lesson dicts for injection.
+        dd_flags: Optional list of due diligence flag dicts with severity/message.
 
     Returns:
         Formatted user message string.
@@ -71,6 +73,13 @@ def _format_engine_data(
     if contradictions:
         lines.append("")
         lines.append(f"Contradictions detected: {'; '.join(contradictions)}")
+
+    if dd_flags:
+        lines.append("")
+        lines.append("DUE DILIGENCE FLAGS:")
+        for flag in dd_flags:
+            severity = flag.get("severity", "info")
+            lines.append(f"  [{severity.upper()}] {flag['message']}")
 
     lines.append("")
     lines.append("Upcoming Events: No event data available yet.")
@@ -107,6 +116,7 @@ def build_decision_prompt(
     signals: list[SignalRecord],
     contradictions: list[str],
     lessons: list[dict[str, object]] | None = None,
+    dd_flags: list[dict[str, str]] | None = None,
 ) -> list[dict[str, str]]:
     """Build the system + user messages for the LLM decision call.
 
@@ -115,13 +125,14 @@ def build_decision_prompt(
         signals: List of signal records from engines.
         contradictions: List of contradiction description strings.
         lessons: Optional list of lesson dicts for injection.
+        dd_flags: Optional list of due diligence flag dicts.
 
     Returns:
         List of two message dicts (system, user).
     """
     return [
         {"role": "system", "content": _SYSTEM_PROMPT},
-        {"role": "user", "content": _format_engine_data(asset, signals, contradictions, lessons)},
+        {"role": "user", "content": _format_engine_data(asset, signals, contradictions, lessons, dd_flags=dd_flags)},
     ]
 
 
