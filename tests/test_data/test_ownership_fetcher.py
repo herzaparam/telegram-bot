@@ -159,7 +159,10 @@ class TestComputeOwnershipChanges:
         result = _compute_ownership_changes(current, previous)
         assert result is not None
         assert len(result["major_changes"]) > 0
-        assert result["major_changes"][0]["direction"] == "decrease"
+        # PT ABC went from 55% -> 50% (decrease)
+        abc_changes = [c for c in result["major_changes"] if c["name"] == "PT ABC"]
+        assert len(abc_changes) == 1
+        assert abc_changes[0]["direction"] == "decrease"
 
     def test_no_previous_returns_none(self) -> None:
         """Returns None when no previous snapshot."""
