@@ -272,6 +272,10 @@ async def decide_stage(session: "AsyncSession", asset: Asset) -> None:  # noqa: 
         except Exception:
             log.debug("dd_flags_load_failed", exc_info=True)
 
+    # Guard: ensure dd_flags is actually a list (not a coroutine from mocked session)
+    if dd_flags is not None and not isinstance(dd_flags, list):
+        dd_flags = None
+
     # 2.5b Load relevant lessons for injection (D-12)
     engine_categories = list({s.category for s in signals})
     relevant_lessons = await lesson_repo.get_relevant_lessons(
