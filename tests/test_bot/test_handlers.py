@@ -228,6 +228,11 @@ class TestScorecardHandler:
         mock_context.args = []
 
         mock_session = AsyncMock()
+        # Mock execute() to return a result with scalars().all() -> []
+        mock_execute_result = MagicMock()
+        mock_execute_result.scalars.return_value.all.return_value = []
+        mock_session.execute = AsyncMock(return_value=mock_execute_result)
+
         mock_ctx = AsyncMock()
         mock_ctx.__aenter__ = AsyncMock(return_value=mock_session)
         mock_ctx.__aexit__ = AsyncMock(return_value=None)
@@ -275,6 +280,10 @@ class TestScorecardParsing:
         mock_context.args = ["30d"]
 
         mock_session = AsyncMock()
+        mock_execute_result = MagicMock()
+        mock_execute_result.scalars.return_value.all.return_value = []
+        mock_session.execute = AsyncMock(return_value=mock_execute_result)
+
         mock_ctx = AsyncMock()
         mock_ctx.__aenter__ = AsyncMock(return_value=mock_session)
         mock_ctx.__aexit__ = AsyncMock(return_value=None)
@@ -306,6 +315,7 @@ class TestScorecardParsing:
         mock_session = AsyncMock()
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = 1  # asset_id = 1
+        mock_result.scalars.return_value.all.return_value = []
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         mock_ctx = AsyncMock()
@@ -341,6 +351,7 @@ class TestScorecardParsing:
         mock_session = AsyncMock()
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = 1
+        mock_result.scalars.return_value.all.return_value = []
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         mock_ctx = AsyncMock()
@@ -421,6 +432,10 @@ class TestScorecardEmpty:
         mock_context.args = []
 
         mock_session = AsyncMock()
+        mock_execute_result = MagicMock()
+        mock_execute_result.scalars.return_value.all.return_value = []
+        mock_session.execute = AsyncMock(return_value=mock_execute_result)
+
         mock_ctx = AsyncMock()
         mock_ctx.__aenter__ = AsyncMock(return_value=mock_session)
         mock_ctx.__aexit__ = AsyncMock(return_value=None)

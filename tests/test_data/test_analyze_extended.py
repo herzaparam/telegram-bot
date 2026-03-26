@@ -129,10 +129,10 @@ class TestAnalyzeStageStoreBacked:
     """Test analyze_stage loads store-backed data and passes to 6 engines."""
 
     @pytest.mark.asyncio
-    async def test_analyze_stage_stores_signals_from_seven_engines(
+    async def test_analyze_stage_stores_signals_from_all_engines(
         self, mock_stock_asset, sample_df
     ):
-        """analyze_stage with mocked DB data creates 7 engine signals for stock."""
+        """analyze_stage with mocked DB data creates 13 engine signals for stock."""
         from src.data.analyze import analyze_stage
 
         session = AsyncMock()
@@ -144,14 +144,17 @@ class TestAnalyzeStageStoreBacked:
             patch("src.data.analyze._load_recent_news", new_callable=AsyncMock, return_value=[]),
             patch("src.data.analyze._load_financial_data", new_callable=AsyncMock, return_value=None),
             patch("src.data.analyze._load_peer_data", new_callable=AsyncMock, return_value=None),
+            patch("src.data.analyze._load_onchain_data", new_callable=AsyncMock, return_value=None),
+            patch("src.data.analyze._load_github_data", new_callable=AsyncMock, return_value=None),
+            patch("src.data.analyze._compute_correlation_data", new_callable=AsyncMock, return_value=None),
             patch("src.data.analyze.signal_repo") as mock_repo,
         ):
-            mock_repo.upsert_signals = AsyncMock(return_value=7)
+            mock_repo.upsert_signals = AsyncMock(return_value=13)
             await analyze_stage(session, mock_stock_asset)
             mock_repo.upsert_signals.assert_called_once()
             signals = mock_repo.upsert_signals.call_args[0][3]
-            # Stock asset should have 7 engines (technical, quantitative, fundamental, macro, sentiment, event, valuation)
-            assert len(signals) == 7
+            # Stock asset should have 13 engines (Phase 3 + 8 + 9 + 10)
+            assert len(signals) == 13
 
     @pytest.mark.asyncio
     async def test_load_fundamentals_returns_dict(self):
