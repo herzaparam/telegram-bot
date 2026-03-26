@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import gc
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import pandas as pd
 import structlog
@@ -20,6 +20,14 @@ from src.engines.quantitative import QuantitativeEngine
 from src.engines.sentiment import SentimentEngine
 from src.engines.technical import TechnicalEngine
 from src.engines.valuation import IDX_SECTOR_MAP, ValuationEngine
+from src.engines.ml_ai import MLAIEngine
+from src.engines.onchain import OnChainEngine
+from src.engines.options import OptionsEngine
+from src.engines.behavioral import BehavioralEngine
+from src.engines.alternative import AlternativeDataEngine
+from src.engines.network import NetworkEngine
+from src.engines.game_theory import GameTheoryEngine
+from src.engines.emerging import EmergingMethodsEngine
 
 logger = structlog.get_logger(__name__)
 
@@ -44,15 +52,22 @@ def _get_engines_for_asset(
     shares_outstanding: float | None = None,
     nvt_data: dict[str, float] | None = None,
     tvl_data: dict[str, float] | None = None,
+    # Phase 10 engine data:
+    onchain_data: dict[str, float] | None = None,
+    github_data: dict[str, int | float] | None = None,
+    correlation_data: dict[str, float] | None = None,
 ) -> list[BaseEngine]:
     """Return engines applicable to this asset type."""
     all_engines: list[BaseEngine] = [
+        # Phase 3 engines
         TechnicalEngine(),
         QuantitativeEngine(),
+        # Phase 8 engines
         FundamentalEngine(fundamentals=fundamentals),
         MacroEngine(macro_data=macro_data),
         SentimentEngine(sentiment_data=sentiment_data),
         EventEngine(news_events=news_events),
+        # Phase 9 engine
         ValuationEngine(
             financial_data=financial_data,
             peer_data=peer_data,
@@ -61,6 +76,15 @@ def _get_engines_for_asset(
             nvt_data=nvt_data,
             tvl_data=tvl_data,
         ),
+        # Phase 10 engines
+        MLAIEngine(asset_type=asset.asset_type),
+        OnChainEngine(onchain_data=onchain_data),
+        OptionsEngine(),
+        BehavioralEngine(),
+        AlternativeDataEngine(github_data=github_data),
+        NetworkEngine(correlation_data=correlation_data),
+        GameTheoryEngine(),
+        EmergingMethodsEngine(),
     ]
     return [
         e for e in all_engines
@@ -320,6 +344,107 @@ async def _load_peer_data(
     return [sector_avg]
 
 
+async def _load_onchain_data(session: AsyncSession, asset_id: int) -> dict[str, float] | None:
+    """Load latest on-chain data for a crypto asset."""
+    from src.db.models import OnChainData
+    today = date.today()
+    result = await session.execute(
+        select(OnChainData)
+        .where(OnChainData.asset_id == asset_id)
+        .where(OnChainData.date >= today - timedelta(days=1))
+    )
+    rows = result.scalars().all()
+    if not rows:
+        return None
+    data: dict[str, float] = {}
+    for row in rows:
+        data[row.metric] = row.value
+        data[f"{row.metric}_source"] = row.source  # type: ignore[assignment]
+    return data
+
+
+async def _load_github_data(session: AsyncSession, asset_id: int) -> dict[str, int | float] | None:
+    """Load latest GitHub activity for a crypto asset."""
+    from src.db.models import GitHubActivity
+    today = date.today()
+    result = await session.execute(
+        select(GitHubActivity)
+        .where(GitHubActivity.asset_id == asset_id)
+        .where(GitHubActivity.date >= today - timedelta(days=1))
+    )
+    row = result.scalars().first()
+    if not row:
+        return None
+    return {"stars": row.stars, "forks": row.forks, "weekly_commits": row.weekly_commits, "contributors": row.contributors}
+
+
+async def _compute_correlation_data(
+    session: AsyncSession, current_asset_id: int, current_prices: pd.DataFrame
+) -> dict[str, float] | None:
+    """Compute rolling 30-day correlation between current asset and all watchlist assets.
+
+    Args:
+        session: DB session
+        current_asset_id: ID of the asset being analyzed
+        current_prices: Already-loaded price DataFrame for the current asset (must have 'close' column)
+
+    Returns:
+        Dict with avg_correlation, max_correlation, min_correlation, num_assets or None if insufficient data.
+    """
+    from src.db.models import Asset as AssetModel, Watchlist
+    import numpy as np
+
+    # Get all watchlisted asset IDs
+    result = await session.execute(
+        select(Watchlist.asset_id).where(Watchlist.asset_id != current_asset_id).distinct()
+    )
+    other_asset_ids = [r[0] for r in result.all()]
+    if not other_asset_ids:
+        return None
+
+    current_close = current_prices["close"].tail(30).values
+    if len(current_close) < 20:
+        return None
+
+    # Load 30-day close prices for each other watchlisted asset
+    correlations: list[float] = []
+    for aid in other_asset_ids:
+        # Query the asset to get a proper object for _load_price_dataframe
+        asset_result = await session.execute(select(AssetModel).where(AssetModel.id == aid))
+        other_asset = asset_result.scalar_one_or_none()
+        if other_asset is None:
+            continue
+        other_df = await _load_price_dataframe(session, other_asset, limit=30)
+        if other_df.empty or len(other_df) < 20:
+            continue
+        other_close = other_df["close"].tail(30).values
+
+        # Align lengths
+        min_len = min(len(current_close), len(other_close))
+        if min_len < 10:
+            continue
+        c = current_close[-min_len:]
+        o = other_close[-min_len:]
+
+        # Skip if constant (no variance)
+        if np.std(c) == 0 or np.std(o) == 0:
+            continue
+
+        corr = float(np.corrcoef(c, o)[0, 1])
+        if not np.isnan(corr):
+            correlations.append(corr)
+
+    if not correlations:
+        return None
+
+    return {
+        "avg_correlation": float(np.mean(correlations)),
+        "max_correlation": float(np.max(np.abs(correlations))),
+        "min_correlation": float(np.min(correlations)),
+        "num_assets": len(correlations),
+    }
+
+
 def _cross_validate(
     financial_data: list[dict],  # type: ignore[type-arg]
     yf_fundamentals: dict,  # type: ignore[type-arg]
@@ -414,6 +539,17 @@ async def analyze_stage(session: AsyncSession, asset: Asset) -> None:
                 nvt_data = {"market_cap": close * vol, "volume_24h": vol}
         # DeFi crypto: tvl_data (per D-13) -- passed as None, ValuationEngine handles gracefully
 
+    # Load Phase 10 engine data
+    onchain_data = None
+    github_data = None
+    correlation_data = None
+
+    if asset.asset_type == "crypto":
+        onchain_data = await _load_onchain_data(session, asset.id)
+        github_data = await _load_github_data(session, asset.id)
+
+    correlation_data = await _compute_correlation_data(session, asset.id, df)
+
     # 3. Run engines sequentially (CPU-bound)
     engines = _get_engines_for_asset(
         asset,
@@ -425,6 +561,9 @@ async def analyze_stage(session: AsyncSession, asset: Asset) -> None:
         peer_data=peer_data,
         nvt_data=nvt_data,
         tvl_data=tvl_data,
+        onchain_data=onchain_data,
+        github_data=github_data,
+        correlation_data=correlation_data,
     )
     signals: list[Signal] = []
 

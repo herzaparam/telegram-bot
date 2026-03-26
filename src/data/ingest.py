@@ -362,3 +362,17 @@ async def ingest_stage(session: AsyncSession, asset: Asset) -> None:
     # Fetch and parse IDX financial docs for stock assets only
     if asset.asset_type == "stock":
         await _fetch_and_parse_docs(session, asset)
+
+    # Fetch on-chain and GitHub data for crypto assets
+    if asset.asset_type == "crypto":
+        try:
+            from src.data.onchain_fetcher import fetch_onchain_data
+            await fetch_onchain_data(asset.symbol, asset.id, session)
+        except Exception as exc:
+            log.warning("onchain_fetch_failed", error=str(exc))
+
+        try:
+            from src.data.github_fetcher import fetch_github_activity
+            await fetch_github_activity(asset.symbol, asset.id, session)
+        except Exception as exc:
+            log.warning("github_fetch_failed", error=str(exc))
