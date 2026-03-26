@@ -52,5 +52,5 @@ jobs:
           script: |
             cd ~/trade-agent
             docker pull ${{ env.IMAGE }}:latest
-            docker compose -f docker-compose.prod.yml up -d bot
+            docker compose -f docker-compose.prod.yml up -d --build --force-recreate bot
             docker image prune -f
