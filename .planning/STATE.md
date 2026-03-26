@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 11-02-PLAN.md
-last_updated: "2026-03-26T04:43:01.881Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 11-06-PLAN.md
+last_updated: "2026-03-26T06:44:31.921Z"
 progress:
   total_phases: 12
   completed_phases: 10
-  total_plans: 37
-  completed_plans: 34
+  total_plans: 38
+  completed_plans: 37
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 11 (asset-discovery-due-diligence) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 
 ## Performance Metrics
 
@@ -81,6 +81,9 @@ Plan: 4 of 5
 | Phase 11 P01 | 2min | 2 tasks | 4 files |
 | Phase 11 P03 | 4min | 1 tasks | 4 files |
 | Phase 11 P02 | 4min | 1 tasks | 2 files |
+| Phase 11 P04 | 5min | 2 tasks | 7 files |
+| Phase 11 P05 | 3min | 2 tasks | 7 files |
+| Phase 11 P06 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -171,6 +174,12 @@ Recent decisions affecting current work:
 - [Phase 11]: Competitive position composite = ROE + revenue_growth - leverage penalty for sector ranking
 - [Phase 11]: pandas-ta-classic .ta accessor for Bollinger/RSI/MACD in discovery (consistent with existing engines)
 - [Phase 11]: IDX ticker fallback to IDX_SECTOR_MAP keys (53 tickers) when IDX API unavailable
+- [Phase 11]: Discovery scan runs as post-pipeline function after batch cross-cutting
+- [Phase 11]: DD flags loaded from DueDiligenceReport in decide_stage with try/except fallback
+- [Phase 11]: Discovery section appended after news digest as last section in daily report
+- [Phase 11]: Handler registration in src/bot/main.py (not __init__.py as plan stated)
+- [Phase 11]: IDX_SECTOR_MAP imported from valuation engine for sector determination in /compare
+- [Phase 11]: isinstance list guard after try/except to catch all non-list types including coroutines from mocked sessions
 
 ### Pending Todos
 
@@ -184,6 +193,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T04:43:01.878Z
-Stopped at: Completed 11-02-PLAN.md
+Last session: 2026-03-26T06:44:31.917Z
+Stopped at: Completed 11-06-PLAN.md
 Resume file: None

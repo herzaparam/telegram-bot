@@ -202,7 +202,7 @@ Plans:
 - [x] 11-02-PLAN.md — Discovery scanner (IDX batch scanning, crypto CoinGecko scanning, trigger detection, composite scoring)
 - [x] 11-03-PLAN.md — Due diligence computation (sector benchmarking, management quality, ownership fetcher, competitive positioning, DD flags)
 - [x] 11-04-PLAN.md — Pipeline wiring (discovery scan, DD computation, LLM DD flags, daily report New Opportunities section)
-- [ ] 11-05-PLAN.md — Bot commands (/discover, /duediligence, /compare) with handler tests
+- [x] 11-05-PLAN.md — Bot commands (/discover, /duediligence, /compare) with handler tests
 - [ ] 11-06-PLAN.md — Gap closure: fix DD flags regression in decide.py, remove net_margin from compare table
 
 ### Phase 12: Portfolio Risk + Advanced Commands
@@ -239,5 +239,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 8. Fundamental, Macro, Sentiment, and News Engines | 4/4 | Complete   | 2026-03-25 |
 | 9. IDX Documents + Valuation Engine | 0/5 | Planned    |  |
 | 10. Remaining Specialized Engines | 4/5 | Complete    | 2026-03-26 |
-| 11. Asset Discovery + Due Diligence | 4/5 | In Progress|  |
+| 11. Asset Discovery + Due Diligence | 5/6 | In Progress|  |
 | 12. Portfolio Risk + Advanced Commands | 0/TBD | Not started | - |

@@ -45,7 +45,7 @@
 - [x] **LLM-03**: LLM considers upcoming events that could invalidate signals
 - [x] **LLM-04**: LLM applies lessons learned from past mistakes
 - [x] **LLM-05**: LLM outputs STRONG BUY / BUY / HOLD / SELL / STRONG SELL + reasoning + fair value context
-- [ ] **LLM-06**: LLM considers due diligence flags (insider selling, management changes, earnings quality)
+- [x] **LLM-06**: LLM considers due diligence flags (insider selling, management changes, earnings quality)
 
 ### Self-Evaluation
 
@@ -75,12 +75,12 @@
 - [x] **TBOT-03**: `/report BTC` gets detailed single-asset report
 - [x] **TBOT-04**: `/scorecard` shows accuracy stats + recent results
 - [x] **TBOT-05**: `/lessons` shows learned lessons
-- [ ] **TBOT-06**: `/discover` shows today's opportunities
+- [x] **TBOT-06**: `/discover` shows today's opportunities
 - [x] **TBOT-07**: `/settings` configures notification time, categories
 - [ ] **TBOT-08**: `/backtest BTC 30d` runs historical signal replay
 - [x] **TBOT-09**: `/valuation BBCA` shows DCF, peer comparison, fair value
-- [ ] **TBOT-10**: `/compare BBCA BBRI BMRI` side-by-side sector comparison
-- [ ] **TBOT-11**: `/duediligence BBCA` full DD report
+- [x] **TBOT-10**: `/compare BBCA BBRI BMRI` side-by-side sector comparison
+- [x] **TBOT-11**: `/duediligence BBCA` full DD report
 - [ ] **TBOT-12**: `/portfolio` portfolio risk overview
 - [x] **TBOT-13**: `/fundamentals BBCA` deep ratio dashboard
 
@@ -92,7 +92,7 @@
 - [x] **REPT-04**: LLM reasoning for each decision
 - [x] **REPT-05**: Lessons applied today
 - [ ] **REPT-06**: Portfolio risk snapshot (concentration, correlation alerts)
-- [ ] **REPT-07**: New opportunities discovered
+- [x] **REPT-07**: New opportunities discovered
 
 ### Valuation Engine
 
@@ -122,7 +122,7 @@
 - [x] **DISC-01**: Scan all IHSG stocks for unusual volume, breakouts
 - [x] **DISC-02**: Scan crypto market for top movers, anomalies
 - [x] **DISC-03**: Recommend new assets based on signal strength
-- [ ] **DISC-04**: "New Opportunities" section in daily report
+- [x] **DISC-04**: "New Opportunities" section in daily report
 
 ### Enhanced Fundamentals
 
@@ -184,7 +184,7 @@
 | LLM-03 | Phase 4 | Complete |
 | LLM-04 | Phase 7 | Complete |
 | LLM-05 | Phase 4 | Complete |
-| LLM-06 | Phase 11 | Pending |
+| LLM-06 | Phase 11 | Complete |
 | EVAL-01 | Phase 6 | Complete |
 | EVAL-02 | Phase 7 | Complete |
 | EVAL-03 | Phase 7 | Complete |
@@ -202,12 +202,12 @@
 | TBOT-03 | Phase 5 | Complete |
 | TBOT-04 | Phase 6 | Complete |
 | TBOT-05 | Phase 7 | Complete |
-| TBOT-06 | Phase 11 | Pending |
+| TBOT-06 | Phase 11 | Complete |
 | TBOT-07 | Phase 5 | Complete |
 | TBOT-08 | Phase 12 | Pending |
 | TBOT-09 | Phase 9 | Complete |
-| TBOT-10 | Phase 11 | Pending |
-| TBOT-11 | Phase 11 | Pending |
+| TBOT-10 | Phase 11 | Complete |
+| TBOT-11 | Phase 11 | Complete |
 | TBOT-12 | Phase 12 | Pending |
 | TBOT-13 | Phase 9 | Complete |
 | REPT-01 | Phase 6 | Complete |
@@ -216,7 +216,7 @@
 | REPT-04 | Phase 5 | Complete |
 | REPT-05 | Phase 7 | Complete |
 | REPT-06 | Phase 12 | Pending |
-| REPT-07 | Phase 11 | Pending |
+| REPT-07 | Phase 11 | Complete |
 | VALN-01 | Phase 9 | Complete |
 | VALN-02 | Phase 9 | Complete |
 | VALN-03 | Phase 9 | Complete |
@@ -234,7 +234,7 @@
 | DISC-01 | Phase 11 | Complete |
 | DISC-02 | Phase 11 | Complete |
 | DISC-03 | Phase 11 | Complete |
-| DISC-04 | Phase 11 | Pending |
+| DISC-04 | Phase 11 | Complete |
 | FUND-01 | Phase 12 | Pending |
 | FUND-02 | Phase 12 | Pending |
 | FUND-03 | Phase 12 | Pending |
