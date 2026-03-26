@@ -106,7 +106,6 @@ async def compare_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                         "pe": fundamental.trailing_pe,
                         "pb": fundamental.price_to_book,
                         "roe": fundamental.return_on_equity,
-                        "net_margin": None,  # Not in StockFundamental
                         "debt_to_equity": fundamental.debt_to_equity,
                         "revenue_cagr": fundamental.revenue_growth,
                     })
@@ -116,7 +115,6 @@ async def compare_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                         "pe": None,
                         "pb": None,
                         "roe": None,
-                        "net_margin": None,
                         "debt_to_equity": None,
                         "revenue_cagr": None,
                     })

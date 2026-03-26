@@ -1067,7 +1067,7 @@ def format_compare_table(symbols: list[str], data: list[dict], sector: str) -> s
 
     Args:
         symbols: List of ticker symbols.
-        data: List of dicts with keys: symbol, pe, pb, roe, net_margin,
+        data: List of dicts with keys: symbol, pe, pb, roe,
               debt_to_equity, revenue_cagr.
         sector: Sector name for header.
 
@@ -1087,7 +1087,6 @@ def format_compare_table(symbols: list[str], data: list[dict], sector: str) -> s
         ("P/E", "pe", False),
         ("P/B", "pb", False),
         ("ROE %", "roe", True),
-        ("Net Mgn %", "net_margin", True),
         ("D/E", "debt_to_equity", False),
         ("Rev CAGR %", "revenue_cagr", True),
     ]

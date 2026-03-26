@@ -206,8 +206,8 @@ class TestFormatCompareTable:
     def test_crown_on_best_values(self) -> None:
         """Crown emoji appears after best value in each row."""
         data = [
-            {"symbol": "BBCA", "pe": 15.0, "pb": 3.0, "roe": 20.0, "net_margin": 30.0, "debt_to_equity": 0.5, "revenue_cagr": 12.0},
-            {"symbol": "BBRI", "pe": 10.0, "pb": 2.0, "roe": 18.0, "net_margin": 25.0, "debt_to_equity": 0.8, "revenue_cagr": 15.0},
+            {"symbol": "BBCA", "pe": 15.0, "pb": 3.0, "roe": 20.0, "debt_to_equity": 0.5, "revenue_cagr": 12.0},
+            {"symbol": "BBRI", "pe": 10.0, "pb": 2.0, "roe": 18.0, "debt_to_equity": 0.8, "revenue_cagr": 15.0},
         ]
         result = format_compare_table(["BBCA", "BBRI"], data, "Banking")
         assert CROWN_EMOJI in result
@@ -222,7 +222,7 @@ class TestFormatCompareTable:
     def test_pre_block(self) -> None:
         """Table uses <pre> block for alignment."""
         data = [
-            {"symbol": "A", "pe": 10.0, "pb": 1.5, "roe": 15.0, "net_margin": 20.0, "debt_to_equity": 0.5, "revenue_cagr": 8.0},
+            {"symbol": "A", "pe": 10.0, "pb": 1.5, "roe": 15.0, "debt_to_equity": 0.5, "revenue_cagr": 8.0},
         ]
         result = format_compare_table(["A"], data, "Tech")
         assert "<pre>" in result
