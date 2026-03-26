@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import structlog
+from sqlalchemy import select
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from src.bot.auth import is_authorized
 from src.db.database import async_session_factory
 from src.db.evaluation_repo import evaluation_repo
+from src.db.models import AccuracyStats
 from src.report.formatter import (
     format_scorecard_error,
     format_scorecard_message,
@@ -16,6 +18,28 @@ from src.report.formatter import (
 )
 
 logger = structlog.get_logger(__name__)
+
+# All 15 engine categories in the full suite
+ALL_ENGINE_CATEGORIES: list[str] = [
+    "technical",
+    "quantitative",
+    "fundamental",
+    "macro",
+    "sentiment",
+    "event",
+    "valuation",
+    "ml_ai",
+    "onchain",
+    "options",
+    "behavioral",
+    "alternative",
+    "network",
+    "game_theory",
+    "emerging_methods",
+]
+
+# Stub engines that lack real data sources -- display "N/A" instead of accuracy
+STUB_ENGINE_CATEGORIES: set[str] = {"options", "game_theory"}
 
 VALID_PERIODS = {"7d", "30d", "90d", "all"}
 
@@ -93,6 +117,31 @@ async def scorecard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             total_decisions = data["total_decisions"]
             win_rates = data["win_rates_by_window"]
 
+            # Fetch per-engine accuracy for the Engine Breakdown section (D-24)
+            engine_stmt = select(AccuracyStats).where(
+                AccuracyStats.period == period,
+                AccuracyStats.engine_name.isnot(None),
+                AccuracyStats.window == "24h",
+            )
+            if asset_id is not None:
+                engine_stmt = engine_stmt.where(AccuracyStats.asset_id == asset_id)
+            else:
+                engine_stmt = engine_stmt.where(AccuracyStats.asset_id.is_(None))
+
+            engine_result = await session.execute(engine_stmt)
+            engine_rows = engine_result.scalars().all()
+
+            per_engine_accuracy: dict[str, tuple[int, int] | None] = {}
+            for row in engine_rows:
+                per_engine_accuracy[row.engine_name] = (row.correct, row.total)
+
+            # Ensure all 15 categories present, stubs get None
+            for cat in ALL_ENGINE_CATEGORIES:
+                if cat in STUB_ENGINE_CATEGORIES:
+                    per_engine_accuracy[cat] = None  # Will display "N/A"
+                elif cat not in per_engine_accuracy:
+                    per_engine_accuracy[cat] = (0, 0)  # No data yet
+
             # Determine empty states
             if total_decisions == 0 and not win_rates:
                 if period != "all" and not asset_filter:
@@ -106,6 +155,7 @@ async def scorecard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) 
                         worst_engine=None,
                         per_asset_buyhold=[],
                         period_empty=True,
+                        per_engine_accuracy=per_engine_accuracy,
                     )
                 else:
                     # Absolute empty
@@ -117,6 +167,7 @@ async def scorecard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) 
                         best_engine=None,
                         worst_engine=None,
                         per_asset_buyhold=[],
+                        per_engine_accuracy=per_engine_accuracy,
                     )
                 await update.message.reply_text(msg, parse_mode="HTML")  # type: ignore[union-attr]
                 return
@@ -160,6 +211,7 @@ async def scorecard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) 
                 worst_engine=data["worst_engine"],
                 per_asset_buyhold=per_asset_buyhold,
                 recent_calls=recent_calls,
+                per_engine_accuracy=per_engine_accuracy,
             )
 
         # Split if message is too long

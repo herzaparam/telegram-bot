@@ -290,6 +290,7 @@ def format_scorecard_message(
     per_asset_buyhold: list[dict[str, object]],
     recent_calls: list[dict[str, object]] | None = None,
     period_empty: bool = False,
+    per_engine_accuracy: dict[str, tuple[int, int] | None] | None = None,
 ) -> str:
     """Format the /scorecard command response.
 
@@ -383,6 +384,21 @@ def format_scorecard_message(
                 f"{emoji} {call['date']} {call['verdict']} -> "
                 f"{sign}{float(call['change_pct']):.1f}% ({call['window']})"  # type: ignore[arg-type]
             )
+
+    # Engine Breakdown (D-24): per-engine accuracy for all 15 categories
+    if per_engine_accuracy:
+        lines.append("")
+        lines.append("<b>Engine Breakdown (24h):</b>")
+        for cat in sorted(per_engine_accuracy.keys()):
+            val = per_engine_accuracy[cat]
+            if val is None:
+                lines.append(f"  {cat}: N/A \u2014 data source unavailable")
+            elif val[1] == 0:
+                lines.append(f"  {cat}: no evaluations yet")
+            else:
+                correct, total = val
+                pct = (correct / total * 100) if total > 0 else 0
+                lines.append(f"  {cat}: {pct:.0f}% ({correct}/{total})")
 
     return "\n".join(lines)
 
