@@ -396,6 +396,64 @@ class FinancialData(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class DiscoveryCandidate(Base):
+    """Asset discovered by scanning IHSG/crypto for unusual volume, breakouts, anomalies."""
+
+    __tablename__ = "discovery_candidates"
+    __table_args__ = (
+        UniqueConstraint("scan_date", "symbol", name="uq_discovery_date_symbol"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    scan_date: Mapped[date] = mapped_column(Date, nullable=False)
+    symbol: Mapped[str] = mapped_column(String(20), nullable=False)
+    name: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    asset_type: Mapped[str] = mapped_column(String(10), nullable=False)  # "stock" or "crypto"
+    composite_score: Mapped[float] = mapped_column(Float, nullable=False)
+    triggers: Mapped[dict] = mapped_column(JSONB, nullable=False)  # {"volume_spike": 0.8, "price_breakout": 0.6, ...}
+    current_price: Mapped[float | None] = mapped_column(Float, nullable=True)
+    price_change_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    volume_ratio: Mapped[float | None] = mapped_column(Float, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class OwnershipSnapshot(Base):
+    """Point-in-time snapshot of asset ownership structure."""
+
+    __tablename__ = "ownership_snapshots"
+    __table_args__ = (
+        UniqueConstraint("asset_id", "snapshot_date", name="uq_ownership_asset_date"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(Integer, ForeignKey("assets.id"), nullable=False)
+    snapshot_date: Mapped[date] = mapped_column(Date, nullable=False)
+    shareholders: Mapped[dict] = mapped_column(JSONB, nullable=False)  # [{"name": "...", "pct": 25.3}, ...]
+    total_shares: Mapped[float | None] = mapped_column(Float, nullable=True)
+    public_float_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class DueDiligenceReport(Base):
+    """Due diligence report with sector benchmarking, management quality, and flags."""
+
+    __tablename__ = "due_diligence_reports"
+    __table_args__ = (
+        UniqueConstraint("asset_id", "report_date", name="uq_dd_asset_date"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(Integer, ForeignKey("assets.id"), nullable=False)
+    report_date: Mapped[date] = mapped_column(Date, nullable=False)
+    sector: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    sector_rank: Mapped[dict | None] = mapped_column(JSONB, nullable=True)  # {"pe_vs_median": -15.2, "roe_vs_median": 8.3, "rank": 3, "of": 12}
+    management_quality: Mapped[dict | None] = mapped_column(JSONB, nullable=True)  # {"score": 0.72, "label": "Good", "revenue_cagr": 12.3}
+    ownership_changes: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    competitive_position: Mapped[dict | None] = mapped_column(JSONB, nullable=True)  # {"market_position": "leader", "moat_indicators": [...]}
+    dd_flags: Mapped[list | None] = mapped_column(JSONB, nullable=True)  # [{"type": "insider_selling", "severity": "warning", "message": "..."}]
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class OnChainData(Base):
     """On-chain metrics for crypto assets (TVL, exchange flows)."""
 

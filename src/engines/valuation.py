@@ -18,21 +18,71 @@ logger = structlog.get_logger(__name__)
 # ---------------------------------------------------------------------------
 
 IDX_SECTOR_MAP: dict[str, str] = {
+    # Banking
     "BBCA": "banking",
     "BBRI": "banking",
     "BMRI": "banking",
     "BBNI": "banking",
+    "BRIS": "banking",
+    "BTPS": "banking",
+    "MEGA": "banking",
+    "NISP": "banking",
+    # Telco
     "TLKM": "telco",
-    "ISAT": "telco",
     "EXCL": "telco",
+    "ISAT": "telco",
+    "FREN": "telco",
+    # Consumer
     "UNVR": "consumer",
     "ICBP": "consumer",
     "INDF": "consumer",
+    "MYOR": "consumer",
+    "KLBF": "consumer",
+    "HMSP": "consumer",
+    "GGRM": "consumer",
+    # Mining
+    "ADRO": "mining",
+    "PTBA": "mining",
+    "ITMG": "mining",
+    "ANTM": "mining",
+    "INCO": "mining",
+    "MDKA": "mining",
+    "TINS": "mining",
+    # Energy
+    "PGAS": "energy",
+    "AKRA": "energy",
+    "MEDC": "energy",
+    # Property
+    "BSDE": "property",
+    "CTRA": "property",
+    "SMRA": "property",
+    "PWON": "property",
+    # Infrastructure
+    "JSMR": "infrastructure",
+    "WIKA": "infrastructure",
+    "WSKT": "infrastructure",
+    "PTPP": "infrastructure",
+    # Automotive
     "ASII": "automotive",
+    "AUTO": "automotive",
+    "IMAS": "automotive",
+    # Cement/Construction Materials
+    "SMGR": "construction_materials",
+    "INTP": "construction_materials",
+    "WTON": "construction_materials",
+    # Technology
     "GOTO": "technology",
     "BUKA": "technology",
+    "EMTK": "technology",
+    # Healthcare
+    "SIDO": "healthcare",
+    "HEAL": "healthcare",
+    "MIKA": "healthcare",
+    # Retail
     "ACES": "retail",
+    "LPPF": "retail",
     "MAPI": "retail",
+    "ERAA": "retail",
 }
 
 # Crypto symbols that use NVT proxy (major L1 chains)
