@@ -92,8 +92,6 @@ async def scorecard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             # If asset filter, resolve to asset_id
             asset_id: int | None = None
             if asset_filter:
-                from sqlalchemy import select
-
                 from src.db.models import Asset, Watchlist
 
                 stmt = (
@@ -183,14 +181,12 @@ async def scorecard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) 
                     session, "24h", days_back, asset_id
                 )
                 if recent_evals:
-                    from sqlalchemy import select as sel
-
                     from src.db.models import Asset as A
                     from src.db.models import DailyDecision as DD
 
                     recent_calls = []
                     for ev in recent_evals[:5]:
-                        dd_stmt = sel(DD).where(DD.id == ev.decision_id)
+                        dd_stmt = select(DD).where(DD.id == ev.decision_id)
                         dd_result = await session.execute(dd_stmt)
                         dd = dd_result.scalar_one_or_none()
                         if dd:
