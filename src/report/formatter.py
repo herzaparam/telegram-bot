@@ -895,8 +895,14 @@ def format_discovery_card(candidate: dict) -> str:
     change_sign = "+" if change_pct >= 0 else ""
     change_str = f"{change_sign}{change_pct:.1f}%"
 
+    # Normalize triggers: can be dict {"volume_spike": 0.8} or list of dicts
+    if isinstance(triggers, dict):
+        trigger_list = [{"type": k, "name": k.replace("_", " ").title(), "score": v} for k, v in triggers.items()]
+    else:
+        trigger_list = [t if isinstance(t, dict) else {"type": str(t), "name": str(t), "score": 0} for t in triggers]
+
     # Sort triggers by score descending, take top 3
-    sorted_triggers = sorted(triggers, key=lambda t: t.get("score", 0), reverse=True)[:3]
+    sorted_triggers = sorted(trigger_list, key=lambda t: t.get("score", 0), reverse=True)[:3]
 
     # Use the first trigger's emoji as the card header emoji
     first_trigger_type = sorted_triggers[0].get("type", "") if sorted_triggers else ""
