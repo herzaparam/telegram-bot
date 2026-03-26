@@ -93,9 +93,13 @@ class IDXStockFetcher(BaseFetcher):
             self._log.warning("empty_dataframe", symbol=symbol)
             return []
 
+        # Flatten MultiIndex columns if yfinance returns them (e.g. ('Open', 'BBCA.JK'))
+        import pandas as pd
+        if isinstance(df.columns, pd.MultiIndex):
+            df = df.droplevel(1, axis=1)
+
         rows: list[OHLCVRow] = []
         for idx, row_data in df.iterrows():
-            # Handle both regular and MultiIndex columns
             try:
                 dt = idx.to_pydatetime()
                 if dt.tzinfo is None:
