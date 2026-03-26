@@ -12,7 +12,23 @@ env:
   IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
+  notify-start:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send start notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            🚀 *Deploy started*
+            Repo: `${{ github.repository }}`
+            Commit: `${{ github.event.head_commit.message }}`
+            By: ${{ github.actor }}
+
   build:
+    needs: notify-start
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -54,3 +70,21 @@ jobs:
             docker pull ${{ env.IMAGE }}:latest
             docker compose -f docker-compose.prod.yml up -d --build --force-recreate bot
             docker image prune -f
+
+  notify-result:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Send result notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ${{ (needs.build.result == 'success' && needs.deploy.result == 'success') && '✅ *Deploy successful*' || '❌ *Deploy failed*' }}
+            Repo: `${{ github.repository }}`
+            Commit: `${{ github.event.head_commit.message }}`
+            Build: ${{ needs.build.result }}
+            Deploy: ${{ needs.deploy.result }}
