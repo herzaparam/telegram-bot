@@ -13,6 +13,7 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
+
     # Database
     db_password: str = "trade_dev"
     database_url: str = "postgresql+asyncpg://trade:trade_dev@localhost:5432/trade_agent"
