@@ -104,10 +104,10 @@
 
 ### Due Diligence
 
-- [ ] **DUED-01**: Sector benchmarking — compare company metrics against sector median
-- [ ] **DUED-02**: Ownership & insider analysis from IDX disclosure filings
-- [ ] **DUED-03**: Management quality scoring (tenure, CAGR, capital allocation)
-- [ ] **DUED-04**: Competitive positioning (market share, moat indicators)
+- [x] **DUED-01**: Sector benchmarking — compare company metrics against sector median
+- [x] **DUED-02**: Ownership & insider analysis from IDX disclosure filings
+- [x] **DUED-03**: Management quality scoring (tenure, CAGR, capital allocation)
+- [x] **DUED-04**: Competitive positioning (market share, moat indicators)
 
 ### Portfolio Risk
 
@@ -119,9 +119,9 @@
 
 ### Asset Discovery
 
-- [ ] **DISC-01**: Scan all IHSG stocks for unusual volume, breakouts
-- [ ] **DISC-02**: Scan crypto market for top movers, anomalies
-- [ ] **DISC-03**: Recommend new assets based on signal strength
+- [x] **DISC-01**: Scan all IHSG stocks for unusual volume, breakouts
+- [x] **DISC-02**: Scan crypto market for top movers, anomalies
+- [x] **DISC-03**: Recommend new assets based on signal strength
 - [ ] **DISC-04**: "New Opportunities" section in daily report
 
 ### Enhanced Fundamentals
@@ -222,18 +222,18 @@
 | VALN-03 | Phase 9 | Complete |
 | VALN-04 | Phase 9 | Complete |
 | VALN-05 | Phase 9 | Complete |
-| DUED-01 | Phase 11 | Pending |
-| DUED-02 | Phase 11 | Pending |
-| DUED-03 | Phase 11 | Pending |
-| DUED-04 | Phase 11 | Pending |
+| DUED-01 | Phase 11 | Complete |
+| DUED-02 | Phase 11 | Complete |
+| DUED-03 | Phase 11 | Complete |
+| DUED-04 | Phase 11 | Complete |
 | RISK-01 | Phase 12 | Pending |
 | RISK-02 | Phase 12 | Pending |
 | RISK-03 | Phase 12 | Pending |
 | RISK-04 | Phase 12 | Pending |
 | RISK-05 | Phase 12 | Pending |
-| DISC-01 | Phase 11 | Pending |
-| DISC-02 | Phase 11 | Pending |
-| DISC-03 | Phase 11 | Pending |
+| DISC-01 | Phase 11 | Complete |
+| DISC-02 | Phase 11 | Complete |
+| DISC-03 | Phase 11 | Complete |
 | DISC-04 | Phase 11 | Pending |
 | FUND-01 | Phase 12 | Pending |
 | FUND-02 | Phase 12 | Pending |
