@@ -22,6 +22,7 @@ from src.db.models import Asset, DailyDecision, Evaluation, NewsEvent, SignalRec
 from src.report.formatter import (
     EvalDisplayItem,
     format_asset_card,
+    format_discovery_section,
     format_lessons_applied,
     format_news_digest,
     format_report_header,
@@ -168,6 +169,7 @@ async def send_daily_report(
     session: AsyncSession,
     run_date: date,
     stage_results: list | None = None,
+    discoveries: list[dict] | None = None,
 ) -> None:
     """Send the daily signal report to all configured Telegram chats.
 
@@ -178,6 +180,7 @@ async def send_daily_report(
         session: SQLAlchemy async session.
         run_date: The pipeline run date.
         stage_results: Optional list of StageResult from pipeline runner.
+        discoveries: Optional list of discovery candidate dicts from scan.
     """
     token = settings.telegram_bot_token.get_secret_value()
     if not token:
@@ -327,6 +330,12 @@ async def send_daily_report(
             cards.append(news_section)
     except Exception:
         logger.debug("news_digest_failed", exc_info=True)
+
+    # Append discovery section if discoveries found (DISC-04, REPT-07)
+    if discoveries:
+        disc_section = format_discovery_section(discoveries)
+        if disc_section:
+            cards.append(disc_section)
 
     # Split into messages respecting 4096-char limit
     messages = split_report(header, cards)

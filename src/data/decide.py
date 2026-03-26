@@ -250,7 +250,29 @@ async def decide_stage(session: "AsyncSession", asset: Asset) -> None:  # noqa: 
     if contradictions:
         log.info("contradictions_detected", count=len(contradictions))
 
-    # 2.5 Load relevant lessons for injection (D-12)
+    # 2.5 Load DD flags if available (LLM-06)
+    dd_flags: list[dict[str, str]] | None = None
+    if asset.asset_type == "stock":
+        try:
+            from sqlalchemy import select as sa_select
+
+            from src.db.models import DueDiligenceReport
+
+            dd_stmt = (
+                sa_select(DueDiligenceReport.dd_flags)
+                .where(DueDiligenceReport.asset_id == asset.id)
+                .order_by(DueDiligenceReport.report_date.desc())
+                .limit(1)
+            )
+            dd_result = await session.execute(dd_stmt)
+            dd_row = dd_result.scalar_one_or_none()
+            if dd_row:
+                dd_flags = dd_row
+                log.info("dd_flags_loaded", count=len(dd_flags))
+        except Exception:
+            log.debug("dd_flags_load_failed", exc_info=True)
+
+    # 2.5b Load relevant lessons for injection (D-12)
     engine_categories = list({s.category for s in signals})
     relevant_lessons = await lesson_repo.get_relevant_lessons(
         session, asset.asset_type, engine_categories, max_lessons=20
@@ -271,7 +293,7 @@ async def decide_stage(session: "AsyncSession", asset: Asset) -> None:  # noqa: 
         log.info("lessons_injected", count=len(relevant_lessons))
 
     # 3. Build prompt and call LLM
-    messages = build_decision_prompt(asset, signals, contradictions, lessons=lessons_for_prompt)
+    messages = build_decision_prompt(asset, signals, contradictions, lessons=lessons_for_prompt, dd_flags=dd_flags)
     result = await llm_completion(
         messages=messages,
         response_format={"type": "json_object"},

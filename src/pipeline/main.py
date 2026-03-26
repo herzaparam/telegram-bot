@@ -16,6 +16,8 @@ from sqlalchemy import select
 from src.config import settings
 from src.data.analyze import analyze_stage, set_sentiment_cache
 from src.data.decide import decide_stage
+from src.data.discovery import run_discovery_scan
+from src.data.due_diligence import compute_dd_report
 from src.data.evaluate import evaluate_stage
 from src.data.fundamental_fetcher import fetch_fundamentals
 from src.data.ingest import ingest_stage
@@ -124,6 +126,11 @@ async def _enhanced_ingest_stage(
         await fetch_fundamentals(session, asset)
     except Exception:
         logger.exception("fundamental_fetch_error", asset=asset.symbol)
+    if asset.asset_type == "stock":
+        try:
+            await compute_dd_report(session, asset, date.today())
+        except Exception:
+            logger.exception("dd_computation_error", asset=asset.symbol)
 
 
 async def async_main() -> None:
@@ -173,6 +180,14 @@ async def async_main() -> None:
     except Exception:
         logger.exception("batch_cross_cutting_error")
 
+    # Post-pipeline: discovery scan (DISC-01/02/03/04)
+    discovery_results: list[dict] = []
+    try:
+        async with async_session_factory() as session:
+            discovery_results = await run_discovery_scan(session, run_date)
+    except Exception:
+        logger.exception("discovery_scan_error")
+
     # Post-pipeline: send daily Telegram report (D-15)
     # Report runs after all stages, not as a per-asset StageFunc
     all_failed = all(r.status == "failed" for r in results) if results else True
@@ -180,7 +195,7 @@ async def async_main() -> None:
         await send_pipeline_failure_alert(run_date)
     else:
         async with async_session_factory() as session:
-            await send_daily_report(session, run_date, stage_results=results)
+            await send_daily_report(session, run_date, stage_results=results, discoveries=discovery_results)
 
 
 def main() -> None:
