@@ -215,10 +215,11 @@ Plans:
   3. /backtest BTC 30d replays historical signals over the specified period and reports win rate, return, and comparison against buy-and-hold
   4. /fundamentals BBCA shows a 5-year trend dashboard of profitability, leverage, efficiency, and growth ratios alongside earnings quality and dividend analysis
   5. Stress testing runs historical scenario shocks (e.g., 2020 COVID crash, 2022 crypto winter) against the current portfolio and reports projected drawdown
-**Plans**: 2 plans
+**Plans**: 3 plans
 Plans:
-- [ ] 04-01-PLAN.md — DecisionRepository, prompt builder, contradiction detection, fallback logic, LLM response parsing
-- [ ] 04-02-PLAN.md — Wire decide_stage into PipelineRunner
+- [ ] 12-01-PLAN.md — DB models, Alembic migration 014, src/risk/ computation module (correlation, VaR, concentration, stress, metrics)
+- [ ] 12-02-PLAN.md — /portfolio handler, daily report risk snapshot, enhanced /fundamentals (5-year trends, earnings quality, dividends)
+- [ ] 12-03-PLAN.md — /backtest command with subprocess pipeline replay and result caching
 **UI hint**: yes
 
 
@@ -240,4 +241,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 9. IDX Documents + Valuation Engine | 0/5 | Planned    |  |
 | 10. Remaining Specialized Engines | 4/5 | Complete    | 2026-03-26 |
 | 11. Asset Discovery + Due Diligence | 5/6 | In Progress|  |
-| 12. Portfolio Risk + Advanced Commands | 0/TBD | Not started | - |
+| 12. Portfolio Risk + Advanced Commands | 0/3 | Planning complete | - |
