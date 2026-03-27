@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Phase complete — ready for verification
-stopped_at: Phase 12 context gathered
-last_updated: "2026-03-27T09:55:04.749Z"
+stopped_at: Completed 12-02-PLAN.md
+last_updated: "2026-03-27T11:01:25.251Z"
 progress:
   total_phases: 12
   completed_phases: 11
-  total_plans: 38
-  completed_plans: 38
+  total_plans: 41
+  completed_plans: 39
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** The daily signal loop must work reliably: fetch data, run engines, produce LLM verdicts, and deliver a Telegram report every morning
-**Current focus:** Phase 11 — asset-discovery-due-diligence
+**Current focus:** Phase 12 — portfolio-risk-advanced-commands
 
 ## Current Position
 
-Phase: 11 (asset-discovery-due-diligence) — EXECUTING
-Plan: 5 of 5
+Phase: 12 (portfolio-risk-advanced-commands) — EXECUTING
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -84,6 +84,9 @@ Plan: 5 of 5
 | Phase 11 P04 | 5min | 2 tasks | 7 files |
 | Phase 11 P05 | 3min | 2 tasks | 7 files |
 | Phase 11 P06 | 3min | 2 tasks | 4 files |
+| Phase 12 P01 | 6min | 2 tasks | 20 files |
+| Phase 12 P03 | 8min | 2 tasks | 6 files |
+| Phase 12 P02 | 7min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -180,6 +183,14 @@ Recent decisions affecting current work:
 - [Phase 11]: Handler registration in src/bot/main.py (not __init__.py as plan stated)
 - [Phase 11]: IDX_SECTOR_MAP imported from valuation engine for sector determination in /compare
 - [Phase 11]: isinstance list guard after try/except to catch all non-list types including coroutines from mocked sessions
+- [Phase 12]: Frozen dataclasses for all risk result types matching Signal pattern
+- [Phase 12]: Pure computation: src/risk/ has zero imports from src.db, src.pipeline, or src.llm
+- [Phase 12]: Equal-weight assumption for concentration and stress testing (position sizing not yet available)
+- [Phase 12]: Subprocess spawning via create_subprocess_exec for two-process boundary in /backtest command
+- [Phase 12]: Cached result fast path: bot checks BacktestResult table before spawning subprocess
+- [Phase 12]: Guard dividend_yield with isinstance check to handle None and MagicMock gracefully
+- [Phase 12]: Enhanced fundamentals sections only for stock assets; crypto gets informational note per D-17
+- [Phase 12]: Risk snapshot appended after discovery section in daily report with --- separator
 
 ### Pending Todos
 
@@ -193,6 +204,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T09:55:04.745Z
-Stopped at: Phase 12 context gathered
-Resume file: .planning/phases/12-portfolio-risk-advanced-commands/12-CONTEXT.md
+Last session: 2026-03-27T11:01:25.248Z
+Stopped at: Completed 12-02-PLAN.md
+Resume file: None

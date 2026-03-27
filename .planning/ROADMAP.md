@@ -217,7 +217,7 @@ Plans:
   5. Stress testing runs historical scenario shocks (e.g., 2020 COVID crash, 2022 crypto winter) against the current portfolio and reports projected drawdown
 **Plans**: 3 plans
 Plans:
-- [ ] 12-01-PLAN.md — DB models, Alembic migration 014, src/risk/ computation module (correlation, VaR, concentration, stress, metrics)
+- [x] 12-01-PLAN.md — DB models, Alembic migration 014, src/risk/ computation module (correlation, VaR, concentration, stress, metrics)
 - [ ] 12-02-PLAN.md — /portfolio handler, daily report risk snapshot, enhanced /fundamentals (5-year trends, earnings quality, dividends)
 - [ ] 12-03-PLAN.md — /backtest command with subprocess pipeline replay and result caching
 **UI hint**: yes
@@ -241,4 +241,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 9. IDX Documents + Valuation Engine | 0/5 | Planned    |  |
 | 10. Remaining Specialized Engines | 4/5 | Complete    | 2026-03-26 |
 | 11. Asset Discovery + Due Diligence | 5/6 | In Progress|  |
-| 12. Portfolio Risk + Advanced Commands | 0/3 | Planning complete | - |
+| 12. Portfolio Risk + Advanced Commands | 1/3 | In Progress|  |

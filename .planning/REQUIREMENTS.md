@@ -77,11 +77,11 @@
 - [x] **TBOT-05**: `/lessons` shows learned lessons
 - [x] **TBOT-06**: `/discover` shows today's opportunities
 - [x] **TBOT-07**: `/settings` configures notification time, categories
-- [ ] **TBOT-08**: `/backtest BTC 30d` runs historical signal replay
+- [x] **TBOT-08**: `/backtest BTC 30d` runs historical signal replay
 - [x] **TBOT-09**: `/valuation BBCA` shows DCF, peer comparison, fair value
 - [x] **TBOT-10**: `/compare BBCA BBRI BMRI` side-by-side sector comparison
 - [x] **TBOT-11**: `/duediligence BBCA` full DD report
-- [ ] **TBOT-12**: `/portfolio` portfolio risk overview
+- [x] **TBOT-12**: `/portfolio` portfolio risk overview
 - [x] **TBOT-13**: `/fundamentals BBCA` deep ratio dashboard
 
 ### Daily Report
@@ -91,7 +91,7 @@
 - [x] **REPT-03**: Valuation summary (fair value vs market price, margin of safety)
 - [x] **REPT-04**: LLM reasoning for each decision
 - [x] **REPT-05**: Lessons applied today
-- [ ] **REPT-06**: Portfolio risk snapshot (concentration, correlation alerts)
+- [x] **REPT-06**: Portfolio risk snapshot (concentration, correlation alerts)
 - [x] **REPT-07**: New opportunities discovered
 
 ### Valuation Engine
@@ -111,11 +111,11 @@
 
 ### Portfolio Risk
 
-- [ ] **RISK-01**: Correlation matrix across all watchlist assets with spike alerts
-- [ ] **RISK-02**: Concentration risk analysis (sector, single-asset, currency exposure)
-- [ ] **RISK-03**: Portfolio VaR (daily and weekly), maximum drawdown tracking
-- [ ] **RISK-04**: Risk-adjusted return metrics (Sharpe ratio, Sortino ratio)
-- [ ] **RISK-05**: Stress testing with historical scenarios and factor shocks
+- [x] **RISK-01**: Correlation matrix across all watchlist assets with spike alerts
+- [x] **RISK-02**: Concentration risk analysis (sector, single-asset, currency exposure)
+- [x] **RISK-03**: Portfolio VaR (daily and weekly), maximum drawdown tracking
+- [x] **RISK-04**: Risk-adjusted return metrics (Sharpe ratio, Sortino ratio)
+- [x] **RISK-05**: Stress testing with historical scenarios and factor shocks
 
 ### Asset Discovery
 
@@ -126,9 +126,9 @@
 
 ### Enhanced Fundamentals
 
-- [ ] **FUND-01**: Ratio dashboard per stock (profitability, leverage, efficiency, growth — 5-year trends)
-- [ ] **FUND-02**: Earnings quality analysis (cash flow vs earnings divergence, one-off items)
-- [ ] **FUND-03**: Dividend analysis (payout ratio, yield, growth rate, FCF coverage)
+- [x] **FUND-01**: Ratio dashboard per stock (profitability, leverage, efficiency, growth — 5-year trends)
+- [x] **FUND-02**: Earnings quality analysis (cash flow vs earnings divergence, one-off items)
+- [x] **FUND-03**: Dividend analysis (payout ratio, yield, growth rate, FCF coverage)
 
 ## v2 Requirements
 
@@ -204,18 +204,18 @@
 | TBOT-05 | Phase 7 | Complete |
 | TBOT-06 | Phase 11 | Complete |
 | TBOT-07 | Phase 5 | Complete |
-| TBOT-08 | Phase 12 | Pending |
+| TBOT-08 | Phase 12 | Complete |
 | TBOT-09 | Phase 9 | Complete |
 | TBOT-10 | Phase 11 | Complete |
 | TBOT-11 | Phase 11 | Complete |
-| TBOT-12 | Phase 12 | Pending |
+| TBOT-12 | Phase 12 | Complete |
 | TBOT-13 | Phase 9 | Complete |
 | REPT-01 | Phase 6 | Complete |
 | REPT-02 | Phase 5 | Complete |
 | REPT-03 | Phase 9 | Complete |
 | REPT-04 | Phase 5 | Complete |
 | REPT-05 | Phase 7 | Complete |
-| REPT-06 | Phase 12 | Pending |
+| REPT-06 | Phase 12 | Complete |
 | REPT-07 | Phase 11 | Complete |
 | VALN-01 | Phase 9 | Complete |
 | VALN-02 | Phase 9 | Complete |
@@ -226,18 +226,18 @@
 | DUED-02 | Phase 11 | Complete |
 | DUED-03 | Phase 11 | Complete |
 | DUED-04 | Phase 11 | Complete |
-| RISK-01 | Phase 12 | Pending |
-| RISK-02 | Phase 12 | Pending |
-| RISK-03 | Phase 12 | Pending |
-| RISK-04 | Phase 12 | Pending |
-| RISK-05 | Phase 12 | Pending |
+| RISK-01 | Phase 12 | Complete |
+| RISK-02 | Phase 12 | Complete |
+| RISK-03 | Phase 12 | Complete |
+| RISK-04 | Phase 12 | Complete |
+| RISK-05 | Phase 12 | Complete |
 | DISC-01 | Phase 11 | Complete |
 | DISC-02 | Phase 11 | Complete |
 | DISC-03 | Phase 11 | Complete |
 | DISC-04 | Phase 11 | Complete |
-| FUND-01 | Phase 12 | Pending |
-| FUND-02 | Phase 12 | Pending |
-| FUND-03 | Phase 12 | Pending |
+| FUND-01 | Phase 12 | Complete |
+| FUND-02 | Phase 12 | Complete |
+| FUND-03 | Phase 12 | Complete |
 
 **Coverage:**
 - v1 requirements: 83 total
