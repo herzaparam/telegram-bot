@@ -23,7 +23,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 9: IDX Documents + Valuation Engine** - PDF laporan keuangan parsing, DCF and peer analysis, /valuation and /fundamentals commands
 - [x] **Phase 10: Remaining Specialized Engines** - ML/AI, on-chain, options, behavioral, quantitative, network, game theory, and emerging methods engines (completed 2026-03-26)
 - [ ] **Phase 11: Asset Discovery + Due Diligence** - IHSG and crypto scanning, sector benchmarking, insider tracking, /discover and /duediligence commands
-- [ ] **Phase 12: Portfolio Risk + Advanced Commands** - Correlation matrix, VaR, stress testing, enhanced fundamentals, /portfolio and /backtest commands
+- [x] **Phase 12: Portfolio Risk + Advanced Commands** - Correlation matrix, VaR, stress testing, enhanced fundamentals, /portfolio and /backtest commands (completed 2026-03-27)
 
 ## Phase Details
 
@@ -241,4 +241,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 9. IDX Documents + Valuation Engine | 0/5 | Planned    |  |
 | 10. Remaining Specialized Engines | 4/5 | Complete    | 2026-03-26 |
 | 11. Asset Discovery + Due Diligence | 5/6 | In Progress|  |
-| 12. Portfolio Risk + Advanced Commands | 1/3 | In Progress|  |
+| 12. Portfolio Risk + Advanced Commands | 1/3 | Complete    | 2026-03-27 |
