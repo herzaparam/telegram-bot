@@ -790,6 +790,52 @@ def format_fundamentals_dashboard(
     return "\n".join(lines)
 
 
+def format_portfolio_risk_snapshot(snapshot: dict) -> str:
+    """Format a compact portfolio risk snapshot card for the daily report.
+
+    Args:
+        snapshot: Dict with keys: concentration, correlation_alerts,
+                  var_summary, sharpe_ratio, sortino_ratio.
+
+    Returns:
+        HTML string with compact risk summary.
+    """
+    lines = [f"<b>{CHART_EMOJI} Portfolio Risk</b>"]
+
+    # Concentration
+    conc = snapshot.get("concentration", {})
+    if conc:
+        sector_pct = conc.get("sector_pct", {})
+        sorted_sectors = sorted(sector_pct.items(), key=lambda x: x[1], reverse=True)
+        parts = [f"{s} {v:.0f}%" for s, v in sorted_sectors[:4]]
+        lines.append(f"Concentration: {' | '.join(parts)}")
+
+    # Correlation alerts
+    alerts = snapshot.get("correlation_alerts", [])
+    if alerts:
+        alert_strs = [f"{a[0]}/{a[1]} {a[2]:.2f}" for a in alerts[:3]]
+        lines.append(f"{WARNING_EMOJI} Corr alerts: {', '.join(alert_strs)}")
+    else:
+        lines.append("No high-correlation alerts")
+
+    # VaR summary
+    var_sum = snapshot.get("var_summary", {})
+    if var_sum:
+        d95 = var_sum.get("daily_var_95", 0)
+        w95 = var_sum.get("weekly_var_95", 0)
+        max_dd = var_sum.get("max_drawdown", 0)
+        lines.append(f"VaR (95%): {d95 * 100:.1f}% daily | {w95 * 100:.1f}% weekly")
+        lines.append(f"Max DD: {max_dd * 100:.1f}%")
+
+    # Sharpe / Sortino
+    sharpe = snapshot.get("sharpe_ratio")
+    sortino = snapshot.get("sortino_ratio")
+    if sharpe is not None and sortino is not None:
+        lines.append(f"Sharpe: {sharpe:.2f} | Sortino: {sortino:.2f}")
+
+    return "\n".join(lines)
+
+
 def format_valuation_summary(
     stocks: list[dict],
 ) -> str:

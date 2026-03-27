@@ -13,6 +13,8 @@ from datetime import date
 import structlog
 from sqlalchemy import select
 
+import pandas as pd
+
 from src.config import settings
 from src.data.analyze import analyze_stage, set_sentiment_cache
 from src.data.decide import decide_stage
@@ -27,10 +29,15 @@ from src.data.reflect import reflect_stage, run_batch_cross_cutting
 from src.data.report import send_daily_report, send_pipeline_failure_alert
 from src.data.sentiment_fetcher import fetch_sentiment_data
 from src.db.database import async_session_factory
-from src.db.models import Asset, Watchlist
+from src.db.models import Asset, PortfolioRiskSnapshot, PriceHistory, Watchlist
+from src.engines.valuation import IDX_SECTOR_MAP
 from src.llm.news_analyzer import score_news_impact
 from src.logging import setup_logging
 from src.pipeline.runner import PipelineRunner
+from src.risk.concentration import compute_concentration
+from src.risk.correlation import compute_correlation_matrix
+from src.risk.metrics import compute_risk_metrics
+from src.risk.var import compute_historical_var
 
 logger = structlog.get_logger(__name__)
 
@@ -133,6 +140,147 @@ async def _enhanced_ingest_stage(
             logger.exception("dd_computation_error", asset=asset.symbol)
 
 
+async def _compute_daily_risk_snapshot(run_date: date) -> dict | None:
+    """Compute and store the daily portfolio risk snapshot.
+
+    Queries watchlist assets and their price history, computes correlation,
+    VaR, concentration, and risk metrics. Stores a PortfolioRiskSnapshot
+    row (upsert by snapshot_date) and returns a dict for the report.
+    """
+    from datetime import datetime, timedelta
+
+    from sqlalchemy import select
+    from sqlalchemy.dialects.postgresql import insert as pg_insert
+
+    async with async_session_factory() as session:
+        # Query watchlist assets
+        stmt = (
+            select(Asset)
+            .join(Watchlist, Watchlist.asset_id == Asset.id)
+            .order_by(Asset.symbol)
+        )
+        result = await session.execute(stmt)
+        assets_list = result.scalars().all()
+
+        if not assets_list:
+            return None
+
+        # Fetch price history (last 365 days)
+        cutoff = datetime.now() - timedelta(days=365)
+        asset_ids = [a.id for a in assets_list]
+
+        price_stmt = (
+            select(PriceHistory)
+            .where(
+                PriceHistory.asset_id.in_(asset_ids),
+                PriceHistory.time >= cutoff,
+            )
+            .order_by(PriceHistory.asset_id, PriceHistory.time)
+        )
+        price_result = await session.execute(price_stmt)
+        price_rows = price_result.scalars().all()
+
+        if not price_rows:
+            return None
+
+        # Build price_data dict
+        asset_map = {a.id: a for a in assets_list}
+        price_data: dict[str, pd.Series] = {}
+        for row in price_rows:
+            sym = asset_map[row.asset_id].symbol
+            if sym not in price_data:
+                price_data[sym] = pd.Series(dtype=float)
+            price_data[sym] = pd.concat([
+                price_data[sym],
+                pd.Series([row.close], index=[pd.Timestamp(row.time)]),
+            ])
+
+        assets_dicts = [
+            {"symbol": a.symbol, "asset_type": a.asset_type}
+            for a in assets_list
+        ]
+
+        # Compute correlation
+        corr_result = compute_correlation_matrix(price_data)
+        correlation_alerts = list(corr_result.high_pairs)
+
+        # Compute portfolio returns (equal-weight)
+        returns_list = []
+        for sym, series in price_data.items():
+            if len(series) > 1:
+                ret = series.sort_index().pct_change().dropna()
+                returns_list.append(ret)
+
+        var_summary: dict = {}
+        sharpe: float | None = None
+        sortino: float | None = None
+
+        if returns_list:
+            returns_df = pd.concat(returns_list, axis=1).dropna()
+            if not returns_df.empty:
+                portfolio_returns = returns_df.mean(axis=1)
+
+                try:
+                    var_result = compute_historical_var(portfolio_returns)
+                    var_summary = {
+                        "daily_var_95": var_result.daily_var_95,
+                        "daily_var_99": var_result.daily_var_99,
+                        "weekly_var_95": var_result.weekly_var_95,
+                        "weekly_var_99": var_result.weekly_var_99,
+                        "max_drawdown": var_result.max_drawdown,
+                    }
+                except ValueError:
+                    pass
+
+                metrics_result = compute_risk_metrics(portfolio_returns)
+                sharpe = metrics_result.sharpe_ratio
+                sortino = metrics_result.sortino_ratio
+
+        # Compute concentration
+        conc_result = compute_concentration(assets_dicts, IDX_SECTOR_MAP)
+
+        # Build snapshot dict for report
+        snapshot = {
+            "concentration": {
+                "sector_pct": conc_result.sector_pct,
+                "max_single_pct": conc_result.max_single_pct,
+                "idr_pct": conc_result.idr_pct,
+                "usd_pct": conc_result.usd_pct,
+            },
+            "correlation_alerts": correlation_alerts,
+            "var_summary": var_summary,
+            "sharpe_ratio": sharpe,
+            "sortino_ratio": sortino,
+        }
+
+        # Store in DB (upsert by snapshot_date)
+        try:
+            insert_stmt = pg_insert(PortfolioRiskSnapshot).values(
+                snapshot_date=run_date,
+                concentration=snapshot["concentration"],
+                correlation_alerts=[list(a) for a in correlation_alerts],
+                var_summary=var_summary,
+                sharpe_ratio=sharpe,
+                sortino_ratio=sortino,
+            )
+            upsert_stmt = insert_stmt.on_conflict_do_update(
+                constraint="uq_risk_snapshot_date",
+                set_={
+                    "concentration": insert_stmt.excluded.concentration,
+                    "correlation_alerts": insert_stmt.excluded.correlation_alerts,
+                    "var_summary": insert_stmt.excluded.var_summary,
+                    "sharpe_ratio": insert_stmt.excluded.sharpe_ratio,
+                    "sortino_ratio": insert_stmt.excluded.sortino_ratio,
+                },
+            )
+            await session.execute(upsert_stmt)
+            await session.commit()
+        except Exception:
+            logger.exception("risk_snapshot_db_store_error")
+
+        return snapshot
+
+
 async def async_main() -> None:
     """Async entry point for the pipeline."""
     setup_logging(settings.log_level, settings.log_format)
@@ -188,6 +336,13 @@ async def async_main() -> None:
     except Exception:
         logger.exception("discovery_scan_error")
 
+    # Post-pipeline: compute daily risk snapshot (REPT-06)
+    risk_snapshot: dict | None = None
+    try:
+        risk_snapshot = await _compute_daily_risk_snapshot(run_date)
+    except Exception:
+        logger.exception("risk_snapshot_error")
+
     # Post-pipeline: send daily Telegram report (D-15)
     # Report runs after all stages, not as a per-asset StageFunc
     all_failed = all(r.status == "failed" for r in results) if results else True
@@ -195,7 +350,12 @@ async def async_main() -> None:
         await send_pipeline_failure_alert(run_date)
     else:
         async with async_session_factory() as session:
-            await send_daily_report(session, run_date, stage_results=results, discoveries=discovery_results)
+            await send_daily_report(
+                session, run_date,
+                stage_results=results,
+                discoveries=discovery_results,
+                risk_snapshot=risk_snapshot,
+            )
 
 
 def main() -> None:

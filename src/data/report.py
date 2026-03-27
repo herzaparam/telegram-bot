@@ -25,6 +25,7 @@ from src.report.formatter import (
     format_discovery_section,
     format_lessons_applied,
     format_news_digest,
+    format_portfolio_risk_snapshot,
     format_report_header,
     format_scorecard_section,
     format_valuation_summary,
@@ -170,6 +171,7 @@ async def send_daily_report(
     run_date: date,
     stage_results: list | None = None,
     discoveries: list[dict] | None = None,
+    risk_snapshot: dict | None = None,
 ) -> None:
     """Send the daily signal report to all configured Telegram chats.
 
@@ -336,6 +338,15 @@ async def send_daily_report(
         disc_section = format_discovery_section(discoveries)
         if disc_section:
             cards.append(disc_section)
+
+    # Append portfolio risk snapshot if available (REPT-06)
+    if risk_snapshot is not None:
+        try:
+            risk_section = format_portfolio_risk_snapshot(risk_snapshot)
+            if risk_section:
+                cards.append("---\n" + risk_section)
+        except Exception:
+            logger.debug("risk_snapshot_format_failed", exc_info=True)
 
     # Split into messages respecting 4096-char limit
     messages = split_report(header, cards)

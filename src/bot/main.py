@@ -15,6 +15,7 @@ from telegram.ext import Application, CommandHandler
 
 from src.bot.handlers.compare import compare_handler
 from src.bot.handlers.discover import discover_handler
+from src.bot.handlers.portfolio import portfolio_handler
 from src.bot.handlers.duediligence import duediligence_handler
 from src.bot.handlers.fundamentals import fundamentals_handler
 from src.bot.handlers.lessons import lessons_handler
@@ -58,6 +59,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         ptb_app.add_handler(CommandHandler("duediligence", duediligence_handler))
         ptb_app.add_handler(CommandHandler("dd", duediligence_handler))  # alias
         ptb_app.add_handler(CommandHandler("compare", compare_handler))
+        ptb_app.add_handler(CommandHandler("portfolio", portfolio_handler))
 
         async with ptb_app:
             await ptb_app.start()
