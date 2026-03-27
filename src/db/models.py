@@ -504,6 +504,43 @@ class MLPrediction(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class PortfolioRiskSnapshot(Base):
+    """Daily pre-computed portfolio risk summary for daily report (REPT-06)."""
+
+    __tablename__ = "portfolio_risk_snapshots"
+    __table_args__ = (UniqueConstraint("snapshot_date", name="uq_risk_snapshot_date"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    snapshot_date: Mapped[date] = mapped_column(Date, nullable=False)
+    concentration: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    correlation_alerts: Mapped[list] = mapped_column(JSONB, nullable=False)
+    var_summary: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    sharpe_ratio: Mapped[float | None] = mapped_column(Float, nullable=True)
+    sortino_ratio: Mapped[float | None] = mapped_column(Float, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class BacktestResult(Base):
+    """Cached backtest output per asset/period (TBOT-08)."""
+
+    __tablename__ = "backtest_results"
+    __table_args__ = (
+        UniqueConstraint("asset_id", "period", "run_date", name="uq_backtest_asset_period_date"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(Integer, ForeignKey("assets.id"), nullable=False)
+    period: Mapped[str] = mapped_column(String(5), nullable=False)
+    run_date: Mapped[date] = mapped_column(Date, nullable=False)
+    win_rate: Mapped[float] = mapped_column(Float, nullable=False)
+    total_return: Mapped[float] = mapped_column(Float, nullable=False)
+    buy_hold_return: Mapped[float] = mapped_column(Float, nullable=False)
+    max_drawdown: Mapped[float] = mapped_column(Float, nullable=False)
+    sharpe_ratio: Mapped[float | None] = mapped_column(Float, nullable=True)
+    daily_results: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 # Seed data for the assets table
 SEED_ASSETS: list[dict[str, str | None]] = [
     # IDX stocks
