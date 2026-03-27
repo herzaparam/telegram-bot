@@ -16,7 +16,13 @@ from telegram.ext import ContextTypes
 from src.bot.auth import is_authorized
 from src.db.database import async_session_factory
 from src.db.models import Asset, FinancialData, FinancialDoc, StockFundamental, Watchlist
-from src.report.formatter import format_fundamentals_dashboard
+from src.report.formatter import (
+    format_dividend_analysis,
+    format_earnings_quality,
+    format_five_year_trends,
+    format_fundamentals_dashboard,
+    split_report,
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -194,4 +200,50 @@ async def fundamentals_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         period=latest_period_key,
         cross_validation_warnings=cross_warnings,
     )
-    await update.message.reply_text(msg, parse_mode="HTML")  # type: ignore[union-attr]
+
+    # Enhanced sections for stock assets only (D-17)
+    enhanced_sections: list[str] = []
+    if asset.asset_type == "stock":
+        # Build financial_data list of dicts for enhanced formatters
+        financial_data_dicts = [
+            {
+                "metric_name": fd.metric_name,
+                "metric_value": fd.metric_value,
+                "period_date": fd.period_date,
+            }
+            for fd in fd_rows
+        ]
+
+        # 5-year trends
+        trends_section = format_five_year_trends(financial_data_dicts)
+        if trends_section:
+            enhanced_sections.append(trends_section)
+
+        # Earnings quality
+        eq_section = format_earnings_quality(financial_data_dicts)
+        if eq_section:
+            enhanced_sections.append(eq_section)
+
+        # Dividend analysis
+        fund_dict: dict = {}
+        if fundamental and isinstance(fundamental.dividend_yield, (int, float)):
+            fund_dict["dividend_yield"] = fundamental.dividend_yield
+        div_section = format_dividend_analysis(fund_dict, financial_data_dicts)
+        if div_section:
+            enhanced_sections.append(div_section)
+    elif asset.asset_type == "crypto":
+        enhanced_sections.append(
+            f"{INFO_EMOJI} Enhanced fundamentals available for IDX stocks only"
+        )
+
+    # Combine and send, using split_report for long messages
+    if enhanced_sections:
+        cards = [msg] + enhanced_sections
+        messages = split_report("", cards)
+        for m in messages:
+            # strip leading newlines from empty header
+            text = m.lstrip("\n")
+            if text:
+                await update.message.reply_text(text, parse_mode="HTML")  # type: ignore[union-attr]
+    else:
+        await update.message.reply_text(msg, parse_mode="HTML")  # type: ignore[union-attr]

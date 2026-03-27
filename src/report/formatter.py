@@ -790,6 +790,182 @@ def format_fundamentals_dashboard(
     return "\n".join(lines)
 
 
+_SPARK_CHARS = " .:-=+*#%@"  # 10 levels low-to-high
+
+
+def _sparkline(values: list[float], width: int = 5) -> str:
+    """Render text sparkline for a list of numeric values."""
+    if not values or all(v == values[0] for v in values):
+        return "-" * min(width, max(len(values), 1))
+    mn, mx = min(values), max(values)
+    rng = mx - mn if mx != mn else 1.0
+    return "".join(
+        _SPARK_CHARS[min(int((v - mn) / rng * (len(_SPARK_CHARS) - 1)), len(_SPARK_CHARS) - 1)]
+        for v in values[-width:]
+    )
+
+
+def format_earnings_quality(financial_data: list[dict]) -> str:
+    """Format earnings quality analysis section.
+
+    Checks: cash flow vs earnings divergence, low CF quality flag.
+    financial_data is list of dicts with keys: metric_name, metric_value, period_date.
+    """
+    if not financial_data:
+        return ""
+
+    CHECK_EMOJI = "\u2705"
+    # Group by period_date, take latest
+    by_period: dict[str, dict[str, float]] = {}
+    for fd in financial_data:
+        pd_key = str(fd.get("period_date", ""))
+        by_period.setdefault(pd_key, {})[fd["metric_name"]] = fd.get("metric_value") or 0.0
+
+    if not by_period:
+        return ""
+
+    latest_key = sorted(by_period.keys(), reverse=True)[0]
+    latest = by_period[latest_key]
+
+    net_profit = latest.get("net_profit", 0.0)
+    operating_cf = latest.get("operating_cash_flow", 0.0)
+
+    if net_profit == 0:
+        cf_ratio = 0.0
+    else:
+        cf_ratio = operating_cf / net_profit
+
+    lines = ["<b>Earnings Quality</b>"]
+
+    # CF/Earnings ratio
+    if net_profit > 0 and operating_cf < 0:
+        lines.append(
+            f"CF/Earnings ratio: {cf_ratio:.2f} {WARNING_EMOJI}"
+        )
+        lines.append(f"{WARNING_EMOJI} Positive earnings but negative operating cash flow")
+    elif cf_ratio < 0.5 and net_profit > 0:
+        lines.append(
+            f"CF/Earnings ratio: {cf_ratio:.2f} {WARNING_EMOJI}"
+        )
+        lines.append(f"{WARNING_EMOJI} Cash flow significantly below reported earnings")
+    else:
+        lines.append(f"CF/Earnings ratio: {cf_ratio:.2f} {CHECK_EMOJI}")
+
+    return "\n".join(lines)
+
+
+def format_dividend_analysis(fundamental: dict, financial_data: list[dict]) -> str:
+    """Format dividend analysis section.
+
+    Args:
+        fundamental: Dict with dividend_yield key.
+        financial_data: List of metric dicts for FCF coverage computation.
+    """
+    div_yield = fundamental.get("dividend_yield")
+    if div_yield is None:
+        return ""
+
+    lines = ["<b>Dividend Analysis</b>"]
+    lines.append(f"Yield: {div_yield * 100:.1f}%")
+
+    # Compute FCF coverage from latest period
+    fcf_coverage_str = "N/A"
+    if financial_data:
+        by_period: dict[str, dict[str, float]] = {}
+        for fd in financial_data:
+            pd_key = str(fd.get("period_date", ""))
+            by_period.setdefault(pd_key, {})[fd["metric_name"]] = fd.get("metric_value") or 0.0
+
+        if by_period:
+            latest_key = sorted(by_period.keys(), reverse=True)[0]
+            latest = by_period[latest_key]
+            fcf = latest.get("free_cash_flow", 0.0)
+            dividends = latest.get("dividends_paid", 0.0)
+            if dividends != 0 and fcf != 0:
+                coverage = fcf / abs(dividends)
+                fcf_coverage_str = f"{coverage:.1f}x"
+
+    lines.append(f"FCF Coverage: {fcf_coverage_str}")
+
+    return "\n".join(lines)
+
+
+def format_five_year_trends(financial_data: list[dict]) -> str:
+    """Format 5-year ratio trends with sparklines.
+
+    Groups data by year, computes annual averages for key ratios.
+    Returns sparkline visualization per ratio category.
+    """
+    if not financial_data:
+        return ""
+
+    # Group by year
+    by_year: dict[int, dict[str, list[float]]] = {}
+    for fd in financial_data:
+        pd_val = fd.get("period_date")
+        if pd_val is None:
+            continue
+        year = pd_val.year if hasattr(pd_val, "year") else int(str(pd_val)[:4])
+        metric = fd["metric_name"]
+        value = fd.get("metric_value")
+        if value is not None:
+            by_year.setdefault(year, {}).setdefault(metric, []).append(value)
+
+    sorted_years = sorted(by_year.keys())
+    if len(sorted_years) < 2:
+        return f"<b>5-Year Trends</b>\n{INFO_EMOJI} Insufficient historical data for trends"
+
+    # Compute annual averages
+    annual_avgs: dict[str, list[float]] = {}
+    for year in sorted_years:
+        metrics = by_year[year]
+        for metric, values in metrics.items():
+            avg = sum(values) / len(values)
+            annual_avgs.setdefault(metric, []).append(avg)
+
+    lines = ["<b>5-Year Trends</b>"]
+
+    # Profitability
+    prof_metrics = [
+        ("gross_margin", "Gross Margin"),
+        ("operating_margin", "Op Margin"),
+        ("roe", "ROE"),
+    ]
+    prof_found = False
+    for key, label in prof_metrics:
+        if key in annual_avgs and len(annual_avgs[key]) >= 2:
+            vals = annual_avgs[key]
+            spark = _sparkline(vals, width=min(5, len(vals)))
+            current = vals[-1]
+            lines.append(f"{label}: {spark} {current * 100:.1f}%")
+            prof_found = True
+
+    # Leverage
+    if "debt_equity" in annual_avgs and len(annual_avgs["debt_equity"]) >= 2:
+        vals = annual_avgs["debt_equity"]
+        spark = _sparkline(vals, width=min(5, len(vals)))
+        current = vals[-1]
+        lines.append(f"D/E: {spark} {current:.2f}")
+
+    # Growth (YoY changes)
+    for key, label in [("revenue", "Revenue"), ("net_profit", "Net Profit")]:
+        if key in annual_avgs and len(annual_avgs[key]) >= 2:
+            vals = annual_avgs[key]
+            yoy_changes = [
+                (vals[i] - vals[i - 1]) / abs(vals[i - 1]) if vals[i - 1] != 0 else 0
+                for i in range(1, len(vals))
+            ]
+            if yoy_changes:
+                spark = _sparkline(yoy_changes, width=min(5, len(yoy_changes)))
+                current_yoy = yoy_changes[-1]
+                lines.append(f"{label} YoY: {spark} {current_yoy * 100:+.1f}%")
+
+    if len(lines) == 1:
+        lines.append(f"{INFO_EMOJI} Insufficient data for trend visualization")
+
+    return "\n".join(lines)
+
+
 def format_portfolio_risk_snapshot(snapshot: dict) -> str:
     """Format a compact portfolio risk snapshot card for the daily report.
 
