@@ -68,4 +68,4 @@ The daily signal loop must work reliably: fetch data, run engines, produce LLM v
 | asyncpg for hot paths, SQLAlchemy for relational | Raw asyncpg ~0.1ms/query for price reads, SQLAlchemy for type safety elsewhere | — Pending |
 
 ---
-*Last updated: 2026-03-29 after Phase 14 (Pipeline Runner Wiring Fixes) completion*
+*Last updated: 2026-03-29 after Phase 15 (Prometheus Metrics Instrumentation) completion*
