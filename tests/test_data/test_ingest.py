@@ -403,6 +403,111 @@ class TestIngestStage:
 
             mock_failure.assert_awaited_once_with(mock_session, "yfinance")
 
+    @pytest.mark.asyncio
+    async def test_fetch_success_increments_metric(self) -> None:
+        """FETCH_SUCCESS metric is incremented after a successful fetch."""
+        asset = _make_asset("stock")
+        rows = _make_rows(3)
+        mock_session = AsyncMock()
+        mock_conn = AsyncMock()
+
+        with (
+            patch("src.data.ingest.IDXStockFetcher") as MockFetcher,
+            patch("src.data.ingest.asyncpg.connect", return_value=mock_conn),
+            patch("src.data.ingest.get_latest_date", return_value=datetime(2026, 3, 19, 0, 0, tzinfo=timezone.utc)),
+            patch("src.data.ingest.validate_rows", return_value=ValidationResult(valid=rows, rejected=[])),
+            patch("src.data.ingest.upsert_prices", return_value=3),
+            patch("src.data.ingest.check_staleness"),
+            patch("src.data.ingest._read_backoff_state", return_value=(1.0, 0)),
+            patch("src.data.ingest._update_backoff_success"),
+            patch("src.data.ingest._should_weekly_refresh", return_value=False),
+            patch("src.data.ingest.settings") as mock_settings,
+            patch("src.data.ingest.FETCH_SUCCESS") as mock_metric,
+        ):
+            mock_settings.database_url = "postgresql+asyncpg://test:test@localhost/test"
+            fetcher_instance = AsyncMock()
+            fetcher_instance.fetch = AsyncMock(return_value=rows)
+            fetcher_instance.source_name = "yfinance"
+            MockFetcher.return_value = fetcher_instance
+
+            from src.data.ingest import ingest_stage
+
+            await ingest_stage(mock_session, asset)
+
+            mock_metric.labels.assert_called_with(source="yfinance", asset_type="stock")
+            mock_metric.labels().inc.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_fetch_failure_increments_metric(self) -> None:
+        """FETCH_FAILURE metric is incremented after a failed fetch."""
+        from src.pipeline.tiers import SourceCriticalError
+
+        asset = _make_asset("stock")
+        mock_session = AsyncMock()
+        mock_conn = AsyncMock()
+
+        with (
+            patch("src.data.ingest.IDXStockFetcher") as MockFetcher,
+            patch("src.data.ingest.asyncpg.connect", return_value=mock_conn),
+            patch("src.data.ingest.get_latest_date", return_value=datetime(2026, 3, 19, 0, 0, tzinfo=timezone.utc)),
+            patch("src.data.ingest._read_backoff_state", return_value=(1.0, 0)),
+            patch("src.data.ingest._update_backoff_failure"),
+            patch("src.data.ingest._should_weekly_refresh", return_value=False),
+            patch("src.data.ingest.settings") as mock_settings,
+            patch("src.data.ingest.FETCH_FAILURE") as mock_metric,
+        ):
+            mock_settings.database_url = "postgresql+asyncpg://test:test@localhost/test"
+            fetcher_instance = AsyncMock()
+            fetcher_instance.fetch = AsyncMock(side_effect=Exception("API down"))
+            fetcher_instance.source_name = "yfinance"
+            MockFetcher.return_value = fetcher_instance
+
+            from src.data.ingest import ingest_stage
+
+            with pytest.raises(SourceCriticalError):
+                await ingest_stage(mock_session, asset)
+
+            mock_metric.labels.assert_called_with(source="yfinance", asset_type="stock")
+            mock_metric.labels().inc.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_data_freshness_hours_set_after_ingest(self) -> None:
+        """DATA_FRESHNESS_HOURS gauge is set with hours since latest data after ingest."""
+        asset = _make_asset("stock")
+        rows = _make_rows(3)
+        mock_session = AsyncMock()
+        mock_conn = AsyncMock()
+
+        two_hours_ago = datetime.now(timezone.utc) - timedelta(hours=2)
+
+        with (
+            patch("src.data.ingest.IDXStockFetcher") as MockFetcher,
+            patch("src.data.ingest.asyncpg.connect", return_value=mock_conn),
+            patch("src.data.ingest.get_latest_date", return_value=two_hours_ago),
+            patch("src.data.ingest.validate_rows", return_value=ValidationResult(valid=rows, rejected=[])),
+            patch("src.data.ingest.upsert_prices", return_value=3),
+            patch("src.data.ingest.check_staleness"),
+            patch("src.data.ingest._read_backoff_state", return_value=(1.0, 0)),
+            patch("src.data.ingest._update_backoff_success"),
+            patch("src.data.ingest._should_weekly_refresh", return_value=False),
+            patch("src.data.ingest.settings") as mock_settings,
+            patch("src.data.ingest.DATA_FRESHNESS_HOURS") as mock_metric,
+        ):
+            mock_settings.database_url = "postgresql+asyncpg://test:test@localhost/test"
+            fetcher_instance = AsyncMock()
+            fetcher_instance.fetch = AsyncMock(return_value=rows)
+            fetcher_instance.source_name = "yfinance"
+            MockFetcher.return_value = fetcher_instance
+
+            from src.data.ingest import ingest_stage
+
+            await ingest_stage(mock_session, asset)
+
+            mock_metric.labels.assert_called_with(asset_type="stock")
+            # Check that set() was called with a value close to 2.0
+            set_call_args = mock_metric.labels().set.call_args[0]
+            assert abs(set_call_args[0] - 2.0) < 0.1
+
     def test_backfill_cli_parses_args(self) -> None:
         """backfill CLI parses --from and --to arguments correctly."""
         from src.data.backfill import parse_args

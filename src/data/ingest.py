@@ -28,6 +28,7 @@ from src.data.validation import validate_rows
 from src.db.models import Asset, BackoffState, FinancialData, FinancialDoc
 from src.db.price_repo import get_latest_date, upsert_prices
 from src.llm.doc_parser import parse_financial_doc
+from src.monitoring.metrics import DATA_FRESHNESS_HOURS, FETCH_FAILURE, FETCH_SUCCESS
 from src.pipeline.tiers import handle_source_failure
 
 logger = structlog.get_logger(__name__)
@@ -314,10 +315,12 @@ async def ingest_stage(session: AsyncSession, asset: Asset) -> None:
             )
             # Update backoff state on success
             await _update_backoff_success(session, fetcher.source_name)
+            FETCH_SUCCESS.labels(source=fetcher.source_name, asset_type=asset.asset_type).inc()
         except Exception as exc:
             # Update backoff state on failure
             await _update_backoff_failure(session, fetcher.source_name)
             _alert_collector.add_fetch_failure(asset.symbol, str(exc))
+            FETCH_FAILURE.labels(source=fetcher.source_name, asset_type=asset.asset_type).inc()
             # price_ohlcv is CRITICAL tier -- raises SourceCriticalError
             handle_source_failure("price_ohlcv", exc)
             return  # unreachable due to raise, but satisfies type checker
@@ -341,6 +344,9 @@ async def ingest_stage(session: AsyncSession, asset: Asset) -> None:
 
         # Check staleness after upsert
         latest_after = await get_latest_date(conn, asset.id)
+        if latest_after is not None:
+            freshness_hours = (datetime.now(UTC) - latest_after).total_seconds() / 3600
+            DATA_FRESHNESS_HOURS.labels(asset_type=asset.asset_type).set(freshness_hours)
         staleness = check_staleness(
             asset.symbol, asset.asset_type, latest_after
         )
