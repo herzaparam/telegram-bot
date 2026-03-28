@@ -254,7 +254,10 @@ Plans:
   1. Running the pipeline without --stage flags executes all registered stages including reflect (lesson extraction)
   2. The reflect stage uses its configured 120s timeout instead of the 60s default
   3. The runner's default stage list contains no entries that lack a corresponding StageFunc
-**Plans**: 0 plans
+**Plans**: 1 plan
+
+Plans:
+- [ ] 14-01-PLAN.md — Fix default stage list, reflect timeout mapping, fail-fast stage validation
 
 ### Phase 15: Prometheus Metrics Instrumentation
 **Goal:** All defined Prometheus metrics are emitted by the application code — Grafana dashboards show real data for fetch rates, engine durations, data freshness, and bot request counts
