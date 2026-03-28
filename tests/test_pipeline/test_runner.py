@@ -395,3 +395,80 @@ class TestCLIArgParsing:
         parser = build_parser()
         args = parser.parse_args([])
         assert args.date is None
+
+
+class TestDefaultStagesDerivedFromStageFuncs:
+    """Default stages derived from stage_funcs keys when stages=None."""
+
+    async def test_default_stages_derived_from_stage_funcs(
+        self, runner, run_date, seeded_session_factory
+    ):
+        """When stages=None, run_pipeline executes all stage_funcs keys in order."""
+        call_order: list[str] = []
+
+        async def make_func(name: str):
+            async def _func(session: AsyncSession, asset: Asset) -> None:
+                if name not in call_order:
+                    call_order.append(name)
+            return _func
+
+        stage_funcs = {
+            "evaluate": await make_func("evaluate"),
+            "reflect": await make_func("reflect"),
+            "fetch": await make_func("fetch"),
+            "analyze": await make_func("analyze"),
+            "decide": await make_func("decide"),
+        }
+
+        results = await runner.run_pipeline(
+            run_date=run_date,
+            stages=None,
+            stage_funcs=stage_funcs,
+        )
+
+        assert len(results) == 5
+        assert call_order == ["evaluate", "reflect", "fetch", "analyze", "decide"]
+
+    async def test_default_stages_empty_when_no_stage_funcs(
+        self, runner, run_date, seeded_session_factory
+    ):
+        """When stages=None and stage_funcs={}, no stages execute."""
+        results = await runner.run_pipeline(
+            run_date=run_date,
+            stages=None,
+            stage_funcs={},
+        )
+        assert results == []
+
+
+class TestGetTimeoutReflect:
+    """_get_timeout returns configured timeout for reflect stage."""
+
+    def test_get_timeout_reflect_returns_configured_value(self, runner):
+        """_get_timeout('reflect') returns settings.timeout_reflect (120), not 60."""
+        with patch("src.pipeline.runner.settings") as mock_settings:
+            mock_settings.timeout_reflect = 120
+            mock_settings.timeout_evaluate = 60
+            mock_settings.timeout_fetch = 300
+            mock_settings.timeout_analyze = 60
+            mock_settings.timeout_llm = 30
+            timeout = runner._get_timeout("reflect")
+        assert timeout == 120
+
+
+class TestInvalidStageRaisesValueError:
+    """Invalid stage names cause immediate ValueError."""
+
+    async def test_invalid_stage_raises_valueerror(
+        self, runner, run_date, seeded_session_factory
+    ):
+        """stages list with name not in stage_funcs raises ValueError."""
+        async def mock_fetch(session: AsyncSession, asset: Asset) -> None:
+            pass
+
+        with pytest.raises(ValueError, match="nonexistent"):
+            await runner.run_pipeline(
+                run_date=run_date,
+                stages=["nonexistent"],
+                stage_funcs={"fetch": mock_fetch},
+            )
