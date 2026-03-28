@@ -88,6 +88,7 @@ class Settings(BaseSettings):
     # Monitoring (Phase 13)
     prometheus_pushgateway_url: str = ""
     grafana_admin_password: str = "admin"
+    telegram_monitoring_bot_token: str = ""
     telegram_monitoring_chat_id: str = ""
 
 

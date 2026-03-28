@@ -18,8 +18,8 @@ jobs:
       - name: Send start notification
         uses: appleboy/telegram-action@master
         with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          to: ${{ secrets.TELEGRAM_MONITORING_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_MONITORING_BOT_TOKEN }}
           format: markdown
           message: |
             🚀 *Deploy started*
@@ -79,8 +79,8 @@ jobs:
       - name: Send result notification
         uses: appleboy/telegram-action@master
         with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          to: ${{ secrets.TELEGRAM_MONITORING_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_MONITORING_BOT_TOKEN }}
           format: markdown
           message: |
             ${{ (needs.build.result == 'success' && needs.deploy.result == 'success') && '✅ *Deploy successful*' || '❌ *Deploy failed*' }}
