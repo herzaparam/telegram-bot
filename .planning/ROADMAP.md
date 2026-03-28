@@ -24,6 +24,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 10: Remaining Specialized Engines** - ML/AI, on-chain, options, behavioral, quantitative, network, game theory, and emerging methods engines (completed 2013-03-26)
 - [ ] **Phase 11: Asset Discovery + Due Diligence** - IHSG and crypto scanning, sector benchmarking, insider tracking, /discover and /duediligence commands
 - [x] **Phase 12: Portfolio Risk + Advanced Commands** - Correlation matrix, VaR, stress testing, enhanced fundamentals, /portfolio and /backtest commands (completed 2013-03-27)
+- [x] **Phase 13: Server and App Monitoring** - Prometheus metrics, Grafana dashboards, alerting, Docker Compose monitoring stack (completed 2026-03-28)
+- [ ] **Phase 14: Pipeline Runner Wiring Fixes** - Fix reflect stage default inclusion, timeout mapping, runner stage list consistency (gap closure)
+- [ ] **Phase 15: Prometheus Metrics Instrumentation** - Wire orphaned metrics into application code for full Grafana visibility (gap closure)
 
 ## Phase Details
 
@@ -240,3 +243,28 @@ Plans:
 - [x] 13-01-PLAN.md — Prometheus metrics module, /metrics endpoint on bot, pushgateway helper, config settings
 - [ ] 13-02-PLAN.md — Instrument pipeline runner and LLM client, push metrics to Pushgateway
 - [x] 13-03-PLAN.md — Docker Compose monitoring services, Prometheus config, Grafana dashboards and alerting
+
+
+### Phase 14: Pipeline Runner Wiring Fixes
+**Goal:** The pipeline runner's default stage list includes all registered stages and each stage uses its configured timeout — the daily pipeline runs the full loop including lesson extraction without manual stage flags
+**Depends on:** Phase 13
+**Requirements**: EVAL-02
+**Gap Closure:** Closes gaps from v1.0 audit (reflect stage wiring, timeout mapping, broken daily pipeline flow)
+**Success Criteria** (what must be TRUE):
+  1. Running the pipeline without --stage flags executes all registered stages including reflect (lesson extraction)
+  2. The reflect stage uses its configured 120s timeout instead of the 60s default
+  3. The runner's default stage list contains no entries that lack a corresponding StageFunc
+**Plans**: 0 plans
+
+### Phase 15: Prometheus Metrics Instrumentation
+**Goal:** All defined Prometheus metrics are emitted by the application code — Grafana dashboards show real data for fetch rates, engine durations, data freshness, and bot request counts
+**Depends on:** Phase 14
+**Requirements**: MON-09, MON-10
+**Gap Closure:** Closes gaps from v1.0 audit (5 orphaned Prometheus metrics never emitted)
+**Success Criteria** (what must be TRUE):
+  1. FETCH_SUCCESS and FETCH_FAILURE counters increment on every data fetch operation (IDX stocks, crypto)
+  2. ENGINE_DURATION histogram records execution time for each engine's analyze() call
+  3. DATA_FRESHNESS_HOURS gauge is set after ingest stage completes with hours since last fresh data
+  4. BOT_REQUEST_COUNT counter increments on every Telegram webhook request
+  5. Grafana System Overview and Pipeline Health dashboards show non-empty panels for all metrics
+**Plans**: 0 plans

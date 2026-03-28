@@ -50,7 +50,7 @@
 ### Self-Evaluation
 
 - [x] **EVAL-01**: System reviews yesterday's decisions against actual prices every morning
-- [x] **EVAL-02**: LLM analyzes what went right/wrong and why
+- [ ] **EVAL-02**: LLM analyzes what went right/wrong and why
 - [x] **EVAL-03**: System extracts concrete lessons and stores in database
 - [x] **EVAL-04**: Lessons feed into future LLM decisions automatically
 - [x] **EVAL-05**: System tracks accuracy stats over time (win rate, best/worst engine)
@@ -124,6 +124,20 @@
 - [x] **DISC-03**: Recommend new assets based on signal strength
 - [x] **DISC-04**: "New Opportunities" section in daily report
 
+### Monitoring
+
+- [x] **MON-01**: Prometheus metric definitions for pipeline, LLM, fetch, engine, and bot operations
+- [x] **MON-02**: Bot exposes /metrics endpoint returning Prometheus text format
+- [x] **MON-03**: Pipeline pushes metrics to Pushgateway after each run
+- [x] **MON-04**: Pipeline stage duration and status metrics emitted per run
+- [x] **MON-05**: LLM call count and latency metrics with fallback labels
+- [x] **MON-06**: Pipeline last success timestamp metric pushed after completion
+- [x] **MON-07**: Prometheus scrape config for bot, Pushgateway, and node_exporter targets
+- [x] **MON-08**: Grafana provisioning (datasources, dashboards, alerts) auto-loaded on startup
+- [ ] **MON-09**: Grafana System Overview dashboard shows real data for all metric panels
+- [ ] **MON-10**: Grafana Pipeline Health dashboard shows real data for all metric panels
+- [x] **MON-11**: Alert rules fire Telegram notifications for pipeline failure, high resources, service down, data staleness
+
 ### Enhanced Fundamentals
 
 - [x] **FUND-01**: Ratio dashboard per stock (profitability, leverage, efficiency, growth — 5-year trends)
@@ -186,7 +200,7 @@
 | LLM-05 | Phase 4 | Complete |
 | LLM-06 | Phase 11 | Complete |
 | EVAL-01 | Phase 6 | Complete |
-| EVAL-02 | Phase 7 | Complete |
+| EVAL-02 | Phase 14 | Pending |
 | EVAL-03 | Phase 7 | Complete |
 | EVAL-04 | Phase 7 | Complete |
 | EVAL-05 | Phase 6 | Complete |
@@ -238,11 +252,23 @@
 | FUND-01 | Phase 12 | Complete |
 | FUND-02 | Phase 12 | Complete |
 | FUND-03 | Phase 12 | Complete |
+| MON-01 | Phase 13 | Complete |
+| MON-02 | Phase 13 | Complete |
+| MON-03 | Phase 13 | Complete |
+| MON-04 | Phase 13 | Complete |
+| MON-05 | Phase 13 | Complete |
+| MON-06 | Phase 13 | Complete |
+| MON-07 | Phase 13 | Complete |
+| MON-08 | Phase 13 | Complete |
+| MON-09 | Phase 15 | Pending |
+| MON-10 | Phase 15 | Pending |
+| MON-11 | Phase 13 | Complete |
 
 **Coverage:**
-- v1 requirements: 83 total
-- Mapped to phases: 83
+- v1 requirements: 94 total (83 original + 11 MON)
+- Mapped to phases: 94
 - Unmapped: 0
+- Pending: 3 (EVAL-02, MON-09, MON-10)
 
 ---
 *Requirements defined: 2026-03-23*
