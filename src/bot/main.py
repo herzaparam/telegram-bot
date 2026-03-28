@@ -11,6 +11,9 @@ import structlog
 import uvicorn
 from fastapi import FastAPI, Request, Response
 from prometheus_client import make_asgi_app
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response as StarletteResponse
 from telegram import Update
 from telegram.ext import Application, CommandHandler
 
@@ -29,6 +32,7 @@ from src.bot.handlers.valuation import valuation_handler
 from src.bot.handlers.watchlist import add_handler, remove_handler, watchlist_handler
 from src.config import settings
 from src.logging import setup_logging
+from src.monitoring.metrics import BOT_REQUEST_COUNT
 
 logger = structlog.get_logger(__name__)
 
@@ -82,7 +86,23 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     ptb_app = None
 
 
+class MetricsMiddleware(BaseHTTPMiddleware):
+    """Count all HTTP requests for Prometheus BOT_REQUEST_COUNT metric."""
+
+    async def dispatch(
+        self, request: StarletteRequest, call_next
+    ) -> StarletteResponse:
+        response = await call_next(request)
+        BOT_REQUEST_COUNT.labels(
+            method=request.method,
+            endpoint=request.url.path,
+            status=str(response.status_code),
+        ).inc()
+        return response
+
+
 app = FastAPI(title="Trade Agent Bot", docs_url=None, redoc_url=None, lifespan=lifespan)
+app.add_middleware(MetricsMiddleware)
 
 # Prometheus metrics endpoint (per D-02, D-04)
 metrics_app = make_asgi_app()
