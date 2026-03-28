@@ -26,7 +26,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12: Portfolio Risk + Advanced Commands** - Correlation matrix, VaR, stress testing, enhanced fundamentals, /portfolio and /backtest commands (completed 2013-03-27)
 - [x] **Phase 13: Server and App Monitoring** - Prometheus metrics, Grafana dashboards, alerting, Docker Compose monitoring stack (completed 2026-03-28)
 - [x] **Phase 14: Pipeline Runner Wiring Fixes** - Fix reflect stage default inclusion, timeout mapping, runner stage list consistency (gap closure) (completed 2026-03-28)
-- [ ] **Phase 15: Prometheus Metrics Instrumentation** - Wire orphaned metrics into application code for full Grafana visibility (gap closure)
+- [x] **Phase 15: Prometheus Metrics Instrumentation** - Wire orphaned metrics into application code for full Grafana visibility (gap closure) (completed 2026-03-28)
 
 ## Phase Details
 
@@ -273,5 +273,5 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 15-01-PLAN.md — Pipeline metrics: FETCH_SUCCESS/FAILURE counters, ENGINE_DURATION histogram, DATA_FRESHNESS_HOURS gauge
+- [x] 15-01-PLAN.md — Pipeline metrics: FETCH_SUCCESS/FAILURE counters, ENGINE_DURATION histogram, DATA_FRESHNESS_HOURS gauge
 - [x] 15-02-PLAN.md — Bot metrics: BOT_REQUEST_COUNT middleware for HTTP request counting

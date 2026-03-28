@@ -135,7 +135,7 @@
 - [x] **MON-07**: Prometheus scrape config for bot, Pushgateway, and node_exporter targets
 - [x] **MON-08**: Grafana provisioning (datasources, dashboards, alerts) auto-loaded on startup
 - [x] **MON-09**: Grafana System Overview dashboard shows real data for all metric panels
-- [ ] **MON-10**: Grafana Pipeline Health dashboard shows real data for all metric panels
+- [x] **MON-10**: Grafana Pipeline Health dashboard shows real data for all metric panels
 - [x] **MON-11**: Alert rules fire Telegram notifications for pipeline failure, high resources, service down, data staleness
 
 ### Enhanced Fundamentals
@@ -261,7 +261,7 @@
 | MON-07 | Phase 13 | Complete |
 | MON-08 | Phase 13 | Complete |
 | MON-09 | Phase 15 | Complete |
-| MON-10 | Phase 15 | Pending |
+| MON-10 | Phase 15 | Complete |
 | MON-11 | Phase 13 | Complete |
 
 **Coverage:**
