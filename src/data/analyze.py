@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import gc
+import time
 from datetime import date, datetime, timedelta
 
 import pandas as pd
@@ -11,6 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.models import Asset, FinancialData, MacroData, NewsEvent, PriceHistory, StockFundamental
+from src.monitoring.metrics import ENGINE_DURATION
 from src.db.signal_repo import signal_repo
 from src.engines.base import BaseEngine, Signal
 from src.engines.event import EventEngine
@@ -568,6 +570,7 @@ async def analyze_stage(session: AsyncSession, asset: Asset) -> None:
     signals: list[Signal] = []
 
     for engine in engines:
+        _engine_start = time.monotonic()
         try:
             signal = engine.analyze(asset.id, asset.symbol, df)
             signals.append(signal)
@@ -580,6 +583,9 @@ async def analyze_stage(session: AsyncSession, asset: Asset) -> None:
         except Exception as exc:
             log.warning("engine_failed", engine=engine.category, error=str(exc))
             signals.append(_failed_signal(engine.category, str(exc)))
+        finally:
+            _engine_duration = time.monotonic() - _engine_start
+            ENGINE_DURATION.labels(engine_name=engine.category).observe(_engine_duration)
 
     # 4. Store signals in one transaction
     if signals:

@@ -349,6 +349,108 @@ class TestAllEnginesProduceValidSignal:
             assert isinstance(signal.reasoning, str) and len(signal.reasoning) > 0
 
 
+class TestEngineDurationMetric:
+    @pytest.mark.asyncio
+    async def test_engine_duration_metric_observed(self, mock_stock_asset):
+        """ENGINE_DURATION histogram is observed for each engine after analyze."""
+        session = AsyncMock()
+        df = pd.DataFrame({
+            "open": [100.0] * 30,
+            "high": [105.0] * 30,
+            "low": [95.0] * 30,
+            "close": [102.0] * 30,
+            "volume": [1000.0] * 30,
+        }, index=pd.date_range("2026-01-01", periods=30, freq="B", tz="UTC"))
+
+        with patch(
+            "src.data.analyze._load_price_dataframe",
+            return_value=df,
+        ), patch(
+            "src.data.analyze._load_fundamentals", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_latest_macro", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_recent_news", new_callable=AsyncMock, return_value=[],
+        ), patch(
+            "src.data.analyze._load_financial_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_peer_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_onchain_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_github_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._compute_correlation_data", new_callable=AsyncMock, return_value=None,
+        ), patch("src.data.analyze.signal_repo") as mock_repo, patch(
+            "src.data.analyze.ENGINE_DURATION"
+        ) as mock_metric:
+            mock_repo.upsert_signals = AsyncMock(return_value=13)
+            await analyze_stage(session, mock_stock_asset)
+
+            # ENGINE_DURATION.labels().observe() should be called for each engine
+            assert mock_metric.labels.call_count == 13  # 13 stock engines
+            # Each call should pass engine_name kwarg
+            for call in mock_metric.labels.call_args_list:
+                assert "engine_name" in call.kwargs
+            # observe() should be called with a positive float
+            for call in mock_metric.labels().observe.call_args_list:
+                assert call.args[0] >= 0.0
+
+    @pytest.mark.asyncio
+    async def test_engine_duration_metric_on_failure(self, mock_stock_asset):
+        """ENGINE_DURATION is still observed even when engine.analyze() raises."""
+        session = AsyncMock()
+        df = pd.DataFrame({
+            "open": [100.0] * 30,
+            "high": [105.0] * 30,
+            "low": [95.0] * 30,
+            "close": [102.0] * 30,
+            "volume": [1000.0] * 30,
+        }, index=pd.date_range("2026-01-01", periods=30, freq="B", tz="UTC"))
+
+        with patch(
+            "src.data.analyze._load_price_dataframe",
+            return_value=df,
+        ), patch(
+            "src.data.analyze._load_fundamentals", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_latest_macro", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_recent_news", new_callable=AsyncMock, return_value=[],
+        ), patch(
+            "src.data.analyze._load_financial_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_peer_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_onchain_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._load_github_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze._compute_correlation_data", new_callable=AsyncMock, return_value=None,
+        ), patch(
+            "src.data.analyze.TechnicalEngine"
+        ) as MockTech, patch(
+            "src.data.analyze.signal_repo"
+        ) as mock_repo, patch(
+            "src.data.analyze.ENGINE_DURATION"
+        ) as mock_metric:
+            mock_engine = MagicMock()
+            mock_engine.category = "technical"
+            mock_engine.supports_stocks = True
+            mock_engine.supports_crypto = True
+            mock_engine.analyze.side_effect = RuntimeError("crash")
+            MockTech.return_value = mock_engine
+
+            mock_repo.upsert_signals = AsyncMock(return_value=13)
+            await analyze_stage(session, mock_stock_asset)
+
+            # ENGINE_DURATION should still be observed for the failing engine (via finally block)
+            engine_names = [call.kwargs.get("engine_name") for call in mock_metric.labels.call_args_list]
+            assert "technical" in engine_names
+            # observe() should have been called for every engine including the failed one
+            assert mock_metric.labels().observe.call_count == 13
+
+
 class TestEngineCategoriesComplete:
     def test_all_15_categories_covered_across_both_types(self):
         """Combined stock + crypto engines cover all 15 expected categories."""
