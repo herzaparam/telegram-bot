@@ -19,11 +19,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: Telegram Bot + Daily Delivery** - Watchlist management, report commands, scheduled delivery; completes the core daily signal loop
 - [ ] **Phase 6: Accuracy Tracking + Scorecard** - Decision tracking vs actual prices, per-engine stats, /scorecard command; validates signal quality
 - [ ] **Phase 7: Self-Evaluation Feedback Loop** - LLM lesson extraction, lesson injection into decisions, /lessons command; the primary product differentiator
-- [x] **Phase 8: Fundamental, Macro, Sentiment, and News Engines** - Four additional engines that deepen analysis for both asset classes (completed 2026-03-25)
+- [x] **Phase 8: Fundamental, Macro, Sentiment, and News Engines** - Four additional engines that deepen analysis for both asset classes (completed 2013-03-25)
 - [ ] **Phase 9: IDX Documents + Valuation Engine** - PDF laporan keuangan parsing, DCF and peer analysis, /valuation and /fundamentals commands
-- [x] **Phase 10: Remaining Specialized Engines** - ML/AI, on-chain, options, behavioral, quantitative, network, game theory, and emerging methods engines (completed 2026-03-26)
+- [x] **Phase 10: Remaining Specialized Engines** - ML/AI, on-chain, options, behavioral, quantitative, network, game theory, and emerging methods engines (completed 2013-03-26)
 - [ ] **Phase 11: Asset Discovery + Due Diligence** - IHSG and crypto scanning, sector benchmarking, insider tracking, /discover and /duediligence commands
-- [x] **Phase 12: Portfolio Risk + Advanced Commands** - Correlation matrix, VaR, stress testing, enhanced fundamentals, /portfolio and /backtest commands (completed 2026-03-27)
+- [x] **Phase 12: Portfolio Risk + Advanced Commands** - Correlation matrix, VaR, stress testing, enhanced fundamentals, /portfolio and /backtest commands (completed 2013-03-27)
 
 ## Phase Details
 
@@ -222,42 +222,12 @@ Plans:
 - [ ] 12-03-PLAN.md — /backtest command with subprocess pipeline replay and result caching
 **UI hint**: yes
 
-### Phase 13: App Monitoring
-**Goal**: The system self-reports its health — pipeline failures, missed runs, and performance degradation are surfaced via Telegram alerts, an enhanced health endpoint, and a /stats command, with all metrics stored for trend analysis
-**Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12
-**Depends on:** Phase 12
-**Success Criteria** (what must be TRUE):
-  1. Pipeline sends one consolidated Telegram alert at end of each run listing all failures, staleness, and engine crashes — deduplicated per asset
-  2. /health returns DB connectivity status, last pipeline completion timestamp, and bot uptime
-  3. If no pipeline run completes within the expected window, the bot sends a missed-run alert
-  4. /stats shows last 7 days of pipeline performance (duration, assets, tokens, alerts)
-  5. Per-run metrics (timing, counts, token usage) are stored in pipeline_metrics table
-  6. Unhandled exceptions in both processes are captured via global handlers and sent as Telegram alerts
-**Plans**: 3 plans
+### Phase 13: app monitoring prometheus
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 13
+**Plans:** 0 plans
 
 Plans:
-- [ ] 13-01-PLAN.md — DB model, Alembic migration, monitoring module foundation (metrics, alerts, error handlers)
-- [ ] 13-02-PLAN.md — Pipeline instrumentation (metrics capture, alert summary, completion message)
-- [ ] 13-03-PLAN.md — Bot-side monitoring (/health enhancement, missed-run checker, /stats command)
-
-
-## Progress
-
-**Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Planning complete | - |
-| 2. Data Layer | 0/2 | Planning complete | - |
-| 3. Technical Engine + Pipeline Shell | 0/4 | Planning complete | - |
-| 4. LLM Decision Maker | 1/2 | In Progress|  |
-| 5. Telegram Bot + Daily Delivery | 2/3 | In Progress|  |
-| 6. Accuracy Tracking + Scorecard | 0/2 | Planning complete | - |
-| 7. Self-Evaluation Feedback Loop | 0/2 | Planning complete | - |
-| 8. Fundamental, Macro, Sentiment, and News Engines | 4/4 | Complete   | 2026-03-25 |
-| 9. IDX Documents + Valuation Engine | 0/5 | Planned    |  |
-| 10. Remaining Specialized Engines | 4/5 | Complete    | 2026-03-26 |
-| 11. Asset Discovery + Due Diligence | 5/6 | In Progress|  |
-| 12. Portfolio Risk + Advanced Commands | 1/3 | Complete    | 2026-03-27 |
-| 13. App Monitoring | 0/3 | Planning complete | - |
+- [ ] TBD (run /gsd:plan-phase 14 to break down)
