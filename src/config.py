@@ -85,5 +85,10 @@ class Settings(BaseSettings):
     weight_sentiment_fear_greed: float = 0.40
     weight_sentiment_reddit: float = 0.60
 
+    # Monitoring (Phase 13)
+    prometheus_pushgateway_url: str = ""
+    grafana_admin_password: str = "admin"
+    telegram_monitoring_chat_id: str = ""
+
 
 settings = Settings()
