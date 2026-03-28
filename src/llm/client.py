@@ -4,12 +4,14 @@ All LLM calls go through llm_completion(). It never raises -- returns
 LLM_UNAVAILABLE sentinel when all models fail.
 """
 
+import time
 from dataclasses import dataclass
 
 import litellm
 import structlog
 
 from src.config import settings
+from src.monitoring.metrics import LLM_CALL_COUNT, LLM_CALL_DURATION
 
 log = structlog.get_logger()
 
@@ -57,13 +59,21 @@ async def llm_completion(
     if response_format is not None:
         kwargs["response_format"] = response_format
 
+    start = time.monotonic()
     try:
         response = await litellm.acompletion(**kwargs)
+        duration = time.monotonic() - start
+        model_used = response.model or model
+        LLM_CALL_COUNT.labels(model=model_used, is_fallback="false").inc()
+        LLM_CALL_DURATION.labels(model=model_used).observe(duration)
         return LLMResult(
             content=response.choices[0].message.content or "",
-            model_used=response.model or model,
+            model_used=model_used,
         )
     except Exception as exc:
+        duration = time.monotonic() - start
+        LLM_CALL_COUNT.labels(model="none", is_fallback="true").inc()
+        LLM_CALL_DURATION.labels(model=model).observe(duration)
         log.error(
             "llm_all_models_failed",
             model=model,

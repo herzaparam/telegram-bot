@@ -85,5 +85,8 @@ class Settings(BaseSettings):
     weight_sentiment_fear_greed: float = 0.40
     weight_sentiment_reddit: float = 0.60
 
+    # Monitoring
+    prometheus_pushgateway_url: str = ""
+
 
 settings = Settings()
