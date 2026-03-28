@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.config import settings
 from src.db.models import Asset, PipelineAssetRun, PipelineRun
+from src.monitoring.metrics import PIPELINE_DURATION, PIPELINE_STAGE_STATUS
 from src.pipeline.tiers import SourceCriticalError
 
 logger = structlog.get_logger(__name__)
@@ -285,6 +286,11 @@ class PipelineRunner:
             "skipped": result.assets_skipped,
             "duration": f"{result.duration_seconds:.2f}s",
         })
+
+        # Emit Prometheus metrics
+        PIPELINE_DURATION.labels(stage=stage).observe(elapsed)
+        PIPELINE_STAGE_STATUS.labels(stage=stage, status=result.status).inc()
+
         return result
 
     def _get_timeout(self, stage: str) -> int:

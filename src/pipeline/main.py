@@ -33,6 +33,8 @@ from src.db.models import Asset, PortfolioRiskSnapshot, PriceHistory, Watchlist
 from src.engines.valuation import IDX_SECTOR_MAP
 from src.llm.news_analyzer import score_news_impact
 from src.logging import setup_logging
+from src.monitoring.metrics import PIPELINE_LAST_SUCCESS
+from src.monitoring.pushgateway import push_pipeline_metrics
 from src.pipeline.runner import PipelineRunner
 from src.risk.concentration import compute_concentration
 from src.risk.correlation import compute_correlation_matrix
@@ -356,6 +358,15 @@ async def async_main() -> None:
                 discoveries=discovery_results,
                 risk_snapshot=risk_snapshot,
             )
+
+    # Record pipeline success timestamp and push metrics to Pushgateway (D-02)
+    if not all_failed:
+        PIPELINE_LAST_SUCCESS.set_to_current_time()
+
+    try:
+        push_pipeline_metrics()
+    except Exception:
+        logger.exception("pushgateway_push_error")
 
 
 def main() -> None:
