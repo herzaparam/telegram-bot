@@ -55,7 +55,73 @@ services:
       db:
         condition: service_healthy
     env_file: .env
+    environment:
+      - PROMETHEUS_PUSHGATEWAY_URL=http://pushgateway:9091
     profiles: ["pipeline"]
+
+  prometheus:
+    image: prom/prometheus:v2.53.5
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=30d'
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+    depends_on:
+      - bot
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:12.4.0
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_MONITORING_CHAT_ID=${TELEGRAM_MONITORING_CHAT_ID}
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  node_exporter:
+    image: prom/node-exporter:v1.9.1
+    command:
+      - '--path.rootfs=/host'
+      - '--web.listen-address=127.0.0.1:9100'
+    network_mode: host
+    pid: host
+    volumes:
+      - '/:/host:ro,rslave'
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: "0.1"
+    restart: unless-stopped
+
+  pushgateway:
+    image: prom/pushgateway:v1.11.2
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: "0.1"
+    restart: unless-stopped
 
 volumes:
   pgdata:
+  prometheus_data:
