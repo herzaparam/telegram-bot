@@ -10,6 +10,7 @@ from collections.abc import AsyncGenerator
 import structlog
 import uvicorn
 from fastapi import FastAPI, Request, Response
+from prometheus_client import make_asgi_app
 from telegram import Update
 from telegram.ext import Application, CommandHandler
 
@@ -82,6 +83,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
 
 
 app = FastAPI(title="Trade Agent Bot", docs_url=None, redoc_url=None, lifespan=lifespan)
+
+# Prometheus metrics endpoint (per D-02, D-04)
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
 
 
 @app.get("/health")
