@@ -50,7 +50,7 @@
 ### Self-Evaluation
 
 - [x] **EVAL-01**: System reviews yesterday's decisions against actual prices every morning
-- [ ] **EVAL-02**: LLM analyzes what went right/wrong and why
+- [x] **EVAL-02**: LLM analyzes what went right/wrong and why
 - [x] **EVAL-03**: System extracts concrete lessons and stores in database
 - [x] **EVAL-04**: Lessons feed into future LLM decisions automatically
 - [x] **EVAL-05**: System tracks accuracy stats over time (win rate, best/worst engine)
@@ -200,7 +200,7 @@
 | LLM-05 | Phase 4 | Complete |
 | LLM-06 | Phase 11 | Complete |
 | EVAL-01 | Phase 6 | Complete |
-| EVAL-02 | Phase 14 | Pending |
+| EVAL-02 | Phase 14 | Complete |
 | EVAL-03 | Phase 7 | Complete |
 | EVAL-04 | Phase 7 | Complete |
 | EVAL-05 | Phase 6 | Complete |

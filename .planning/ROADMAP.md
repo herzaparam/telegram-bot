@@ -25,7 +25,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 11: Asset Discovery + Due Diligence** - IHSG and crypto scanning, sector benchmarking, insider tracking, /discover and /duediligence commands
 - [x] **Phase 12: Portfolio Risk + Advanced Commands** - Correlation matrix, VaR, stress testing, enhanced fundamentals, /portfolio and /backtest commands (completed 2013-03-27)
 - [x] **Phase 13: Server and App Monitoring** - Prometheus metrics, Grafana dashboards, alerting, Docker Compose monitoring stack (completed 2026-03-28)
-- [ ] **Phase 14: Pipeline Runner Wiring Fixes** - Fix reflect stage default inclusion, timeout mapping, runner stage list consistency (gap closure)
+- [x] **Phase 14: Pipeline Runner Wiring Fixes** - Fix reflect stage default inclusion, timeout mapping, runner stage list consistency (gap closure) (completed 2026-03-28)
 - [ ] **Phase 15: Prometheus Metrics Instrumentation** - Wire orphaned metrics into application code for full Grafana visibility (gap closure)
 
 ## Phase Details
@@ -257,7 +257,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 14-01-PLAN.md — Fix default stage list, reflect timeout mapping, fail-fast stage validation
+- [x] 14-01-PLAN.md — Fix default stage list, reflect timeout mapping, fail-fast stage validation
 
 ### Phase 15: Prometheus Metrics Instrumentation
 **Goal:** All defined Prometheus metrics are emitted by the application code — Grafana dashboards show real data for fetch rates, engine durations, data freshness, and bot request counts

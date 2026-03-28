@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Milestone complete
-stopped_at: Phase 14 context gathered
-last_updated: "2026-03-28T17:46:23.557Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 14-01-PLAN.md
+last_updated: "2026-03-28T17:55:04.523Z"
 progress:
   total_phases: 15
-  completed_phases: 13
-  total_plans: 44
-  completed_plans: 44
+  completed_phases: 14
+  total_plans: 45
+  completed_plans: 45
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** The daily signal loop must work reliably: fetch data, run engines, produce LLM verdicts, and deliver a Telegram report every morning
-**Current focus:** Phase 13 — server-and-app-monitoring-with-prometheus-etc
+**Current focus:** Phase 14 — pipeline-runner-wiring-fixes
 
 ## Current Position
 
-Phase: 13
-Plan: Not started
+Phase: 14 (pipeline-runner-wiring-fixes) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -90,6 +90,7 @@ Plan: Not started
 | Phase 13 P01 | 3min | 2 tasks | 11 files |
 | Phase 13 P03 | 2min | 2 tasks | 9 files |
 | Phase 13 P02 | 4min | 2 tasks | 5 files |
+| Phase 14 P01 | 2min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -203,6 +204,7 @@ Recent decisions affecting current work:
 - [Phase 13]: node_exporter bound to 127.0.0.1:9100; Prometheus reaches via Docker bridge gateway 172.17.0.1
 - [Phase 13]: metrics_path /metrics/ (trailing slash) for FastAPI mount redirect compatibility
 - [Phase 13]: Metrics emitted at end of run_stage after result construction; LLM fallback uses model=none label; push_pipeline_metrics wrapped in try/except
+- [Phase 14]: Default stages derived from stage_funcs.keys() instead of hardcoded list
 
 ### Pending Todos
 
@@ -216,6 +218,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-28T17:46:23.550Z
-Stopped at: Phase 14 context gathered
-Resume file: .planning/phases/14-pipeline-runner-wiring-fixes/14-CONTEXT.md
+Last session: 2026-03-28T17:55:04.519Z
+Stopped at: Completed 14-01-PLAN.md
+Resume file: None
