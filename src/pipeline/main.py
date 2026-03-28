@@ -30,6 +30,8 @@ from src.db.database import async_session_factory
 from src.db.models import Asset, Watchlist
 from src.llm.news_analyzer import score_news_impact
 from src.logging import setup_logging
+from src.monitoring.metrics import PIPELINE_LAST_SUCCESS
+from src.monitoring.pushgateway import push_pipeline_metrics
 from src.pipeline.runner import PipelineRunner
 
 logger = structlog.get_logger(__name__)
@@ -196,6 +198,15 @@ async def async_main() -> None:
     else:
         async with async_session_factory() as session:
             await send_daily_report(session, run_date, stage_results=results, discoveries=discovery_results)
+
+    # Record pipeline success timestamp and push metrics to Pushgateway (D-02)
+    if not all_failed:
+        PIPELINE_LAST_SUCCESS.set_to_current_time()
+
+    try:
+        push_pipeline_metrics()
+    except Exception:
+        logger.exception("pushgateway_push_error")
 
 
 def main() -> None:
