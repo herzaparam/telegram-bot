@@ -270,4 +270,8 @@ Plans:
   3. DATA_FRESHNESS_HOURS gauge is set after ingest stage completes with hours since last fresh data
   4. BOT_REQUEST_COUNT counter increments on every Telegram webhook request
   5. Grafana System Overview and Pipeline Health dashboards show non-empty panels for all metrics
-**Plans**: 0 plans
+**Plans**: 2 plans
+
+Plans:
+- [ ] 15-01-PLAN.md — Pipeline metrics: FETCH_SUCCESS/FAILURE counters, ENGINE_DURATION histogram, DATA_FRESHNESS_HOURS gauge
+- [ ] 15-02-PLAN.md — Bot metrics: BOT_REQUEST_COUNT middleware for HTTP request counting
