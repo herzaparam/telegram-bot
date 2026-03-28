@@ -222,11 +222,29 @@ Plans:
 - [ ] 12-03-PLAN.md — /backtest command with subprocess pipeline replay and result caching
 **UI hint**: yes
 
+### Phase 13: App Monitoring
+**Goal**: The system self-reports its health — pipeline failures, missed runs, and performance degradation are surfaced via Telegram alerts, an enhanced health endpoint, and a /stats command, with all metrics stored for trend analysis
+**Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12
+**Depends on:** Phase 12
+**Success Criteria** (what must be TRUE):
+  1. Pipeline sends one consolidated Telegram alert at end of each run listing all failures, staleness, and engine crashes — deduplicated per asset
+  2. /health returns DB connectivity status, last pipeline completion timestamp, and bot uptime
+  3. If no pipeline run completes within the expected window, the bot sends a missed-run alert
+  4. /stats shows last 7 days of pipeline performance (duration, assets, tokens, alerts)
+  5. Per-run metrics (timing, counts, token usage) are stored in pipeline_metrics table
+  6. Unhandled exceptions in both processes are captured via global handlers and sent as Telegram alerts
+**Plans**: 3 plans
+
+Plans:
+- [ ] 13-01-PLAN.md — DB model, Alembic migration, monitoring module foundation (metrics, alerts, error handlers)
+- [ ] 13-02-PLAN.md — Pipeline instrumentation (metrics capture, alert summary, completion message)
+- [ ] 13-03-PLAN.md — Bot-side monitoring (/health enhancement, missed-run checker, /stats command)
+
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -242,3 +260,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 10. Remaining Specialized Engines | 4/5 | Complete    | 2026-03-26 |
 | 11. Asset Discovery + Due Diligence | 5/6 | In Progress|  |
 | 12. Portfolio Risk + Advanced Commands | 1/3 | Complete    | 2026-03-27 |
+| 13. App Monitoring | 0/3 | Planning complete | - |
