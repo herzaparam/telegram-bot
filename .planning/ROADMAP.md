@@ -274,4 +274,4 @@ Plans:
 
 Plans:
 - [ ] 15-01-PLAN.md — Pipeline metrics: FETCH_SUCCESS/FAILURE counters, ENGINE_DURATION histogram, DATA_FRESHNESS_HOURS gauge
-- [ ] 15-02-PLAN.md — Bot metrics: BOT_REQUEST_COUNT middleware for HTTP request counting
+- [x] 15-02-PLAN.md — Bot metrics: BOT_REQUEST_COUNT middleware for HTTP request counting
