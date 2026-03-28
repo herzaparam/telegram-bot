@@ -92,8 +92,6 @@ Plan: Not started
 
 ### Roadmap Evolution
 
-- Phase 13 added: app monitoring
-- Phase 14 added: app monitoring prometheus
 
 ### Decisions
 

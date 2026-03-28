@@ -222,12 +222,3 @@ Plans:
 - [ ] 12-03-PLAN.md — /backtest command with subprocess pipeline replay and result caching
 **UI hint**: yes
 
-### Phase 13: app monitoring prometheus
-
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 13
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (run /gsd:plan-phase 14 to break down)
