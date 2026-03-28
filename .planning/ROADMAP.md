@@ -234,9 +234,9 @@ Plans:
   3. Grafana auto-loads two dashboards (System Overview, Pipeline Health) from provisioned JSON on container startup
   4. Four critical alert conditions (pipeline failure, high resource usage, service down, data staleness) fire Telegram notifications to the monitoring chat
   5. docker-compose.prod.yml includes prometheus, grafana, node_exporter, and pushgateway services with resource limits
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 
 Plans:
-- [ ] 13-01-PLAN.md — Prometheus metrics module, /metrics endpoint on bot, pushgateway helper, config settings
+- [x] 13-01-PLAN.md — Prometheus metrics module, /metrics endpoint on bot, pushgateway helper, config settings
 - [ ] 13-02-PLAN.md — Instrument pipeline runner and LLM client, push metrics to Pushgateway
-- [ ] 13-03-PLAN.md — Docker Compose monitoring services, Prometheus config, Grafana dashboards and alerting
+- [x] 13-03-PLAN.md — Docker Compose monitoring services, Prometheus config, Grafana dashboards and alerting
