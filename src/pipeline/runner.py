@@ -67,18 +67,24 @@ class PipelineRunner:
         Returns:
             List of StageResult, one per stage executed.
         """
-        if stages is None:
-            stages = ["evaluate", "fetch", "analyze", "decide", "report"]
-
         if stage_funcs is None:
             stage_funcs = {}
 
+        if stages is None:
+            stages = list(stage_funcs.keys())
+            self._log.info("using_default_stages", stages=stages)
+
+        # Validate all stage names have corresponding functions (D-03/D-04)
+        unknown = [s for s in stages if s not in stage_funcs]
+        if unknown:
+            raise ValueError(
+                f"Stage(s) {unknown} not found in stage_funcs. "
+                f"Available: {list(stage_funcs.keys())}"
+            )
+
         results: list[StageResult] = []
         for stage in stages:
-            func = stage_funcs.get(stage)
-            if func is None:
-                self._log.warning("no_stage_func", stage=stage)
-                continue
+            func = stage_funcs[stage]
             result = await self.run_stage(run_date, stage, func, rerun_failed=rerun_failed)
             results.append(result)
 
@@ -304,6 +310,7 @@ class PipelineRunner:
         """
         timeouts: dict[str, int] = {
             "evaluate": settings.timeout_evaluate,
+            "reflect": settings.timeout_reflect,
             "fetch": settings.timeout_fetch,
             "analyze": settings.timeout_analyze,
             "decide": settings.timeout_llm,
