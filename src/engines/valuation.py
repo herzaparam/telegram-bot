@@ -31,7 +31,6 @@ IDX_SECTOR_MAP: dict[str, str] = {
     "TLKM": "telco",
     "EXCL": "telco",
     "ISAT": "telco",
-    "FREN": "telco",
     # Consumer
     "UNVR": "consumer",
     "ICBP": "consumer",

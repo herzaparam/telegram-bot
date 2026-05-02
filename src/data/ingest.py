@@ -271,6 +271,19 @@ async def ingest_stage(session: AsyncSession, asset: Asset) -> None:
 
     # Read adaptive backoff state
     delay_seconds, failures = await _read_backoff_state(session, fetcher.source_name)
+    # Clamp below the per-asset timeout so the sleep itself can't cause a
+    # wait_for timeout (which would skip the fetch entirely and leave the
+    # backoff state frozen — a self-perpetuating deadlock).
+    max_delay = settings.timeout_fetch / 2
+    if delay_seconds > max_delay:
+        log.warning(
+            "backoff_delay_clamped",
+            source=fetcher.source_name,
+            requested=delay_seconds,
+            applied=max_delay,
+            prior_failures=failures,
+        )
+        delay_seconds = max_delay
     if delay_seconds > 1.0:
         log.info(
             "adaptive_backoff_applied",

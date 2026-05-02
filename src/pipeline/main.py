@@ -67,6 +67,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=False,
         help="Reprocess assets with status 'failed'.",
     )
+    parser.add_argument(
+        "--skip-global-fetch",
+        action="store_true",
+        default=False,
+        help="Skip macro/news/sentiment global fetch.",
+    )
     return parser
 
 
@@ -293,9 +299,11 @@ async def async_main() -> None:
     run_date = date.fromisoformat(args.date) if args.date else date.today()
     stages = [args.stage] if args.stage else None
 
-    # Fetch global data (macro, news, sentiment) once before per-asset processing
-    async with async_session_factory() as global_session:
-        await fetch_global_data(global_session)
+    # Fetch global data (macro, news, sentiment) only when the fetch stage will run
+    running_fetch = (stages is None or "fetch" in stages) and not args.skip_global_fetch
+    if running_fetch:
+        async with async_session_factory() as global_session:
+            await fetch_global_data(global_session)
 
     runner = PipelineRunner(async_session_factory)
     stage_funcs = {

@@ -112,7 +112,14 @@ class PipelineRunner:
         log = self._log.bind(stage=stage, run_date=str(run_date))
 
         async with self._session_factory() as session:
-            # Check for existing run
+            # Active assets must be loaded before deciding whether to short-circuit:
+            # a prior run for this date may have completed against a smaller (or empty)
+            # watchlist, and assets added since then need PipelineAssetRun rows.
+            assets_result = await session.execute(
+                select(Asset).where(Asset.is_active.is_(True))
+            )
+            active_assets = assets_result.scalars().all()
+
             existing = await session.execute(
                 select(PipelineRun).where(
                     PipelineRun.run_date == run_date,
@@ -121,10 +128,50 @@ class PipelineRunner:
             )
             pipeline_run = existing.scalar_one_or_none()
 
-            if pipeline_run is not None and pipeline_run.status == "completed" and not rerun_failed:
+            new_assets_added = False
+            if pipeline_run is None:
+                pipeline_run = PipelineRun(
+                    run_date=run_date,
+                    stage=stage,
+                    status="running",
+                    started_at=datetime.now(UTC),
+                )
+                session.add(pipeline_run)
+                await session.flush()
+
+                for asset in active_assets:
+                    session.add(PipelineAssetRun(
+                        run_id=pipeline_run.id,
+                        asset_id=asset.id,
+                        status="pending",
+                    ))
+                new_assets_added = bool(active_assets)
+                await session.commit()
+            else:
+                existing_ids_result = await session.execute(
+                    select(PipelineAssetRun.asset_id).where(
+                        PipelineAssetRun.run_id == pipeline_run.id,
+                    )
+                )
+                existing_asset_ids = {row[0] for row in existing_ids_result.all()}
+                for asset in active_assets:
+                    if asset.id not in existing_asset_ids:
+                        session.add(PipelineAssetRun(
+                            run_id=pipeline_run.id,
+                            asset_id=asset.id,
+                            status="pending",
+                        ))
+                        new_assets_added = True
+                if new_assets_added:
+                    await session.commit()
+
+            if (
+                pipeline_run.status == "completed"
+                and not rerun_failed
+                and not new_assets_added
+            ):
                 log.info("stage_already_completed")
                 elapsed = time.monotonic() - start_time
-                # Count existing asset runs for the result
                 asset_runs_result = await session.execute(
                     select(PipelineAssetRun).where(
                         PipelineAssetRun.run_id == pipeline_run.id,
@@ -143,39 +190,11 @@ class PipelineRunner:
                     duration_seconds=elapsed,
                 )
 
-            # Get active assets
-            assets_result = await session.execute(
-                select(Asset).where(Asset.is_active.is_(True))
-            )
-            active_assets = assets_result.scalars().all()
-
-            if pipeline_run is None:
-                # Create new run
-                pipeline_run = PipelineRun(
-                    run_date=run_date,
-                    stage=stage,
-                    status="running",
-                    started_at=datetime.now(UTC),
-                )
-                session.add(pipeline_run)
-                await session.flush()
-
-                # Create asset run records
-                for asset in active_assets:
-                    asset_run = PipelineAssetRun(
-                        run_id=pipeline_run.id,
-                        asset_id=asset.id,
-                        status="pending",
-                    )
-                    session.add(asset_run)
-                await session.commit()
-            else:
-                # Existing run (partial/failed) - reuse
+            if pipeline_run.status != "running":
                 pipeline_run.status = "running"
                 pipeline_run.started_at = datetime.now(UTC)
                 await session.commit()
 
-            # Determine which assets to process
             asset_runs_result = await session.execute(
                 select(PipelineAssetRun).where(
                     PipelineAssetRun.run_id == pipeline_run.id,

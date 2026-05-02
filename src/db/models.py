@@ -550,6 +550,7 @@ SEED_ASSETS: list[dict[str, str | None]] = [
         "asset_type": "stock",
         "exchange": "IDX",
         "yfinance_symbol": "BBCA.JK",
+        "is_active": True,
     },
     {
         "symbol": "BBRI",
@@ -557,6 +558,7 @@ SEED_ASSETS: list[dict[str, str | None]] = [
         "asset_type": "stock",
         "exchange": "IDX",
         "yfinance_symbol": "BBRI.JK",
+        "is_active": True,
     },
     {
         "symbol": "TLKM",
@@ -564,6 +566,7 @@ SEED_ASSETS: list[dict[str, str | None]] = [
         "asset_type": "stock",
         "exchange": "IDX",
         "yfinance_symbol": "TLKM.JK",
+        "is_active": True,
     },
     # Crypto
     {
@@ -572,6 +575,7 @@ SEED_ASSETS: list[dict[str, str | None]] = [
         "asset_type": "crypto",
         "exchange": "binance",
         "ccxt_symbol": "BTC/USDT",
+        "is_active": True,
     },
     {
         "symbol": "ETH",
@@ -579,6 +583,7 @@ SEED_ASSETS: list[dict[str, str | None]] = [
         "asset_type": "crypto",
         "exchange": "binance",
         "ccxt_symbol": "ETH/USDT",
+        "is_active": True,
     },
     {
         "symbol": "SOL",
@@ -586,5 +591,6 @@ SEED_ASSETS: list[dict[str, str | None]] = [
         "asset_type": "crypto",
         "exchange": "binance",
         "ccxt_symbol": "SOL/USDT",
+        "is_active": True,
     },
 ]

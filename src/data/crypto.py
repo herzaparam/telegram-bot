@@ -10,6 +10,7 @@ from datetime import UTC, date, datetime, time
 from typing import Any
 
 import ccxt
+import ccxt.async_support  # noqa: F401  registers the async_support submodule
 import httpx
 import structlog
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
@@ -53,7 +54,7 @@ class CryptoFetcher(BaseFetcher):
         Returns:
             List of validated OHLCVRow instances.
         """
-        exchange = ccxt.binance({"enableRateLimit": True})
+        exchange = ccxt.async_support.binance({"enableRateLimit": True})
         try:
             rows = await self._fetch_ccxt(exchange, asset_id, symbol, start, end, "1d")
             result = validate_rows(rows, asset_symbol=symbol)
@@ -86,7 +87,7 @@ class CryptoFetcher(BaseFetcher):
         Returns:
             List of validated OHLCVRow instances with source='ccxt'.
         """
-        exchange = ccxt.binance({"enableRateLimit": True})
+        exchange = ccxt.async_support.binance({"enableRateLimit": True})
         try:
             rows = await self._fetch_ccxt(exchange, asset_id, symbol, start, end, "1h")
             result = validate_rows(rows, asset_symbol=symbol)
