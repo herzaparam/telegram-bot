@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node '/Users/herza/rapier/trade-agent/.codex/hooks/gsd-prompt-guard.js'",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit|Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node '/Users/herza/rapier/trade-agent/.codex/hooks/gsd-context-monitor.js'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node '/Users/herza/rapier/trade-agent/.codex/hooks/gsd-check-update.js'"
+          }
+        ]
+      }
+    ]
+  }
+}
