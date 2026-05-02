@@ -44,7 +44,7 @@ services:
       timeout: 10s
       retries: 3
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
 
   pipeline:
     image: ${IMAGE:-ghcr.io/herzaparam/telegram-bot:latest}
@@ -84,13 +84,14 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL}
       - TELEGRAM_MONITORING_BOT_TOKEN=${TELEGRAM_MONITORING_BOT_TOKEN}
       - TELEGRAM_MONITORING_CHAT_ID=${TELEGRAM_MONITORING_CHAT_ID}
     volumes:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     deploy:
       resources:
         limits:
