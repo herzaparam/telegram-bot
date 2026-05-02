@@ -1,6 +1,8 @@
 services:
   db:
     image: timescale/timescaledb:2.18.0-pg16
+    ports:
+      - "127.0.0.1:5432:5432"
     deploy:
       resources:
         limits:
@@ -10,6 +12,7 @@ services:
           memory: 128M
     volumes:
       - pgdata:/var/lib/postgresql/data
+    env_file: .env
     environment:
       POSTGRES_DB: trade_agent
       POSTGRES_USER: trade
