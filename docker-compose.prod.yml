@@ -64,6 +64,7 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.53.5
+    profiles: ["monitoring"]
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
@@ -81,6 +82,7 @@ services:
 
   grafana:
     image: grafana/grafana:12.4.0
+    profiles: ["monitoring"]
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
@@ -103,6 +105,7 @@ services:
 
   node_exporter:
     image: prom/node-exporter:v1.9.1
+    profiles: ["monitoring"]
     command:
       - '--path.rootfs=/host'
       - '--web.listen-address=127.0.0.1:9100'
@@ -119,6 +122,7 @@ services:
 
   pushgateway:
     image: prom/pushgateway:v1.11.2
+    profiles: ["monitoring", "pipeline"]
     deploy:
       resources:
         limits:
