@@ -1,11 +1,31 @@
 """Async database engine and session factory."""
 
 from collections.abc import AsyncGenerator
+from typing import Any
+from urllib.parse import urlsplit
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import settings
+
+
+def asyncpg_connect_kwargs() -> dict[str, Any]:
+    """Parse settings.database_url into kwargs for asyncpg.connect.
+
+    Why: asyncpg's URI parser mishandles passwords containing characters like
+    '/', causing 'invalid literal for int()' when it tries to parse the rest of
+    the URL as a port. urlsplit decodes percent-encoded chars correctly, and
+    asyncpg's kwargs interface bypasses the URI parser entirely.
+    """
+    parts = urlsplit(settings.database_url.replace("postgresql+asyncpg://", "postgresql://"))
+    return {
+        "host": parts.hostname,
+        "port": parts.port,
+        "user": parts.username,
+        "password": parts.password,
+        "database": parts.path.lstrip("/") or None,
+    }
 
 engine = create_async_engine(
     settings.database_url,

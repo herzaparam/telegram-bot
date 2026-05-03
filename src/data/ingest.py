@@ -25,6 +25,7 @@ from src.data.idx_doc_fetcher import fetch_idx_docs
 from src.data.idx_stocks import IDXStockFetcher
 from src.data.staleness import check_staleness
 from src.data.validation import validate_rows
+from src.db.database import asyncpg_connect_kwargs
 from src.db.models import Asset, BackoffState, FinancialData, FinancialDoc
 from src.db.price_repo import get_latest_date, upsert_prices
 from src.llm.doc_parser import parse_financial_doc
@@ -294,8 +295,7 @@ async def ingest_stage(session: AsyncSession, asset: Asset) -> None:
         await asyncio.sleep(delay_seconds)
 
     # Connect to DB via raw asyncpg for hot-path operations
-    raw_url = settings.database_url.replace("postgresql+asyncpg://", "postgresql://")
-    conn = await asyncpg.connect(raw_url)
+    conn = await asyncpg.connect(**asyncpg_connect_kwargs())
 
     try:
         # Get latest stored date

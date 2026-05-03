@@ -17,11 +17,11 @@ from typing import Any
 import asyncpg
 import structlog
 
-from src.config import settings
 from src.data.base import BaseFetcher
 from src.data.crypto import CryptoFetcher
 from src.data.idx_stocks import IDXStockFetcher
 from src.data.validation import validate_rows
+from src.db.database import asyncpg_connect_kwargs
 from src.db.price_repo import upsert_prices
 
 logger = structlog.get_logger(__name__)
@@ -125,8 +125,7 @@ async def run_backfill(
         asset_type: Filter by 'stock', 'crypto', or None for all.
         asset_symbols: Filter by specific symbols, or None for all active.
     """
-    raw_url = settings.database_url.replace("postgresql+asyncpg://", "postgresql://")
-    conn = await asyncpg.connect(raw_url)
+    conn = await asyncpg.connect(**asyncpg_connect_kwargs())
 
     try:
         # Query active assets
