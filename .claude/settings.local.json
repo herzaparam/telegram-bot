@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "Bash(pip3 index:*)"
+      "Bash(pip3 index:*)",
+      "WebFetch(domain:docs.coingecko.com)"
     ]
   }
 }

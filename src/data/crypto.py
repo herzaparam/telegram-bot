@@ -29,6 +29,21 @@ COINGECKO_ID_MAP: dict[str, str] = {
 
 COINGECKO_BASE_URL = "https://api.coingecko.com/api/v3"
 
+# Free CoinGecko /coins/{id}/ohlc only accepts these `days` values.
+# https://docs.coingecko.com/reference/coins-id-ohlc
+COINGECKO_OHLC_DAYS_BUCKETS: tuple[int, ...] = (1, 7, 14, 30, 90, 180, 365)
+
+
+def _coingecko_days_param(days: int) -> str:
+    """Return the smallest allowed `days` bucket that covers `days`.
+
+    Falls back to 'max' when more than 365 days are requested.
+    """
+    for bucket in COINGECKO_OHLC_DAYS_BUCKETS:
+        if days <= bucket:
+            return str(bucket)
+    return "max"
+
 
 class CryptoFetcher(BaseFetcher):
     """Fetches crypto OHLCV via ccxt/Binance with CoinGecko fallback."""
@@ -178,26 +193,33 @@ class CryptoFetcher(BaseFetcher):
             raise ValueError(f"No CoinGecko mapping for symbol: {symbol}")
 
         days = (end - start).days + 1
+        days_param = _coingecko_days_param(days)
 
         self._log.info(
             "coingecko_fallback",
             symbol=symbol,
             coin_id=coin_id,
-            days=days,
+            requested_days=days,
+            days_param=days_param,
         )
 
         async with httpx.AsyncClient() as client:
             resp = await client.get(
                 f"{COINGECKO_BASE_URL}/coins/{coin_id}/ohlc",
-                params={"vs_currency": "usd", "days": str(days)},
+                params={"vs_currency": "usd", "days": days_param},
                 timeout=30.0,
             )
             resp.raise_for_status()
             data = resp.json()
 
+        start_ms = datetime.combine(start, time.min, tzinfo=UTC).timestamp() * 1000
+        end_ms = datetime.combine(end, time.max, tzinfo=UTC).timestamp() * 1000
+
         rows: list[OHLCVRow] = []
         for candle in data:
             ts_ms, o, h, l, c = candle  # noqa: E741
+            if ts_ms < start_ms or ts_ms > end_ms:
+                continue
             dt = datetime.fromtimestamp(ts_ms / 1000, tz=UTC)
             rows.append(
                 OHLCVRow(
