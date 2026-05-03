@@ -20,6 +20,17 @@ def setup_logging(log_level: str = "INFO", log_format: str = "json") -> None:
         structlog.processors.StackInfoRenderer(),
     ]
 
+    if log_level.upper() == "DEBUG":
+        shared_processors.append(
+            structlog.processors.CallsiteParameterAdder(
+                parameters=[
+                    structlog.processors.CallsiteParameter.FILENAME,
+                    structlog.processors.CallsiteParameter.LINENO,
+                    structlog.processors.CallsiteParameter.FUNC_NAME,
+                ],
+            ),
+        )
+
     if log_format == "json":
         renderer: structlog.types.Processor = structlog.processors.JSONRenderer()
     else:
