@@ -1,0 +1,50 @@
+# VCS
+.git
+.gitignore
+.github
+
+# Python
+__pycache__
+*.py[cod]
+*.egg
+*.egg-info
+dist
+build
+.venv
+.python-version
+
+# Tooling caches
+.mypy_cache
+.pytest_cache
+.ruff_cache
+
+# Editor / IDE
+.vscode
+.idea
+
+# Local env (never bake secrets into the image)
+.env
+.env.*
+!.env.example
+
+# Agent / planning artifacts
+.agents
+.claude
+.codex
+.planning
+plan
+AGENTS.md
+CLAUDE.md
+
+# Tests & dev compose (not needed at runtime)
+tests
+docker-compose.yml
+docker-compose.prod.yml
+Dockerfile
+.dockerignore
+.pre-commit-config.yaml
+.ruff.toml
+
+# Local data & monitoring configs (mounted at runtime, not baked in)
+data
+monitoring
