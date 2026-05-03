@@ -106,6 +106,7 @@ def upgrade() -> None:
         sa.column("exchange", sa.String),
         sa.column("yfinance_symbol", sa.String),
         sa.column("ccxt_symbol", sa.String),
+        sa.column("is_active", sa.Boolean),
     )
     op.bulk_insert(
         assets_table,
@@ -117,6 +118,7 @@ def upgrade() -> None:
                 "exchange": "IDX",
                 "yfinance_symbol": "BBCA.JK",
                 "ccxt_symbol": None,
+                "is_active": True,
             },
             {
                 "symbol": "BBRI",
@@ -125,6 +127,7 @@ def upgrade() -> None:
                 "exchange": "IDX",
                 "yfinance_symbol": "BBRI.JK",
                 "ccxt_symbol": None,
+                "is_active": True,
             },
             {
                 "symbol": "TLKM",
@@ -133,6 +136,7 @@ def upgrade() -> None:
                 "exchange": "IDX",
                 "yfinance_symbol": "TLKM.JK",
                 "ccxt_symbol": None,
+                "is_active": True,
             },
             {
                 "symbol": "BTC",
@@ -141,6 +145,7 @@ def upgrade() -> None:
                 "exchange": "binance",
                 "yfinance_symbol": None,
                 "ccxt_symbol": "BTC/USDT",
+                "is_active": True,
             },
             {
                 "symbol": "ETH",
@@ -149,6 +154,7 @@ def upgrade() -> None:
                 "exchange": "binance",
                 "yfinance_symbol": None,
                 "ccxt_symbol": "ETH/USDT",
+                "is_active": True,
             },
             {
                 "symbol": "SOL",
@@ -157,6 +163,7 @@ def upgrade() -> None:
                 "exchange": "binance",
                 "yfinance_symbol": None,
                 "ccxt_symbol": "SOL/USDT",
+                "is_active": True,
             },
         ],
     )
