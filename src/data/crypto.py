@@ -37,12 +37,14 @@ COINGECKO_OHLC_DAYS_BUCKETS: tuple[int, ...] = (1, 7, 14, 30, 90, 180, 365)
 def _coingecko_days_param(days: int) -> str:
     """Return the smallest allowed `days` bucket that covers `days`.
 
-    Falls back to 'max' when more than 365 days are requested.
+    Caps at 365 — the free public API rejects 'max' with error 10012
+    ("Public API users are limited to querying historical data within
+    the past 365 days") so anything longer is clamped.
     """
     for bucket in COINGECKO_OHLC_DAYS_BUCKETS:
         if days <= bucket:
             return str(bucket)
-    return "max"
+    return str(COINGECKO_OHLC_DAYS_BUCKETS[-1])
 
 
 class CryptoFetcher(BaseFetcher):
