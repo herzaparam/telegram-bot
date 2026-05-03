@@ -28,7 +28,7 @@ services:
   bot:
     build:
       context: .
-    image: trade-agent:latest
+    image: trade-agent:${IMAGE_TAG:-latest}
     command: uv run python -m src.bot.main
     deploy:
       resources:
@@ -51,7 +51,7 @@ services:
   pipeline:
     build:
       context: .
-    image: trade-agent:latest
+    image: trade-agent:${IMAGE_TAG:-latest}
     command: uv run python -m src.pipeline.main
     deploy:
       resources:
