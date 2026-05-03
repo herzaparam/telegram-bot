@@ -2,7 +2,7 @@
 
 from collections.abc import AsyncGenerator
 from typing import Any
-from urllib.parse import urlsplit
+from urllib.parse import unquote
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -13,18 +13,45 @@ from src.config import settings
 def asyncpg_connect_kwargs() -> dict[str, Any]:
     """Parse settings.database_url into kwargs for asyncpg.connect.
 
-    Why: asyncpg's URI parser mishandles passwords containing characters like
-    '/', causing 'invalid literal for int()' when it tries to parse the rest of
-    the URL as a port. urlsplit decodes percent-encoded chars correctly, and
-    asyncpg's kwargs interface bypasses the URI parser entirely.
+    Why: both asyncpg's URI parser and urllib.parse.urlsplit choke on passwords
+    containing '/', '@', or ':' — they end up reading the password as the port.
+    This parser is tolerant: it splits on the LAST '@' (hosts can't contain '@')
+    and the FIRST ':' inside userinfo (usernames can't contain ':'), so the
+    password can hold any of those chars unencoded.
     """
-    parts = urlsplit(settings.database_url.replace("postgresql+asyncpg://", "postgresql://"))
+    raw = settings.database_url.replace("postgresql+asyncpg://", "postgresql://")
+    if not raw.startswith("postgresql://"):
+        raise ValueError(f"unsupported database URL scheme: {raw!r}")
+    rest = raw[len("postgresql://") :]
+
+    if "@" in rest:
+        userinfo, hostpart = rest.rsplit("@", 1)
+    else:
+        userinfo, hostpart = "", rest
+
+    if ":" in userinfo:
+        user, password = userinfo.split(":", 1)
+    else:
+        user, password = userinfo, ""
+
+    if "/" in hostpart:
+        hostport, database = hostpart.split("/", 1)
+        database = database.split("?", 1)[0]
+    else:
+        hostport, database = hostpart, ""
+
+    if ":" in hostport:
+        host, port_s = hostport.rsplit(":", 1)
+        port = int(port_s) if port_s else None
+    else:
+        host, port = hostport, None
+
     return {
-        "host": parts.hostname,
-        "port": parts.port,
-        "user": parts.username,
-        "password": parts.password,
-        "database": parts.path.lstrip("/") or None,
+        "host": host or None,
+        "port": port,
+        "user": unquote(user) if user else None,
+        "password": unquote(password) if password else None,
+        "database": unquote(database) if database else None,
     }
 
 engine = create_async_engine(
