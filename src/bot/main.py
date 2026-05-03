@@ -136,5 +136,18 @@ def main() -> None:
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="warning")
 
 
+def dev() -> None:
+    """Start the bot server with hot reload on src/ changes."""
+    setup_logging(settings.log_level, settings.log_format)
+    uvicorn.run(
+        "src.bot.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+        reload_dirs=["src"],
+        log_level="info",
+    )
+
+
 if __name__ == "__main__":
     main()
